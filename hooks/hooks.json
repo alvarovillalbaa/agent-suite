@@ -1,0 +1,158 @@
+{
+  "PermissionRequest": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/guard-destructive-commands.sh",
+          "timeout": 5,
+          "description": "Deny destructive shell commands by default"
+        }
+      ]
+    }
+  ],
+  "PreToolUse": [
+    {
+      "matcher": "call_mcp_tool",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Confirm this MCP call is for a legitimate HR workflow (intake, review, lookup, hiring, performance, offboard), not data exfiltration or bulk export to an unknown destination. If in doubt, do not block but note the concern.",
+          "timeout": 5
+        }
+      ]
+    },
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-legal-language.sh \"$FILE\"",
+          "timeout": 10,
+          "description": "Validate legal language in PIP, feedback, and performance documents"
+        },
+        {
+          "type": "command",
+          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/pii-guard.sh",
+          "timeout": 10,
+          "description": "Block writes that appear to contain PII or sensitive HR data"
+        }
+      ]
+    },
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/guard-destructive-commands.sh",
+          "timeout": 5,
+          "description": "Deny destructive shell commands by default"
+        }
+      ]
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/log-metrics.sh \"$COMMAND\"",
+          "timeout": 5,
+          "description": "Log when team metrics are analyzed"
+        }
+      ]
+    },
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-json.sh",
+          "timeout": 15,
+          "description": "Validate JSON output and schema when available"
+        },
+        {
+          "type": "prompt",
+          "prompt": "If the file just written or edited is an intake (intake-*.json), an eval or report (candidate-report, *report*.md, burnout-risk-assessment, performance-diagnosis-report), or a PIP/feedback doc (*PIP*.md, *pip*.md), suggest the next step in one line: e.g. run /clous:eval, /clous:review-packet, /clous:burnout, /clous:perf-diagnose, or share with recruiter/HR.",
+          "timeout": 5
+        }
+      ]
+    }
+  ],
+  "UserPromptSubmit": [
+    {
+      "matcher": ".*",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Classify intent (hiring, performance, onboarding, org planning, people ops, compliance). If it matches, suggest the most relevant /clous:* commands or agents from the clous-hreng plugin.",
+          "timeout": 5
+        }
+      ]
+    }
+  ],
+  "SessionStart": [
+    {
+      "matcher": ".*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/session-start.sh",
+          "timeout": 5,
+          "description": "Load team config and house rules if present"
+        }
+      ]
+    }
+  ],
+  "PreCompact": [
+    {
+      "matcher": ".*",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Before compaction, summarize decisions, constraints, open questions, and files touched in concise bullets.",
+          "timeout": 5
+        }
+      ]
+    }
+  ],
+  "Stop": [
+    {
+      "matcher": ".*",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "If the response includes legal or termination guidance, add a brief 'not legal advice' note and a jurisdiction caveat. If the response recommended a PIP or termination, remind the user to involve HR/legal before any action.",
+          "timeout": 5
+        }
+      ]
+    }
+  ],
+  "SubagentStop": [
+    {
+      "matcher": ".*",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "When a subagent (hreng-hiring, hreng-performance, hreng-org) has just finished, append a one-liner to the session audit: 'Subagent X produced Y' with a brief deliverable summary.",
+          "timeout": 5
+        }
+      ]
+    }
+  ],
+  "SessionEnd": [
+    {
+      "matcher": ".*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/session-end-log.sh",
+          "timeout": 5,
+          "description": "Append a session audit entry"
+        }
+      ]
+    }
+  ]
+}
