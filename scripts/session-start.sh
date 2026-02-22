@@ -5,6 +5,7 @@ set -euo pipefail
 
 ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 FILES=(
+  "$ROOT/.claude/agent-suite.local.md"
   "$ROOT/.claude/clous-hreng.local.md"
   "$ROOT/.claude/house-rules.md"
 )

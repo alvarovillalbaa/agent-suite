@@ -1,9 +1,18 @@
-#!/bin/bash
-# Validate plugin structure and components
+#!/usr/bin/env bash
+# Validate plugin structure and components.
+# Requires: .claude-plugin/plugin.json, skills/*/SKILL.md with name + description.
+# Optional per skill: references.md, templates/, examples/.
 
 set -euo pipefail
 
-echo "🔍 Validating Clous HR Engineering Plugin"
+PLUGIN_NAME="Agent Suite Plugin"
+if [ -f ".claude-plugin/plugin.json" ]; then
+  if command -v jq >/dev/null 2>&1; then
+    PLUGIN_NAME=$(jq -r '.name // "Agent Suite Plugin"' .claude-plugin/plugin.json 2>/dev/null)
+  fi
+fi
+
+echo "🔍 Validating $PLUGIN_NAME"
 echo ""
 
 ERRORS=0
@@ -11,88 +20,69 @@ WARNINGS=0
 
 # Check plugin.json exists
 if [ -f ".claude-plugin/plugin.json" ]; then
-    echo "✅ Plugin manifest found"
+  echo "✅ Plugin manifest found"
 else
-    echo "❌ Missing .claude-plugin/plugin.json"
-    ERRORS=$((ERRORS + 1))
+  echo "❌ Missing .claude-plugin/plugin.json"
+  ERRORS=$((ERRORS + 1))
 fi
 
-# Check skills
-SKILL_COUNT=$(find skills -name "SKILL.md" | wc -l | tr -d ' ')
+# Check skills (only folders with SKILL.md count)
+SKILL_COUNT=0
+for skill in skills/*/; do
+  [ -d "$skill" ] || continue
+  [ -f "${skill}SKILL.md" ] && SKILL_COUNT=$((SKILL_COUNT + 1))
+done
 echo "✅ Found $SKILL_COUNT skills"
 
-if [ "$SKILL_COUNT" -ne 10 ]; then
-    echo "⚠️  Expected 10 skills, found $SKILL_COUNT"
-    WARNINGS=$((WARNINGS + 1))
-fi
-
 # Check commands
-CMD_COUNT=$(find commands -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+CMD_COUNT=$(find commands -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 echo "✅ Found $CMD_COUNT commands"
 
 # Check agents
-AGENT_COUNT=$(find agents -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+AGENT_COUNT=$(find agents -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 echo "✅ Found $AGENT_COUNT agents"
-
-if [ "$AGENT_COUNT" -ne 3 ]; then
-    echo "⚠️  Expected 3 agents, found $AGENT_COUNT"
-    WARNINGS=$((WARNINGS + 1))
-fi
 
 # Check hooks
 if [ -f "hooks/hooks.json" ]; then
-    echo "✅ Hooks configuration found"
+  echo "✅ Hooks configuration found"
 else
-    echo "⚠️  No hooks configuration"
-    WARNINGS=$((WARNINGS + 1))
+  echo "⚠️  No hooks configuration"
+  WARNINGS=$((WARNINGS + 1))
 fi
 
-# Check for SKILL.md frontmatter and skeleton
-
+# Check skill structure: only SKILL.md with name + description required
 echo ""
 echo "📋 Checking skill structure..."
-for skill in skills/*; do
-    if [ ! -d "$skill" ]; then
-        continue
-    fi
-    name=$(basename "$skill")
+for skill in skills/*/; do
+  [ -d "$skill" ] || continue
+  name=$(basename "$skill")
 
-    if [[ "$name" != hreng-* ]]; then
-        echo "  ❌ Skill does not use hreng- prefix: $name"
-        ERRORS=$((ERRORS + 1))
-    fi
+  if [ ! -f "$skill/SKILL.md" ]; then
+    echo "  ❌ Missing SKILL.md: $name"
+    ERRORS=$((ERRORS + 1))
+    continue
+  fi
 
-    if [ -f "$skill/SKILL.md" ] && grep -q "^name:" "$skill/SKILL.md" && grep -q "^description:" "$skill/SKILL.md"; then
-        echo "  ✅ $name"
-    else
-        echo "  ❌ Missing SKILL.md frontmatter: $name"
-        ERRORS=$((ERRORS + 1))
-    fi
+  if grep -q "^name:" "$skill/SKILL.md" && grep -q "^description:" "$skill/SKILL.md"; then
+    echo "  ✅ $name"
+  else
+    echo "  ❌ Missing name/description frontmatter in SKILL.md: $name"
+    ERRORS=$((ERRORS + 1))
+  fi
 
-    if [ ! -f "$skill/references.md" ]; then
-        echo "  ❌ Missing references.md: $name"
-        ERRORS=$((ERRORS + 1))
-    fi
-
-    if [ ! -d "$skill/templates" ] || [ -z "$(ls -A "$skill/templates" 2>/dev/null)" ]; then
-        echo "  ❌ Missing or empty templates/: $name"
-        ERRORS=$((ERRORS + 1))
-    fi
-
-    if [ ! -d "$skill/examples" ] || [ -z "$(ls -A "$skill/examples" 2>/dev/null)" ]; then
-        echo "  ❌ Missing or empty examples/: $name"
-        ERRORS=$((ERRORS + 1))
-    fi
-
+  # Optional: references, templates, examples (inform only, no error)
+  [ -f "$skill/references.md" ] || [ -d "$skill/references" ] || true
+  [ -d "$skill/templates" ] && [ -n "$(ls -A "$skill/templates" 2>/dev/null)" ] || true
+  [ -d "$skill/examples" ] && [ -n "$(ls -A "$skill/examples" 2>/dev/null)" ] || true
 done
 
 # Summary
 echo ""
 echo "═══════════════════════════════════════"
 if [ $ERRORS -eq 0 ]; then
-    echo "✅ Validation passed ($WARNINGS warnings)"
-    exit 0
+  echo "✅ Validation passed ($WARNINGS warnings)"
+  exit 0
 else
-    echo "❌ Validation failed ($ERRORS errors, $WARNINGS warnings)"
-    exit 1
+  echo "❌ Validation failed ($ERRORS errors, $WARNINGS warnings)"
+  exit 1
 fi

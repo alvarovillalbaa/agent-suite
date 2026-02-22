@@ -1,10 +1,22 @@
-If you want other teams to install your HR “skills” with `npx skills add`, treat your repo as a **skills package**: a set of **small, atomic, installable folders**, each with a `SKILL.md` that follows the Agent Skills spec (YAML frontmatter + instructions). ([Agent Skills][1])
+If you want other teams to install your HR “skills” with `npx skills add`, treat your repo as a **skills package**: a set of **small, atomic, installable folders**, each with a `SKILL.md` that follows the Agent Skills spec (YAML frontmatter + instructions). ([Agent Skills][1]) This repo (agent-suite) is an example of a multi-skill, multi-agent package with commands and hooks.
 
 ## 1) The simplest open-source shape (works with `npx skills add`)
 
 **One repo = many skills.** This matches how the ecosystem is evolving (e.g., Vercel’s skill collections). ([GitHub][2])
 
-Recommended layout:
+Recommended layout (canonical per-skill structure used in this repo):
+
+```
+skills/<skill-name>/
+├── SKILL.md              # Main instructions (see SKILL.md template below)
+├── references.md         # Short index: "Use references/ for …"
+├── references/           # Optional: legal, domain, methodology
+├── examples/             # Optional: example inputs/outputs
+├── templates/            # Optional: JSON schemas, doc templates
+└── scripts/              # Optional: validation/helper scripts
+```
+
+Legacy/minimal layout (also valid):
 
 ```
 clousai/hr-agent-skills/
@@ -15,13 +27,10 @@ clousai/hr-agent-skills/
       references/
       assets/
       templates/
-    interview-scorecards/
-      SKILL.md
-      templates/
-    performance-calibration/
-      SKILL.md
-      references/
+    ...
 ```
+
+**SKILL.md content template (comprehensive):** Frontmatter: `name`, `description`, `version`, `license`, `compatibility`. Sections: Overview → When to Use → Inputs Required → Outputs Produced (with schema/template path) → Tooling rule → Core Process (numbered steps) → Using Supporting Resources (Templates, References, Scripts) → Example Workflow → Next Steps After [skill] → Validation checklist → Legal/caveats (if relevant).
 
 Why this works:
 
