@@ -1,16 +1,16 @@
 ---
 name: slides
-description: Create an animation-rich HTML slide deck from scratch or from a brief using the slides-deck-generation skill.
+description: Create a code-based or HTML slide deck from scratch, a brief, or a PPTX using the code-slides skill.
 argument-hint: "[topic or title]"
 allowed-tools: [Read, Write, AskUserQuestion, Skill]
 ---
 
-Use skill: **slides-deck-generation** — `skills/slides-deck-generation/SKILL.md`. Creates a zero-dependency, viewport-fitting HTML presentation.
+Use skill: **code-slides** — `skills/code-slides/SKILL.md`. Creates viewport-fitting HTML or code-based presentations, including PPTX-to-web rebuilds.
 
-1. **Gather scope** – Ask the user for topic, title, number of slides, and preferred style (or suggest from STYLE_PRESETS.md) if not in the argument.
-2. **Read the skill** – Load `skills/slides-deck-generation/SKILL.md` and respect **viewport fitting** and content limits (no scrolling within slides).
-3. **Plan** – Optionally produce a short deck plan (slide titles and content density) using the skill’s templates.
-4. **Implement** – Generate a single HTML file (or linked assets) with inline CSS/JS; use the mandatory base CSS from the skill for viewport fitting.
-5. **Deliver** – Output the slide deck file and how to open it in a browser.
+1. **Gather scope** – Ask for topic, title, number of slides, delivery format, and whether the user wants direct preset selection or style previews if not already provided.
+2. **Read the skill** – Load `skills/code-slides/SKILL.md` and respect viewport fitting and content density limits.
+3. **Plan** – Optionally produce a short deck plan using `skills/code-slides/templates/`.
+4. **Implement** – Generate the presentation in the chosen mode: single-file HTML, multi-file HTML, React/TS, or PPTX conversion output.
+5. **Deliver** – Output the slide deck files and how to open or run them.
 
 If the user only gave a topic, ask for title and approximate slide count before generating.

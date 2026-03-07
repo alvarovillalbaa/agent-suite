@@ -23,7 +23,7 @@ Maps user intent to the most relevant **command**, **agent**, or **skill** in ag
 | User intent | Recommended command | Agent | Single skill (if one workflow only) |
 |-------------|---------------------|-------|------------------------------------|
 | **Content** (brief, blog, LinkedIn, X, syndication) | `/agent-suite:content-brief` | content-manager | briefings, blog-articles, linkedin-articles, x-articles, content-syndication |
-| **Slides** (presentation, deck, pitch) | `/agent-suite:slides` | — | slides-deck-generation |
+| **Slides** (presentation, deck, pitch) | `/agent-suite:slides` | — | code-slides |
 | **Video** (programmatic, Remotion) | `/agent-suite:video` | — | video-generation |
 | **Fundraising** (investor messaging, materials, process) | `/agent-suite:fundraise` | financial-manager | fundraising |
 | **Finance** (reconciliation, modeling, fundraise) | `/agent-suite:fundraise` or — | financial-manager | accounting-reconciliation, financial-modeling, fundraising |

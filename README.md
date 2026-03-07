@@ -20,7 +20,7 @@ Productivity and business toolkit: content, finance, sales, and social media wor
 | linkedin-engagement | LinkedIn comments and engagement |
 | message-outreach | Outreach and sales messaging |
 | prospect-research | Prospect and account research |
-| slides-deck-generation | Animation-rich HTML slide decks |
+| code-slides | Code-based slide decks, HTML presentations, and PPT-to-web conversion |
 | video-generation | Programmatic video (Remotion-style) |
 | x-articles | X/Twitter threads and articles |
 | email-inbox-management | Email triage and reply drafting (placeholder) |
@@ -34,7 +34,7 @@ Commands are namespaced by plugin name: use `/agent-suite:<command>` in Claude C
 | Command | Skill(s) | Description |
 |---------|----------|-------------|
 | `video` | video-generation | Generate video from brief (Remotion) |
-| `slides` | slides-deck-generation | Create HTML slide deck from topic/brief |
+| `slides` | code-slides | Create HTML or code-based slide deck from topic/brief |
 | `fundraise` | fundraising | Investor messaging, materials upgrade, process diagnostics |
 | `content-brief` | briefings (+ content flow) | Content/campaign brief; optionally draft blog/LinkedIn/X |
 | `outreach` | message-outreach, prospect-research | Research brief and optional LinkedIn engagement drafts |

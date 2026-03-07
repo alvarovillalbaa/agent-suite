@@ -1,6 +1,6 @@
 # code-slides skill
 
-`code-slides` is an agent skill for building responsive, code-based slide decks with remote control, configurable navigation placement, and multi-source image workflows.
+`code-slides` is an agent skill for building responsive, code-based slide decks and single-file HTML presentations with visual preset exploration, PPT-to-web conversion guidance, configurable navigation placement, and multi-source image workflows.
 
 ## Install with Vercel Skills CLI
 
@@ -29,6 +29,7 @@ Use `--dry-run` first if you want to preview target paths.
 ## Repository layout
 
 - `skills/code-slides/SKILL.md`: Skill instructions and workflow.
-- `skills/code-slides/references/`: Decision trees and implementation references.
+- `skills/code-slides/references/`: Decision trees, style presets, viewport-fit, and implementation references.
 - `skills/code-slides/scripts/`: Scaffolding, indexing, validation, and install automation.
 - `skills/code-slides/assets/templates/`: HTML and React/TS starter templates.
+- `skills/code-slides/templates/`: Planning and implementation prompt templates.

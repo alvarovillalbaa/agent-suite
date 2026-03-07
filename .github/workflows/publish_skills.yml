@@ -1,0 +1,84 @@
+name: Publish skills to public repos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/**"
+      - "public/**"
+      - "publish_targets.yml"
+      - ".github/workflows/publish_skills.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Detect changed skills
+        id: changed
+        run: |
+          set -euo pipefail
+          CHANGED=$(git diff --name-only HEAD~1 HEAD | awk -F/ '/^skills\/[^\/]+\/./ {print $2}' | sort -u | tr '\n' ' ')
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
+          echo "Changed skills: $CHANGED"
+
+      - name: Publish changed skills
+        if: steps.changed.outputs.changed != ''
+        env:
+          TOKEN: ${{ secrets.SKILL_PUBLISH_TOKEN }}
+          CHANGED: ${{ steps.changed.outputs.changed }}
+        run: |
+          set -euo pipefail
+
+          # guard: never run without token
+          [ -n "${TOKEN:-}" ] || (echo "Missing SKILL_PUBLISH_TOKEN" && exit 1)
+
+          for SKILL in $CHANGED; do
+            DEST_REPO=$(yq -r ".skills.${SKILL}.repo" publish_targets.yml)
+
+            if [ "$DEST_REPO" = "null" ] || [ -z "$DEST_REPO" ]; then
+              echo "No target repo configured for skill: $SKILL. Skipping."
+              continue
+            fi
+
+            echo "Publishing $SKILL -> $DEST_REPO"
+
+            rm -rf /tmp/mirror
+            git clone "https://x-access-token:${TOKEN}@github.com/${DEST_REPO}.git" /tmp/mirror
+
+            # wipe destination (keep .git)
+            find /tmp/mirror -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
+
+            # copy skill contents to repo root
+            rsync -av --delete "./skills/${SKILL}/" /tmp/mirror/
+
+            # add shared public files if you want
+            if [ -f ./public/LICENSE ]; then cp ./public/LICENSE /tmp/mirror/LICENSE; fi
+            if [ -f ./public/CONTRIBUTING.md ]; then cp ./public/CONTRIBUTING.md /tmp/mirror/CONTRIBUTING.md; fi
+
+            # commit & push
+            cd /tmp/mirror
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+
+            if git diff --cached --quiet; then
+              echo "No changes for $SKILL"
+              continue
+            fi
+
+            git commit -m "Publish ${SKILL} from agent-suite"
+            git push origin HEAD:main
+          done
