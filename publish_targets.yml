@@ -2,19 +2,15 @@
 skills:
   code-slides:
     repo: alvarovillalbaa/code-slides
-  # quality-assurance:
-  #   repo: alvarovillalbaa/quality-assurance
-  # cloud-management:
-  #   repo: alvarovillalbaa/cloud-management
-  # code-documentation:
-  #   repo: alvarovillalbaa/code-documentation
-  # agent-orchestration:
-  #   repo: alvarovillalbaa/agent-orchestration
-  # seo-and-geo:
-  #   repo: alvarovillalbaa/seo-and-geo
-  # agentic-driven-development:
-  #   repo: alvarovillalbaa/agentic-driven-development
-  # project-collaboration:
-  #   repo: alvarovillalbaa/project-collaboration
-  # continuous-learning:
-  #   repo: alvarovillalbaa/continuous-learning
+  quality-assurance:
+    repo: alvarovillalbaa/quality-assurance
+  cloud-management:
+    repo: alvarovillalbaa/cloud-management
+  code-documentation:
+    repo: alvarovillalbaa/code-documentation
+  seo-and-geo:
+    repo: alvarovillalbaa/seo-and-geo
+  agentic-driven-development:
+    repo: alvarovillalbaa/agentic-driven-development
+  continuous-learning:
+    repo: alvarovillalbaa/continuous-learning
