@@ -102,7 +102,7 @@ Design for mobile, tablet, and desktop.
 - `scaffold_deck.py`: Create HTML or React/TS starter deck files.
 - `index_image_sources.py`: Discover local images and external image URLs.
 - `validate_deck.py`: Validate required deck capabilities.
-- `install_local.sh`: Copy this skill into Codex/Claude/OpenClaw skill folders after `git clone`.
+- `install_local.sh`: Optional helper for copying this skill into a local skill registry after clone.
 
 ### references/
 

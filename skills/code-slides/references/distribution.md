@@ -19,21 +19,15 @@ git clone https://github.com/<owner>/<repo>.git
 cd <repo>
 ```
 
-Copy `skills/code-slides` into agent-specific skill directories.
+Copy `skills/code-slides` into the local skill registry used by your assistant runtime.
 
-- Codex: `~/.codex/skills/code-slides`
-- Claude Code: `~/.claude/skills/code-slides`
-- OpenClaw: `~/.openclaw/skills/code-slides` (older setups may use `~/.moltbot/skills/code-slides`)
-
-Use `scripts/install_local.sh` to automate local copy after clone.
+Use `scripts/install_local.sh` only when your environment supports that workflow.
 
 ## Validation
 
-Run skill validation before publishing:
+Run skill validation before publishing. Use the validator bundled with your local skill-authoring toolchain.
 
-```bash
-python3 /Users/alvipe/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/code-slides
-```
+If you maintain repo-specific install or validation commands, document them in a separate integration guide rather than here.
 
 ## Publishing Checklist
 

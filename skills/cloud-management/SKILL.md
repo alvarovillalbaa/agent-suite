@@ -1,6 +1,6 @@
 ---
 name: cloud-management
-description: Cross-cloud CLI-first cloud operations for AWS, Azure, and GCP. Use when Codex needs to identify which cloud provider or multi-cloud estate a repo uses, deploy new resources or services, wire automatic deployments, inventory and optimize infrastructure, or diagnose and repair cloud failures entirely from the terminal, with explicit approval gates for high-cost, destructive, identity-sensitive, or hard-to-reverse changes.
+description: Cross-cloud CLI-first cloud operations for AWS, Azure, and GCP. Use when the assistant needs to identify which cloud provider or multi-cloud estate a repo uses, deploy new resources or services, wire automatic deployments, inventory and optimize infrastructure, or diagnose and repair cloud failures entirely from the terminal, with explicit approval gates for high-cost, destructive, identity-sensitive, or hard-to-reverse changes.
 ---
 
 # Cloud Management

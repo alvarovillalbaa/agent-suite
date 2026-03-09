@@ -1,35 +1,51 @@
 # Architecture
 
-This plugin separates skills, agents, hooks, and MCP servers for clarity.
+This plugin separates skills, commands, agents, hooks, and optional external tooling so each layer has a clear job.
 
-```
+```text
 User Prompt
    |
    v
-Agents (hreng-hiring / hreng-performance / hreng-org)
-   |   \ 
-   |    \__ assemble templates
+Commands (narrow end-to-end automations)
    |
    v
-Skills (hreng-*)  ---> examples/ + templates/ + references.md
+Agents (multi-step orchestrators)
+   |
+   +--> sequence commands when a stable flow exists
+   |
+   +--> invoke skills directly for custom work
    |
    v
-Outputs (JSON/Markdown)
+Skills (portable capability units)
+   |
+   +--> references / templates / scripts / assets
+   |
+   v
+Outputs (code, docs, HTML, decks, reports, models)
 
-Hooks (PreToolUse/PostToolUse/UserPromptSubmit)
+Hooks
    ^
    |
-   +-- run automatically on events
+   +--> lightweight routing, validation, and safety prompts
 
-MCP Servers (remote)
+External tools / MCP
    ^
    |
-   +-- optional tool calls when enabled
+   +--> optional runtime-specific integrations
 ```
 
 ## Responsibilities
 
-- **Skills**: Single-purpose commands with defined inputs/outputs
-- **Agents**: Orchestrators that select and sequence skills
-- **Hooks**: Event listeners that run automatically
-- **MCP**: External tools for HR or employee systems
+- **Skills**: Portable capability units with a clear input/output shape.
+- **Commands**: Narrow automations that run one skill or a well-defined slice of a workflow end-to-end.
+- **Agents**: Orchestrators that decide which commands or skills to sequence for broader workflows.
+- **Hooks**: Event-driven prompts or checks that improve routing, safety, and output quality.
+- **External tools / MCP**: Optional integrations that expand what the runtime can access.
+
+## Design principle
+
+Prefer the smallest layer that can solve the task cleanly:
+
+1. Use a **skill** when the user needs a capability.
+2. Use a **command** when the workflow is stable and repeatable.
+3. Use an **agent** when the work spans multiple commands or skills.

@@ -33,7 +33,7 @@ Use this skill when:
 - They want **multiple channel outputs** from a single asset.
 
 Prefer other skills when:
-- They only need a **blog from knowledge** → use `knowledge-to-blogs`.
+- They only need a **blog from knowledge** → use `blog-articles`.
 - They only need a **single, high-quality X Article** → use `x-articles`.
 
 ## Inputs You Should Collect
@@ -535,7 +535,7 @@ Handle these scenarios explicitly:
 ## Interactions with Other Skills
 
 - When the source is **knowledge only** (no canonical article yet):
-  - First use `knowledge-to-blogs` to create a **canonical blog**.
+  - First use `blog-articles` to create a **canonical blog**.
   - Then use `content-syndication` on that canonical asset.
 
 - When the user wants a **hero X Article** as the main long-form:
@@ -544,4 +544,6 @@ Handle these scenarios explicitly:
     - X thread teasing the Article.
     - LinkedIn / Substack / Medium versions adapted from either the X Article or the canonical blog, depending on strategy.
 
-
+- When the user wants to turn syndicated posts into conversation or outreach:
+  - Use `linkedin-engagement` for LinkedIn comments and DMs.
+  - Use `x-engagement` for X replies, quote posts, and DMs.

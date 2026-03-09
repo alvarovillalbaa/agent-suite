@@ -1,14 +1,14 @@
 ---
 name: outreach
-description: Run prospect/account research and outreach messaging using message-outreach and prospect-research skills.
-argument-hint: "[prospect/account or research goal]"
+description: Run account research and produce ready-to-send outreach messaging using prospect-research, message-outreach, and optional engagement skills.
+argument-hint: "[prospect, account, or outreach goal]"
 allowed-tools: [Read, Write, AskUserQuestion, Skill]
 ---
 
-Use skills: **message-outreach** (`skills/message-outreach/SKILL.md`), **prospect-research** (`skills/prospect-research/SKILL.md`); optionally **linkedin-engagement** for comment/DM drafts.
+Use skills: **prospect-research**, **message-outreach**, and optionally **linkedin-engagement**.
 
-1. **Gather inputs** – Ask the user for prospect/account data (URLs, JSON, CSV, notes) or research goal. If the user passed a name or context in the argument, use it.
-2. **Choose skill** – If user has raw data and wants a **skimmable brief with ICP/ICA scoring**, use **message-outreach** (`skills/message-outreach/SKILL.md`). If user has URLs/content and wants a **full GTM brief** (Account, Persona, Next best motion) and can provide scorecards, use **prospect-research** (`skills/prospect-research/SKILL.md`).
-3. **Run research** – Load the skill and produce the brief per its template. Cite sources inline; do not invent scorecard math if using prospect-research with provided scorecards.
-4. **Optional engagement** – If the user wants **LinkedIn comments or DMs**, load **linkedin-engagement** and draft 1–2 variants using the brief’s engagement cues.
-5. **Deliver** – Output the brief and any message drafts. Suggest next step (e.g. multi-thread, send sequence).
+1. **Gather inputs** – Ask for prospect or account data, URLs, notes, or a clear outreach goal if the argument is thin.
+2. **Choose the research depth** – Use `message-outreach` for a shorter scored brief, or `prospect-research` for a fuller GTM brief.
+3. **Build the brief** – Produce the research artifact with evidence and a clear next motion.
+4. **Draft the outreach** – Turn the brief into email, LinkedIn, or follow-up messaging as requested.
+5. **Deliver** – Output the brief plus the message drafts and suggest the next touchpoint.

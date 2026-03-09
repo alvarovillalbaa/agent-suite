@@ -31,7 +31,7 @@ Use this skill when:
 
 Do **not** use this when:
 - The ask is just for a short X post / thread (use normal prompting or a different skill).
-- The user wants a generic blog article for their site (use `knowledge-to-blogs`).
+- The user wants a generic blog article for their site (use `blog-articles`).
 - The user wants multi-channel repurposing (use `content-syndication` as the orchestrator).
 
 ## Inputs You Should Collect
@@ -481,10 +481,12 @@ Use this as a mental model when transforming real content.
 ## Interactions with Other Skills
 
 - When the user’s input is **pure knowledge** (notes, research, transcripts) and they haven’t yet produced a blog or long-form, consider:
-  - First using `knowledge-to-blogs` to create a **canonical blog article**.
-  - Then using `x-articles` to create a **long-form X-native version**.
+  - First use `blog-articles` to create a **canonical blog article**.
+  - Then use `x-articles` to create a **long-form X-native version**.
 
 - When the user wants **multi-channel distribution**:
   - Use this skill to generate the **X Article**.
   - Then call `content-syndication` to derive X threads, LinkedIn posts, Substack variants, etc., ensuring each one is differentiated.
 
+- When the user needs replies, quote posts, or DMs around the article:
+  - Hand off to `x-engagement`.

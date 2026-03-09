@@ -1,6 +1,6 @@
 ---
 name: agentic-development
-description: End-to-end repository execution workflow for implementing, debugging, refactoring, reviewing, instrumenting, and shipping code in any software repo. Use when Codex needs to orient in an unfamiliar codebase, choose between working on main, branches, or worktrees, distinguish specs from plans from tests, coordinate subagents or parallel agents, handle PRs and review comments, inspect observability, or finish work without leaving loose ends.
+description: End-to-end repository execution workflow for implementing, debugging, refactoring, reviewing, instrumenting, and shipping code in any software repo. Use when the assistant needs to orient in an unfamiliar codebase, choose between working on main, branches, or worktrees, distinguish specs from plans from tests, coordinate subagents or parallel agents, handle PRs and review comments, inspect observability, or finish work without leaving loose ends.
 ---
 
 # Agentic Development
@@ -9,7 +9,7 @@ Drive work through one loop: orient, choose the collaboration mode, choose the e
 
 ## Start Here
 
-1. Run `python .agents/skills/agentic-development/scripts/repo_scan.py` from the repo root.
+1. Run the repository scan helper if one is bundled with the skill; otherwise perform an equivalent manual scan from the repo root.
 2. Read the instruction files the scan finds before making workflow or architecture assumptions.
 3. Inspect git state: branch, dirty files, worktrees, and PR context if relevant.
 4. Decide whether the task is direct implementation, spec clarification, plan execution, debugging, review, instrumentation, or release cleanup.

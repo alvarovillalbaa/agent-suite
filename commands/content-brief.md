@@ -1,14 +1,14 @@
 ---
 name: content-brief
-description: Create a content or campaign brief and optionally kick off drafting (briefings skill + content-manager flow).
-argument-hint: "[topic or campaign name]"
+description: Create a working content brief from a topic, campaign, transcript, or knowledge dump, then optionally route into drafting commands.
+argument-hint: "[topic, campaign, or source material]"
 allowed-tools: [Read, Write, AskUserQuestion, Skill]
 ---
 
-Use skill: **briefings** — `skills/briefings/SKILL.md` first; then optionally **content-manager** or blog-articles, linkedin-articles, x-articles, content-syndication.
+Create a compact working brief the rest of the content workflow can depend on.
 
-1. **Gather scope** – Ask the user for topic/campaign, audience, key messages, and desired formats (blog, LinkedIn, X, etc.) if not in the argument.
-2. **Brief** – Load `skills/briefings/SKILL.md` and produce a content or campaign brief (objective, audience, messages, format, timeline, success criteria).
-3. **Confirm** – Show the brief and ask if the user wants to proceed to draft (blog, LinkedIn, X) or stop here.
-4. **If drafting** – Use the **content-manager** agent’s workflow: invoke blog-articles, linkedin-articles, x-articles, or content-syndication as needed. Deliver drafts per channel.
-5. **Deliver** – Output the brief and, if requested, the draft(s) and a short checklist for approval/publish.
+1. **Gather scope** – Ask for topic, audience, goal, channel mix, and source material if those are not already clear.
+2. **Frame the brief inline** – Produce a concise brief covering objective, reader, core message, proof points, formats, and CTA.
+3. **Resolve ambiguity** – If the channel mix or positioning is still fuzzy, ask the minimum follow-up needed to sharpen it.
+4. **Route to the next command if requested** – Suggest `blog-draft` for the canonical piece or `social-pack` for repurposing.
+5. **Deliver** – Output the brief in a form that can be reused by a human, an agent, or a follow-on command.

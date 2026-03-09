@@ -2,29 +2,13 @@
 
 `code-slides` is an agent skill for building responsive, code-based slide decks and single-file HTML presentations with visual preset exploration, PPT-to-web conversion guidance, configurable navigation placement, and multi-source image workflows.
 
-## Install with Vercel Skills CLI
+## Portable use
 
-```bash
-npx skills add https://github.com/<owner>/code-slides
-```
+Clone the repository or copy `skills/code-slides` into your local skill registry, then load `SKILL.md` in your preferred assistant environment.
 
-Select `code-slides` when prompted.
+## Repo-specific integration
 
-## Install from git clone
-
-```bash
-git clone https://github.com/<owner>/code-slides.git
-cd code-slides/skills/code-slides
-./scripts/install_local.sh --agent all
-```
-
-Use `--dry-run` first if you want to preview target paths.
-
-## Manual skill folders
-
-- Codex: `~/.codex/skills/code-slides`
-- Claude Code: `~/.claude/skills/code-slides`
-- OpenClaw: `~/.openclaw/skills/code-slides` (older installs may use `~/.moltbot/skills/code-slides`)
+Environment-specific install examples live in [docs/agent-suite-integration.md](../../docs/agent-suite-integration.md).
 
 ## Repository layout
 

@@ -6,36 +6,37 @@
 - **npx skills add (Vercel):** `npx skills add alvarovillalbaa/agent-suite`
 - **OpenClaw:** `git clone https://github.com/alvarovillalbaa/agent-suite.git ./skills/agent-suite` (or `~/.openclaw/skills/agent-suite`); point runtime at `skills/` in clone
 
-See [README](../README.md#installation) (Installation and Updating) for the full install table and update one-liners.
+See [README](../README.md#install) for the full install matrix and command inventory.
 
 ## Configure
 
-Optional: copy the settings template and edit for your context:
-
-```bash
-cp templates/settings-template.md .claude/agent-suite.local.md
-```
+Optional: create a project context file for your runtime with brand, product, finance, or workflow defaults. See [docs/agent-suite-integration.md](./agent-suite-integration.md) for repo-specific examples.
 
 ## Try it
 
 **Commands** (use `/agent-suite:<command>` in Claude Code):
 
-- `/agent-suite:video` – Generate a video from a brief
+- `/agent-suite:content-brief` – Create the working content brief
+- `/agent-suite:blog-draft` – Turn notes or research into a blog draft
+- `/agent-suite:outreach` – Research an account and draft outreach
+- `/agent-suite:investor-messaging` – Draft the fundraising narrative and FAQs
+- `/agent-suite:visualize` – Create a shareable HTML explainer or review page
+- `/agent-suite:repo-review` – Run a focused engineering review
 - `/agent-suite:slides` – Create an HTML slide deck
-- `/agent-suite:fundraise` – Fundraising materials and process
-- `/agent-suite:content-brief` – Content/campaign brief (optionally draft)
-- `/agent-suite:outreach` – Prospect research and outreach
+- `/agent-suite:video` – Generate a video from a brief
 - `/agent-suite:help` – List all agents and commands
 
 **Orchestrator agents**
 
-- **content-manager** – Brief → blog, LinkedIn, X, syndication
-- **financial-manager** – Reconciliation, modeling, fundraising
-- **sales-manager** – Prospect research, outreach, competitor intel
+- **content-manager** – Brief → draft → syndication
+- **financial-manager** – Reconciliation, modeling, investor messaging, materials, diagnostics
+- **sales-manager** – Prospect research, outreach, competitor analysis, inbox follow-up
 - **social-media-manager** – LinkedIn and X content and engagement
+- **visual-manager** – Visual explainers, decks, and video
+- **swe** – Engineering review, docs, QA, visuals, learning capture
 
 Invoke an agent by name when you want a multi-step workflow; use a command for a single skill flow.
 
 ## Update
 
-See **README → Updating** for one-liners per install method. From repo root you can run `./scripts/update.sh` to auto-detect and update, or `./scripts/update-from-upstream.sh` for git pull.
+From repo root you can run `./scripts/update.sh` to auto-detect and update, or `./scripts/update-from-upstream.sh` for a direct git-based update.

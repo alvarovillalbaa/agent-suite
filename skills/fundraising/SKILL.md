@@ -103,7 +103,7 @@ Turn every scrap of fundraising data—decks, models, e-mails, CRM notes—into 
 ## Next Steps After Fundraising
 
 - Run **financial-manager** agent for full finance flow (reconciliation, modeling, fundraising).
-- Use command **/agent-suite:fundraise** to re-run this skill with new or updated inputs.
+- Re-run this skill with new or updated inputs as materials, model assumptions, or pipeline data change.
 - Share the Materials Upgrade Report with the team and assign owners from the Accountability Matrix.
 
 ## Validation checklist

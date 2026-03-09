@@ -343,6 +343,5 @@ For full measurement framework: see [`references/measurement.md`](references/mea
 
 ## Related Skills
 
-- **seo-audit** — Reactive audit of an existing site's SEO issues
-- **seo-review** — Page-level SEO review with scoring rubric
-- **update-docs** — Keeping documentation fresh (freshness is a ranking signal)
+- Use `blog-articles` when the user first needs a strong canonical article before optimization.
+- Use `content-syndication` when the optimized piece needs channel-specific variants after SEO and GEO improvements.

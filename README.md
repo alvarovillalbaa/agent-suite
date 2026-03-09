@@ -1,145 +1,378 @@
 # Agent Suite
 
-Productivity and business toolkit: content, finance, sales, and social media workflows via skills, commands, and orchestrating agents.
+Portable business and productivity workflows for AI agents: content, finance, sales, research, social, slides, and video.
 
-## Features
+This repo is structured so people can use it in multiple ways:
+
+- As a Claude Code plugin
+- As a skill collection via Vercel's `npx skills`
+- In Codex
+- In OpenClaw
+- By cloning the repo and loading it manually
+- By copying only the folders you want with shell scripts
+- By installing only individual skills, agents, or commands
+
+## What is in this repo
 
 ### Skills
 
 | Skill | Purpose |
 |-------|---------|
-| accounting-reconciliation | Match books, statements, and ledgers; flag discrepancies |
-| blog-articles | Draft and structure blog posts |
-| briefings | Create briefs and content plans |
-| competitors | Competitive intel and positioning |
-| content-syndication | Repurpose and distribute content across channels |
-| financial-modeling | Build and review financial models |
-| fundraising | Investor messaging, materials upgrade, process diagnostics |
-| industry-discovery | Industry and market research |
-| linkedin-articles | LinkedIn long-form articles |
-| linkedin-engagement | LinkedIn comments and engagement |
-| message-outreach | Outreach and sales messaging |
-| prospect-research | Prospect and account research |
-| code-slides | Code-based slide decks, HTML presentations, and PPT-to-web conversion |
-| video-generation | Programmatic video (Remotion-style) |
-| x-articles | X/Twitter threads and articles |
-| email-inbox-management | Email triage and reply drafting (placeholder) |
-| x-engagement | X/Twitter replies and engagement (placeholder) |
-| suite-router | Map intent to command/agent/skill (routing index) |
+| `accounting-reconciliation` | Match books, statements, and ledgers; flag discrepancies |
+| `agentic-development` | General repository execution workflow |
+| `blog-articles` | Draft and structure blog posts |
+| `cloud-management` | Cross-cloud CLI-first operations |
+| `code-documentation` | Technical docs and reports |
+| `code-slides` | Code-based slide decks, HTML presentations, PPT-to-web conversion |
+| `competitors` | Competitive intel and positioning |
+| `content-syndication` | Repurpose and distribute content across channels |
+| `continuous-learning` | Capture lessons and reusable knowledge |
+| `email-inbox-management` | Email triage, replies, and inbox workflows |
+| `financial-modeling` | Build and review financial models |
+| `fundraising` | Investor messaging, materials upgrade, process diagnostics |
+| `linkedin-articles` | LinkedIn long-form articles |
+| `linkedin-engagement` | LinkedIn comments, DMs, and engagement |
+| `message-outreach` | Outreach and sales messaging |
+| `prospect-research` | Prospect and account research |
+| `quality-assurance` | QA and testing workflows |
+| `seo-and-geo` | SEO, GEO, and AEO optimization |
+| `suite-router` | Route intent to the right agent or skill |
+| `video-generation` | Programmatic video workflows |
+| `visualizer` | Visual explainers, reviews, dashboards, and slide-mode HTML |
+| `x-articles` | X long-form articles |
+| `x-engagement` | X replies, quote posts, DMs, and engagement |
+
+### Agents
+
+| Agent | Scope |
+|-------|-------|
+| `content-manager` | Content planning, drafting, and distribution |
+| `financial-manager` | Reconciliation, modeling, and fundraising |
+| `sales-manager` | Prospect research, outreach, and competitor analysis |
+| `social-media-manager` | LinkedIn and X content plus engagement |
+| `visual-manager` | Visual explainers, decks, and video outputs |
+| `swe` | Software engineering orchestration |
 
 ### Commands
 
-Commands are namespaced by plugin name: use `/agent-suite:<command>` in Claude Code (e.g. `/agent-suite:video`).
+These are repo-provided command entry points, primarily useful in Claude-style plugin environments:
 
-| Command | Skill(s) | Description |
-|---------|----------|-------------|
-| `video` | video-generation | Generate video from brief (Remotion) |
-| `slides` | code-slides | Create HTML or code-based slide deck from topic/brief |
-| `fundraise` | fundraising | Investor messaging, materials upgrade, process diagnostics |
-| `content-brief` | briefings (+ content flow) | Content/campaign brief; optionally draft blog/LinkedIn/X |
-| `outreach` | message-outreach, prospect-research | Research brief and optional LinkedIn engagement drafts |
-| `help` | — | List agents and commands |
+| Command | Purpose |
+|---------|---------|
+| `content-brief` | Build a reusable content brief |
+| `blog-draft` | Draft a canonical blog article |
+| `social-pack` | Repurpose a canonical piece across social channels |
+| `account-brief` | Build a focused account or prospect brief |
+| `outreach` | Research and draft outreach messages |
+| `competitor-scan` | Scan competitor or market moves |
+| `linkedin-engage` | Draft LinkedIn comments or DMs |
+| `x-engage` | Draft X replies, quote posts, or DMs |
+| `inbox-triage` | Triage inbound email threads and draft replies |
+| `reconcile-books` | Reconcile statements, receipts, and ledgers |
+| `model-scenarios` | Build or review a financial model with scenarios |
+| `investor-messaging` | Draft the fundraising narrative and investor hooks |
+| `materials-audit` | Audit deck, model, or data room quality |
+| `pipeline-diagnostics` | Diagnose fundraising funnel health and next steps |
+| `visualize` | Turn source material into a visual HTML artifact |
+| `repo-review` | Run a findings-first engineering review |
+| `docs-pass` | Update technical documentation close to the code |
+| `learning-sync` | Capture durable engineering lessons |
+| `help` | List suite capabilities |
+| `slides` | Slides workflow entry point |
+| `video` | Video workflow entry point |
 
-### Agents (orchestrators)
+## Install
 
-Agents orchestrate multiple skills; use them for multi-step workflows.
+### Install matrix
 
-| Agent | Scope | Skills |
-|-------|-------|--------|
-| content-manager | Content planning, drafting, distribution (blog, LinkedIn, X) | briefings, blog-articles, content-syndication, x-articles, linkedin-articles |
-| financial-manager | Reconciliation, modeling, fundraising | accounting-reconciliation, financial-modeling, fundraising |
-| sales-manager | Prospect research, outreach, competitor intel | prospect-research, message-outreach, competitors |
-| social-media-manager | LinkedIn and X content and engagement | linkedin-articles, linkedin-engagement, x-articles, content-syndication |
+| Method | Best for | Installs |
+|--------|----------|----------|
+| Claude Code plugin | Full repo with commands, hooks, agents, and skills | Full plugin |
+| `npx skills` | Cross-agent skill install | Skills only |
+| Codex manual install | One skill or a small set of skills | Skills only |
+| Codex `$skill-installer` | Direct GitHub skill install inside Codex | Individual skills |
+| OpenClaw manual install | Local runtime skill folders | Skills, optionally agents/commands |
+| Git clone | Local development, forking, direct loading | Everything |
+| Symlink / shell copy | Selective local installs | Individual folders |
+| Sparse checkout | Pull only specific folders from Git | Individual folders |
 
-### Hooks
+## 1. Claude Code Plugin
 
-- **PreToolUse**: MCP legitimacy check; Bash guard for destructive commands; optional JSON/PII validation on Write/Edit
-- **PostToolUse**: Suggest next `/agent-suite:*` command or agent after key deliverable writes; optional JSON validation
-- **UserPromptSubmit**: Classify intent using suite-router mapping; suggest relevant `/agent-suite:*` command or agent
-- **Stop**: Caveats for legal/financial guidance when response has material impact
-- **SubagentStop**: Append one-liner to session audit (Subagent X produced Y)
-- **SessionStart / SessionEnd / PreCompact**: Load config, session audit, compaction summary
+Use this when you want the full repo: plugin metadata, commands, hooks, agents, and skills.
 
-## Installation
-
-| Method | Install | Update |
-|--------|--------|--------|
-| **Claude Code (plugin)** | `git clone https://github.com/alvarovillalbaa/agent-suite.git ~/.claude/plugins/agent-suite` or `claude --plugin-dir /path/to/agent-suite` | `cd ~/.claude/plugins/agent-suite && git pull` or `./scripts/update-from-upstream.sh` |
-| **npx skills add (Vercel)** | `npx skills add alvarovillalbaa/agent-suite` (optional: `--skill <name>` for one skill) | Re-run the same `npx skills add` command to refresh |
-| **OpenClaw** | `git clone https://github.com/alvarovillalbaa/agent-suite.git ./skills/agent-suite` or `~/.openclaw/skills/agent-suite`; point runtime at `skills/` in clone. With ClawHub: `clawhub install` when the pack is registered | `git pull` in the cloned repo; restart or reload runtime |
-
-### Claude Code (plugin)
+### Local development
 
 ```bash
-# Development: load from repo
-claude --plugin-dir /path/to/agent-suite
-
-# Permanent: clone into plugins dir
-cd ~/.claude/plugins
-git clone https://github.com/alvarovillalbaa/agent-suite.git agent-suite
+claude --plugin-dir /absolute/path/to/agent-suite
 ```
 
-### npx skills add (Vercel)
+### Persistent install
 
 ```bash
-npx skills add alvarovillalbaa/agent-suite
-# Optional: install one skill only
-npx skills add alvarovillalbaa/agent-suite --skill fundraising
+mkdir -p ~/.claude/plugins
+git clone https://github.com/alvarovillalbaa/agent-suite.git ~/.claude/plugins/agent-suite
 ```
 
-Installs the repo as a skill collection; each folder under `skills/` with a `SKILL.md` is an installable skill.
-
-### OpenClaw
+### Update
 
 ```bash
-# Workspace skills
-git clone https://github.com/alvarovillalbaa/agent-suite.git ./skills/agent-suite
+cd ~/.claude/plugins/agent-suite && git pull
+```
 
-# Or user skills
+## 2. Vercel `npx skills`
+
+Use this when you want portable skill installation across supported agents.
+
+### Install all skills
+
+```bash
+npx -y skills add alvarovillalbaa/agent-suite
+```
+
+### Install all skills globally
+
+```bash
+npx -y skills add -g alvarovillalbaa/agent-suite
+```
+
+### Install for a specific agent
+
+```bash
+npx -y skills add -a codex alvarovillalbaa/agent-suite
+npx -y skills add -a claude-code alvarovillalbaa/agent-suite
+```
+
+### Install only selected skills
+
+```bash
+npx -y skills add alvarovillalbaa/agent-suite --skill fundraising
+npx -y skills add alvarovillalbaa/agent-suite --skill blog-articles --skill seo-and-geo
+```
+
+### Install from local path
+
+```bash
+npx -y skills add ./agent-suite
+```
+
+## 3. Codex
+
+You have two practical options: install through `npx skills` targeting Codex, or install an individual skill directly.
+
+### Option A: install through `npx skills`
+
+```bash
+npx -y skills add -a codex alvarovillalbaa/agent-suite
+```
+
+### Option B: install a single skill manually
+
+Copy a skill folder into your local Codex skills directory.
+
+```bash
+mkdir -p ~/.codex/skills
+cp -R skills/fundraising ~/.codex/skills/
+```
+
+### Option C: install a single skill with Codex's skill installer
+
+Inside Codex, use `$skill-installer` for built-in or repository-backed installs.
+
+```text
+$skill-installer
+```
+
+If you want a skill from this repo, prompt the installer to fetch the skill from:
+
+```text
+https://github.com/alvarovillalbaa/agent-suite/tree/main/skills/<skill-name>
+```
+
+## 4. OpenClaw
+
+OpenClaw users can clone the repo and point the runtime at the `skills/` directory, or copy individual folders.
+
+### Full clone
+
+```bash
+mkdir -p ~/.openclaw/skills
 git clone https://github.com/alvarovillalbaa/agent-suite.git ~/.openclaw/skills/agent-suite
 ```
 
-Point OpenClaw at the `skills/` inside the clone, or copy individual skill folders. Restart or reload the runtime after install. If using ClawHub, `clawhub install` once the pack is registered.
+### Individual skill copy
 
-## Configuration
+```bash
+mkdir -p ~/.openclaw/skills
+cp -R skills/code-slides ~/.openclaw/skills/
+```
 
-Optional: create `.claude/agent-suite.local.md` (or equivalent in your environment) with team name, domains, and any overrides. See `templates/settings-template.md` if present.
+Reload the runtime after install.
+
+## 5. Git clone
+
+Use this when you want the repo locally for development, inspection, or manual loading in any AI OS.
+
+```bash
+git clone https://github.com/alvarovillalbaa/agent-suite.git
+cd agent-suite
+```
+
+From there you can:
+
+- Load the full repo as a plugin if your runtime supports plugins
+- Point your runtime at `skills/`
+- Copy only `agents/`, `commands/`, or selected skills
+- Symlink folders into a local skill registry
+
+## 6. Install with shell scripts
+
+Use plain `sh` commands if you want repeatable installs without a marketplace.
+
+### Copy one skill
+
+```sh
+mkdir -p "$HOME/.codex/skills"
+cp -R skills/seo-and-geo "$HOME/.codex/skills/"
+```
+
+### Copy several skills
+
+```sh
+mkdir -p "$HOME/.codex/skills"
+for skill in blog-articles seo-and-geo content-syndication; do
+  cp -R "skills/$skill" "$HOME/.codex/skills/"
+done
+```
+
+### Symlink for local development
+
+```sh
+mkdir -p "$HOME/.codex/skills"
+ln -s "$(pwd)/skills/fundraising" "$HOME/.codex/skills/fundraising"
+```
+
+## 7. Install only individual skills
+
+Every folder under `skills/` is installable on its own.
+
+Examples:
+
+```bash
+cp -R skills/fundraising ~/.codex/skills/
+cp -R skills/code-slides ~/.openclaw/skills/
+npx -y skills add alvarovillalbaa/agent-suite --skill x-articles
+```
+
+## 8. Install only individual agents
+
+If your runtime supports agent files, copy only the agent you want from `agents/`.
+
+Examples:
+
+```bash
+cp agents/content-manager.md /path/to/your/agents/
+cp agents/sales-manager.md /path/to/your/agents/
+```
+
+The agent files reference skills by logical name, so the corresponding skills should also be available in that runtime.
+
+## 9. Install only individual commands
+
+If your runtime supports command markdown files, copy only the files you need from `commands/`.
+
+Examples:
+
+```bash
+cp commands/investor-messaging.md /path/to/your/commands/
+cp commands/slides.md /path/to/your/commands/
+```
+
+Command support is runtime-specific. In some environments, commands are ignored while skills still work.
+
+## 10. Sparse checkout for partial clone
+
+Use sparse checkout if you want only one part of the repo without pulling everything.
+
+### One skill
+
+```bash
+git clone --filter=blob:none --no-checkout https://github.com/alvarovillalbaa/agent-suite.git
+cd agent-suite
+git sparse-checkout init --cone
+git sparse-checkout set skills/fundraising
+git checkout main
+```
+
+### Only agents and commands
+
+```bash
+git clone --filter=blob:none --no-checkout https://github.com/alvarovillalbaa/agent-suite.git
+cd agent-suite
+git sparse-checkout init --cone
+git sparse-checkout set agents commands
+git checkout main
+```
+
+## 11. Other compatible approaches
+
+Depending on the runtime, these also work:
+
+- Install from a local path after cloning the repo
+- Use symlinks instead of copies for local development
+- Fork the repo and install from your own GitHub namespace
+- Vendor specific `skills/<name>` folders into another repo
+- Use the repo as a template for your own internal skill pack
 
 ## Quick start
 
-1. Install via one of the methods above.
-2. Try a command: `/agent-suite:slides` or `/agent-suite:video`, or ask the **content-manager** to draft a content brief.
-3. For fundraising: `/agent-suite:fundraise` or invoke the **financial-manager** agent with fundraising context.
+### If you installed the full plugin
 
-## Updating
+- Try `content-manager` for multi-channel content work
+- Try `financial-manager` for modeling or fundraising
+- Try `sales-manager` for research and outreach
+- Try `social-media-manager` for LinkedIn and X workflows
+- Try `visual-manager` for explainers, decks, and video
 
-- **Claude plugin (git clone):** `cd ~/.claude/plugins/agent-suite && git pull` or run `./scripts/update-from-upstream.sh` from the repo root. You can also run `./scripts/update.sh` to auto-detect install type and run the right update.
-- **npx skills add:** Re-run `npx skills add alvarovillalbaa/agent-suite` to refresh installed skills.
-- **OpenClaw:** `cd` into the cloned repo (e.g. `./skills/agent-suite` or `~/.openclaw/skills/agent-suite`) and run `git pull`; restart or reload the runtime.
+### If you installed individual skills
 
-## Architecture
+Good entry points:
 
-```
+- `suite-router`
+- `visualize`
+- `fundraising`
+- `repo-review`
+- `code-slides`
+- `blog-articles`
+- `prospect-research`
+- `seo-and-geo`
+
+## Repository layout
+
+```text
 agent-suite/
 ├── .claude-plugin/
 │   └── plugin.json
-├── agents/           # Orchestrators (content, financial, sales, social-media)
-├── commands/         # /agent-suite:* slash commands
+├── agents/
+├── commands/
+├── docs/
 ├── hooks/
-│   └── hooks.json
-├── skills/           # One folder per skill; canonical layout per skill:
+├── scripts/
+├── skills/
 │   └── <skill-name>/
-│       ├── SKILL.md        # Main instructions
-│       ├── references.md   # Index to references/
-│       ├── references/     # Domain/legal/methodology docs
-│       ├── examples/       # Example inputs/outputs
-│       ├── templates/      # Schemas, doc templates
-│       └── scripts/        # Optional validators/helpers
-├── scripts/          # Shared hook scripts
-└── templates/        # Optional settings template
+│       ├── SKILL.md
+│       ├── references/
+│       ├── examples/
+│       ├── templates/
+│       └── scripts/
+└── templates/
 ```
 
-See [docs/spec/skills.md](docs/spec/skills.md) for the full canonical skill layout and SKILL.md content template.
+## Notes
+
+- Skills are the most portable unit in this repo.
+- Agents are portable when the target runtime supports agent files.
+- Commands and hooks are the least portable because support varies by runtime.
+- Repo-specific integration notes live in [docs/agent-suite-integration.md](docs/agent-suite-integration.md).
 
 ## License
 

@@ -409,9 +409,10 @@ Use this template mentally; don’t hard-code content.
   - An **X Article** version → feed your final blog draft into `x-articles`.
   - A **multi-channel pack** (X, LinkedIn, Substack, Medium) → feed the canonical blog into `content-syndication`.
 
+- If the user wants stronger discoverability after drafting:
+  - Run the final article through `seo-and-geo` for SEO, GEO, and AEO improvements.
+
 - When used as part of a pipeline:
-  - `knowledge-to-blogs` defines the **canonical argument and structure**.
+  - `blog-articles` defines the **canonical argument and structure**.
   - `x-articles` shapes it into **X-native long-form**.
   - `content-syndication` breaks it into **channel-native variants**.
-
-

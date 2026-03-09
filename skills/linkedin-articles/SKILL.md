@@ -3,7 +3,7 @@ name: linkedin-articles
 description: Draft and structure LinkedIn long-form articles (posts, carousels, or article format) with professional tone, clear hooks, and actionable takeaways. Use when the user wants LinkedIn-native thought leadership or long-form content.
 version: 1.0.0
 license: MIT
-compatibility: Instruction-only. Optional inputs from briefings or existing drafts.
+compatibility: Instruction-only. Optional inputs from planning notes or existing drafts.
 ---
 
 # LinkedIn Articles Skill
@@ -37,3 +37,8 @@ Draft and structure LinkedIn long-form content: single long posts, carousel-styl
 - Structure is scannable (headings or bullets where helpful).
 - One clear takeaway or CTA.
 - Length appropriate for format (e.g. 800–1200 words for article; shorter for post).
+
+## Related Skills
+
+- If the user wants a broader distribution pack after the article is drafted, use `content-syndication`.
+- If the user needs comments, DMs, or connection-message follow-up around the article, use `linkedin-engagement`.

@@ -51,7 +51,7 @@
         },
         {
           "type": "prompt",
-          "prompt": "If the file just written or edited looks like a key deliverable (e.g. brief, report, deck plan, video plan, research brief, model output), suggest the next step in one line: e.g. run another /agent-suite:* command, invoke an agent (content-manager, financial-manager, sales-manager, social-media-manager), or share with stakeholder.",
+          "prompt": "If the file just written or edited looks like a key deliverable, suggest the next step in one line: another /agent-suite:* command, a coordinating agent (content-manager, financial-manager, sales-manager, social-media-manager, visual-manager, swe), or a stakeholder handoff.",
           "timeout": 5
         }
       ]
@@ -63,7 +63,7 @@
       "hooks": [
         {
           "type": "prompt",
-          "prompt": "Classify intent using suite-router mapping: content → /agent-suite:content-brief or content-manager; slides → /agent-suite:slides; video → /agent-suite:video; fundraising/finance → /agent-suite:fundraise or financial-manager; sales/outreach/research/competitors → /agent-suite:outreach or sales-manager; social → social-media-manager. If intent matches this plugin, suggest the most relevant /agent-suite:* command or agent in one line.",
+          "prompt": "Classify intent using suite-router mapping. Suggest the most relevant /agent-suite:* command or coordinating agent in one line. Use command-first routing for stable flows: content → content-brief, blog-draft, social-pack or content-manager; finance/fundraising → reconcile-books, model-scenarios, investor-messaging, materials-audit, pipeline-diagnostics or financial-manager; sales/research → account-brief, outreach, competitor-scan, inbox-triage or sales-manager; social → linkedin-engage, x-engage, social-pack or social-media-manager; visualization → visualize, slides, video or visual-manager; engineering → repo-review, docs-pass, learning-sync or swe.",
           "timeout": 5
         }
       ]
