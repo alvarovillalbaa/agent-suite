@@ -1,6 +1,6 @@
 ---
 name: agentic-development
-description: End-to-end repository execution workflow for implementing, debugging, refactoring, reviewing, instrumenting, and shipping code in any software repo. Use when the assistant needs to orient in an unfamiliar codebase, decide how to work safely on main, branches, or worktrees, separate specs from plans from tests, coordinate parallel agents, handle PR and review feedback, inspect observability, or land cross-cutting frontend/backend changes without leaving loose ends.
+description: End-to-end repository execution workflow for implementing, debugging, refactoring, reviewing, instrumenting, explaining architecture, assessing refactor impact, and shipping code in any software repo. Use when the assistant needs to orient in an unfamiliar codebase, answer how a system works, decide how to work safely on main, branches, or worktrees, separate specs from plans from tests, coordinate parallel agents, handle PR and review feedback, inspect observability, or land cross-cutting frontend/backend changes without leaving loose ends.
 ---
 
 # Agentic Development
@@ -9,20 +9,24 @@ Drive work through one loop: orient, classify the task, choose the execution mod
 
 ## Start Here
 
-1. Map the repo before touching code: instruction files, package or service boundaries, build and test commands, deployment surfaces, and current git state.
-2. Decide the task type: direct implementation, debugging, review, spec clarification, plan execution, refactor, instrumentation, or release cleanup.
-3. Choose the authoritative path for the change: the existing module, service, component, hook, page, command, or workflow that already owns the behavior.
-4. Decide the proof before editing: what command, test, log, screenshot, or trace will confirm the result.
-5. Load only the reference files relevant to the current task.
+1. Run the repo scan helper if the skill bundles one; otherwise do the same discovery manually from the repo root.
+2. Map the repo before touching code: instruction files, package or service boundaries, entrypoints, build and test commands, deployment surfaces, and current git state.
+3. For frontend-heavy work, map framework boundaries, route ownership, design-system sources, shared primitives, state owners, and existing analytics or error-reporting seams before choosing an edit path.
+4. Decide the task type: direct implementation, architecture explanation, debugging, review, spec clarification, plan execution, refactor, instrumentation, or release cleanup.
+5. Choose the authoritative path for the change or explanation: the existing module, service, component, hook, page, command, model, or workflow that already owns the behavior.
+6. Decide the proof before editing: what command, test, log, screenshot, trace, or dependency search will confirm the result.
+7. Load only the reference files relevant to the current task.
 
 ## Core Rules
 
 - Prefer repo-local instructions over generic advice. If `AGENTS.md`, `CLAUDE.md`, `SOUL.md`, `PRINCIPLES.md`, `PLANS.md`, `README.md`, `CONTRIBUTING.md`, or service/package docs exist, follow them in the hierarchy the repo defines.
 - Work with the current git reality. Do not force a branch or worktree change just because `main` is active; choose the safest path that fits the user's intent.
 - Extend existing seams. Reuse current services, hooks, stores, component primitives, models, logging, analytics, and scripts instead of creating parallel abstractions.
+- Architecture claims need evidence. Trace entrypoints, ownership, dependencies, and contracts before explaining how the system works or what a refactor will affect.
 - Separate concerns intentionally: specs define behavior, plans define execution, tests prove behavior, and instrumentation explains production behavior.
 - Verification gates claims. Do not say fixed, complete, passing, or ready without fresh evidence.
 - Frontend work is product behavior, not decoration. Preserve design systems, router conventions, state ownership, accessibility, and interaction quality the same way you would preserve API boundaries in a backend.
+- Choose the right frontend artifact level before coding: primitive, composed control, domain component, page section, hook, store, or route. A bad boundary choice causes more churn than a small implementation bug.
 - Finish cleanly. Make the next integration step explicit instead of silently leaving the repo in an ambiguous state.
 
 ## Architecture Bias
@@ -35,6 +39,7 @@ Apply these defaults unless the repo clearly prefers something else:
 - Do not over-modularize. Split only when independence, ownership, or readability materially improves.
 - Favor cohesive vertical slices over scattering one concept across many files.
 - Push business logic and async orchestration out of leaf UI where possible; keep views readable and state ownership explicit.
+- Prefer composition, slots, or subcomponents over boolean-heavy component APIs and prop matrices.
 - Treat loading, empty, error, success, and responsive states as part of the implementation, not post-hoc polish.
 
 ## Workflow Router
@@ -42,6 +47,10 @@ Apply these defaults unless the repo clearly prefers something else:
 ### Orientation and repo policy
 
 Read [repo-orientation.md](./references/repo-orientation.md) for startup discovery, instruction-file handling, repo-shape detection, and initial command selection.
+
+### Architecture analysis and refactor impact
+
+Read [architecture-analysis.md](./references/architecture-analysis.md) when the user asks how the system works, wants dependency or data-model relationships explained, or needs impact analysis before a rename, move, extraction, or schema change.
 
 ### Git, branches, worktrees, and PR flow
 
@@ -78,7 +87,7 @@ Read [verification-and-finish.md](./references/verification-and-finish.md) befor
 ## Standard Execution Loop
 
 1. Orient: inspect repo instructions, architecture, git state, and current task context.
-2. Classify: decide whether this is implementation, debugging, review, refactor, instrumentation, or release work.
+2. Classify: decide whether this is implementation, architecture analysis, debugging, review, refactor, instrumentation, or release work.
 3. Anchor: find the existing owner of the behavior and the minimal safe change surface.
 4. Implement: make the smallest coherent change that solves the right problem, not just the nearest symptom.
 5. Verify: run the focused proof first, then any broader regression evidence the repo or user expects.
@@ -92,7 +101,7 @@ If the current environment exposes more specialized skills, route work through t
 - Use `quality-assurance` when verification strategy, flaky tests, review findings, or CI triage becomes the bottleneck.
 - Use `gh-address-comments` for GitHub review-thread triage and inline replies.
 - Use `gh-fix-ci` when GitHub Actions checks are failing.
-- Use repo-specific frontend, observability, browser-testing, analytics, or release skills when they exist. Otherwise, use the references in this skill.
+- Use dedicated component-building, frontend-design, refactoring, browser-testing, observability, analytics, or release skills when they exist. Otherwise, use the references in this skill.
 
 ## Completion Hook
 

@@ -40,9 +40,17 @@ Do not use full-browser tests for logic that a unit, component, or integration t
 - Prefer `userEvent` or equivalent real interaction helpers over calling component internals directly.
 - Mock boundaries, not business logic.
 - Assert loading, empty, error, success, retry, disabled, and optimistic states when relevant.
+- Do not delete or weaken existing tests without explicit sign-off. Repair or quarantine with evidence.
 - Test IDs are a last resort unless the ID is itself the stable contract.
 - Snapshots are a narrow tool. Prefer behavior assertions unless the visual structure is the contract.
 - One behavior per test is the default. Group only when the behavior is inseparable.
+
+## Test Placement and Naming
+
+- Follow the repo's existing test layout first. If the repo separates `unit`, `integration`, `e2e`, or `smoke`, keep using those boundaries.
+- Mirror source ownership when naming or placing tests so the next engineer can find them quickly.
+- Reuse the repo's import aliases and test helpers instead of brittle relative-path setups or one-off render wrappers.
+- If automated coverage does not yet exist, record concise manual QA notes alongside the change until the automated proof lands.
 
 ## Component and Integration Patterns
 
@@ -53,6 +61,7 @@ For component-heavy apps:
 - prefer real child components and shared primitives over mocking the entire tree
 - mock network, auth, analytics, or third-party side-effect boundaries instead of internal business logic
 - use explicit assertions for forms, keyboard paths, focus moves, toasts, and inline errors
+- prefer Testing Library-style queries and assertions over DOM snapshots when the stack supports them
 
 What to cover:
 
@@ -104,6 +113,15 @@ Keep browser tests stable by:
 - collecting screenshots, videos, or traces on failure
 - keeping the critical-path browser suite small and intentional
 
+Use a reconnaissance-then-action workflow when selectors or timing are unclear:
+
+1. Navigate to the page and wait for an observable ready state such as settled network activity, a stable heading, or a loaded key control.
+2. Capture screenshot, console output, DOM state, or trace data before guessing at selectors.
+3. Identify stable selectors from the rendered UI, preferably by role or accessible name.
+4. Execute the interaction and re-check the same user-visible state.
+
+If the repo or another skill provides browser bootstrap helpers, run the helper with `--help` first and treat it as a black box before reading the implementation source.
+
 Visual regression helps when layout matters, but keep the baseline small and review diffs like code, not as auto-approved noise.
 
 ## Incremental Workflow for Large Frontend Scopes
@@ -129,6 +147,7 @@ Most frontend flakes come from:
 - animations and transitions not disabled or awaited
 - selectors tied to unstable DOM structure
 - leaked global state, storage, or feature flags
+- mocks, timers, or spies not reset between tests
 - viewport, locale, or timezone assumptions hidden in the test environment
 
 Fix flakes by making state transitions explicit and observable, not by sprinkling longer sleeps.

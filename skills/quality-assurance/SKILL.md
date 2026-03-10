@@ -12,18 +12,21 @@ In command examples below, `<skill-dir>` means the installed `quality-assurance`
 ## Start Here
 
 1. Run `python <skill-dir>/scripts/qa-scan.py <repo-root>` when the bundled scanner is available; otherwise perform the same stack and CI inventory manually.
-2. Reconstruct the intended behavior and the cheapest proof that can falsify or confirm it.
-3. Reuse repo commands from `Makefile`, `package.json`, `pyproject.toml`, `tox.ini`, `noxfile.py`, `justfile`, `Taskfile.yml`, or CI config before inventing new ones.
-4. Read repo-local instructions before deciding whether tests may be run, which suites are mandatory, or how evidence must be reported.
-5. Load only the reference files that match the task, and state the proof command before making any success claim.
+2. Preserve and read the full failure artifact set before changing code: stack traces, failing assertions, screenshots, traces, query logs, retry logs, seeds, and the first bad CI step.
+3. Reconstruct the intended behavior and the cheapest proof that can falsify or confirm it.
+4. Reuse repo commands from `Makefile`, `package.json`, `pyproject.toml`, `tox.ini`, `noxfile.py`, `justfile`, `Taskfile.yml`, or CI config before inventing new ones.
+5. Read repo-local instructions before deciding whether tests may be run, which suites are mandatory, or how evidence must be reported.
+6. Load only the reference files that match the task, and state the proof command before making any success claim.
 
 ## Operating Rules
 
 - Evidence before claims. Do not say fixed, passing, or complete without fresh command output.
 - Reproduce before repair. A regression test is part of the fix whenever the repo and task permit it.
+- Read the full artifact before editing. The first failing step, root-cause frame, slow query, or browser trace usually matters more than the last summary line.
 - Use the lowest-fidelity test that can actually prove the behavior. Escalate only when cheaper layers cannot prove it.
 - Mock boundaries, not business logic.
 - Frontend QA must prove user-visible state transitions, not just that markup rendered.
+- Do not delete, weaken, or silently skip existing tests without explicit sign-off from the user or repo owners.
 - Review comments are technical claims to evaluate, not social cues to obey.
 - Flaky tests are bugs. Quarantine is temporary containment, not completion.
 - Coverage is a lagging indicator. Use it to find blind spots, not to justify weak tests.
@@ -121,10 +124,11 @@ Read [references/anti-patterns.md](./references/anti-patterns.md) for fast smell
 ### Frontend verification loop
 
 1. Choose the correct test layer: unit, component, integration, browser, or visual.
-2. Render through realistic providers and control network, time, storage, and viewport explicitly.
-3. Assert loading, empty, error, success, retry, disabled, and optimistic states when they matter.
-4. Verify accessible names, keyboard flow, and focus behavior for user-facing changes.
-5. Run the smallest proof first, then broaden only when necessary.
+2. Render through realistic providers and control network, time, storage, viewport, locale, and feature flags explicitly.
+3. If browser state is unclear, inspect the rendered DOM, screenshot, console, or trace before automating more actions.
+4. Assert loading, empty, error, success, retry, disabled, and optimistic states when they matter.
+5. Verify accessible names, keyboard flow, and focus behavior for user-facing changes.
+6. Run the smallest proof first, then broaden only when necessary.
 
 ### Test-authoring loop
 

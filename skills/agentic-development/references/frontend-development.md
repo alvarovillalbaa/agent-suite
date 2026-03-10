@@ -20,6 +20,18 @@ Before editing code, identify:
 4. Verify keyboard flow, focus behavior, errors, empty states, and responsiveness before calling the work complete.
 5. Instrument meaningful events and failure paths if the repo already tracks them.
 
+## Choose the Artifact First
+
+Pick the smallest artifact that can own the behavior cleanly:
+
+- primitive: low-level reusable control, token-aware, minimal business knowledge
+- composed control: combines primitives into a reusable interaction pattern
+- domain component: owns product-specific rendering and event wiring for one feature area
+- page or route section: composes multiple domain pieces and route-level data or navigation concerns
+- hook, store, loader, or action: owns state transitions, async orchestration, or persistence without hiding them inside view code
+
+Do not start by adding JSX to the nearest file. Decide what should own the behavior first.
+
 ## Component Construction
 
 - Choose the right artifact level before coding: primitive, composed control, domain component, or page section.
@@ -28,6 +40,7 @@ Before editing code, identify:
 - Expose native attributes, refs, and styling seams when the framework supports them.
 - Support both controlled and uncontrolled state only when both modes are genuinely useful.
 - Keep data fetching and persistence outside low-level reusable components unless the component exists specifically to own that workflow.
+- Make state and semantics observable from the public API. If a consumer cannot tell how to label, focus, disable, validate, or style the component, the API is incomplete.
 
 ## Component and State Boundaries
 
@@ -47,6 +60,7 @@ Before editing code, identify:
 - Keep focus order logical. Dialogs, menus, popovers, and drawers should manage focus on open and close.
 - Keyboard paths should match pointer paths. Do not hide required functionality behind hover-only UI.
 - Maintain touch-friendly hit targets and mobile-safe input sizing. Do not disable zoom.
+- Avoid dead zones. If a visual region appears interactive, its full hit area should behave that way.
 - Keep destructive actions behind confirmation or an explicit undo path.
 - Keep empty states actionable instead of decorative.
 
@@ -54,6 +68,7 @@ Before editing code, identify:
 
 - Preserve an established design system if the repo has one. If it does not, choose a clear direction instead of generic scaffolding.
 - Treat typography, color, spacing, density, and motion as a system, not isolated tweaks.
+- Commit to an intentional visual direction. Distinctive and restrained are both valid; generic placeholder UI is not.
 - Verify sparse, average, and dense content. Handle long labels, large numbers, empty collections, and narrow screens intentionally.
 - Check mobile, laptop, and wide layouts. Fix overflow and dead space instead of hiding them with arbitrary widths and clipping.
 - Use motion to clarify cause and effect. Respect reduced-motion preferences and avoid animating layout or huge blur surfaces unless the repo intentionally does so.
@@ -62,6 +77,8 @@ Before editing code, identify:
 
 - Let users type freely; validate at the right boundary and explain how to recover.
 - Keep submit enabled until the request starts. Disable during submission if duplicate writes are risky.
+- Loading indicators should preserve the original label or context so the action remains understandable while pending.
+- Use delayed and minimum-visible loading states when the UI would otherwise flicker between idle and busy too quickly.
 - Prefer optimistic updates only when rollback is explicit and the existing data layer supports it.
 - Preserve user input through refetches, hydration, and validation errors.
 - Reuse repo conventions for toasts, inline errors, undo flows, and retry actions.
@@ -90,9 +107,11 @@ Before editing code, identify:
 
 Refactor when you see:
 
+- a component trying to act as primitive, domain component, and route container at the same time
 - a long render function plus heavy state or effect logic
 - raw network calls and data transforms inside view components
 - repeated JSX or duplicated variant logic
+- very wide prop surfaces or mutually exclusive booleans that hide the real API
 - multiple modal states or tangled conditional branches
 - unclear ownership between hook, store, URL, and component state
 - fragile accessibility or focus behavior patched piecemeal

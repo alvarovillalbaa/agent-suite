@@ -45,6 +45,7 @@ Two axes govern every documentation decision:
 | Migration steps | One-off | `docs/plans/YYYY-MM-DD/migration-name.md` |
 | Complex function explanation | Inline | comment above function |
 | Component props/usage | Inline | JSDoc / TSDoc / Storybook |
+| Component, hook, or route contract | Inline + local feature doc | TSDoc plus nearby README or feature doc when behavior spans files |
 | Testing patterns | Service-level | `services/name/TESTS.md` |
 | Investigation findings | One-off | `docs/reports/YYYY-MM-DD/report-name.md` |
 | How-to guide | Project-level | `docs/cookbook/guide-name.md` |
@@ -179,6 +180,16 @@ Additional files as needed:
 - Document props (type, required, default, description) for all components
 - Mark deprecated items with `@deprecated` and provide migration path
 
+## Frontend Documentation
+
+Frontend docs should capture contracts that types and screenshots alone do not make obvious.
+
+- Document reusable components, hooks, stores, and route helpers at the public boundary, not by narrating internal implementation.
+- When a feature spans multiple files, add a nearby feature or service doc that explains ownership: data, URL state, form state, client state, side effects, and analytics.
+- For user-facing flows, document important states and constraints: loading, empty, error, success, disabled, optimistic, permission-restricted, and responsive behavior.
+- Record accessibility expectations when they are part of the contract: labeling, keyboard flow, focus behavior, dialogs, and destructive-action safeguards.
+- If automated coverage does not yet protect a risky frontend flow, include concise manual verification notes in the most natural nearby doc until tests exist.
+
 ---
 
 ## Project Documentation Placement Rules
@@ -226,6 +237,7 @@ Good documentation passes this test: **can a new engineer understand what they n
 For in-depth guidance, consult:
 - **`references/documentation-types.md`** — Full taxonomy of all doc types, audience, examples, when to use each
 - **`references/continuous-docs.md`** — Deep guide on daily logs, changelogs, API docs, inline docs, and maintenance cadence
+- **`references/frontend-documentation.md`** — Component, hook, route, design-system, and browser-behavior documentation guidance
 - **`references/one-off-docs.md`** — Full guide for reports, ADRs, post-mortems, migration guides, investigation reports
 - **`references/writing-standards.md`** — Tone, voice, tense, structure, anti-patterns, quality checklist, audience patterns
 

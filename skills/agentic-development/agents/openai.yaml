@@ -1,4 +1,4 @@
 interface:
   display_name: "Agentic Development"
-  short_description: "Drive repo work with git, specs, reviews, and verification"
-  default_prompt: "Orient in this repo, choose the right collaboration mode, and execute the task with the appropriate spec, plan, test, review, and verification workflow."
+  short_description: "Orient, explain architecture, refactor safely, and verify repo work"
+  default_prompt: "Orient in this repo, explain the current architecture when needed, choose the right execution mode, and carry the task through implementation, review, and verification."

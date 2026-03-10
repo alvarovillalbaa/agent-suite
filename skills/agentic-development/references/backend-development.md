@@ -2,6 +2,16 @@
 
 Start by identifying where this backend expects business logic to live. Do not impose a generic architecture on a repo that already has strong patterns.
 
+## First Pass
+
+Before editing backend code, answer these questions:
+
+1. What are the entrypoints for this behavior: HTTP, RPC, CLI, webhook, queue, scheduler, or signal?
+2. Where does the repo expect business rules, state transitions, and side effects to live?
+3. Which models, schemas, repositories, or services already own this concept?
+4. What async, cache, auth, tenancy, rate-limit, or logging boundaries must remain intact?
+5. What command, test, or manual scenario will prove the change works, and does repo policy allow running it automatically?
+
 ## Owning Layer
 
 - Keep transport layers thin. Controllers, views, handlers, and serializers should validate, delegate, and return.
@@ -26,11 +36,19 @@ When the repo prefers strict, explicit schemas, follow that instead.
 
 Preserve the repo's conventions for IDs, timestamps, soft delete, tenancy, audit, search, and lifecycle state. Schema changes should ship with a migration and rollout plan proportionate to the risk.
 
+For schema work in any backend:
+
+- prefer additive, backward-compatible changes first
+- separate schema evolution from data backfill when lock time or rollout risk matters
+- consider expand, backfill, switch, and contract for higher-risk changes
+- check downstream contracts such as API schemas, workers, analytics payloads, caches, and generated clients
+
 ## API and DTO Bias
 
 In REST-oriented backends, prefer stable resource URLs and cohesive object-owned endpoints over parameter-heavy catch-all routes. If the repo already groups CRUD methods around one resource surface, keep doing that.
 
 - Keep one clear owner for create, update, delete, and side-effect behavior.
+- Validate once at the boundary, then operate on normalized data.
 - Validate shape and basic invariants at the transport boundary, but keep cross-entity business rules in the owning service.
 - Keep serializer, DTO, and schema objects explicit. Avoid hidden read/write drift, duplicate names for the same concept, or magic transformations when simpler field modeling works.
 - Use transactions for multi-entity writes.
@@ -42,6 +60,7 @@ In REST-oriented backends, prefer stable resource URLs and cohesive object-owned
 - Reuse the repo's current task, queue, scheduler, webhook, or signal system instead of inventing a new async path.
 - Keep job envelopes thin: deserialize input, load context, call the owning service, emit the right logs or metrics, and exit.
 - Design async work to be idempotent and retry-safe.
+- Pass correlation identifiers and the minimum context needed to debug failures.
 - Respect transaction boundaries. If background work depends on committed state, enqueue after commit or through the repo's equivalent safe handoff.
 - Keep signal, webhook, and scheduler handlers thin; delegate real work to services or processors.
 - In mixed sync and async stacks, use the framework's approved boundary helpers instead of blocking the event loop or bypassing connection safety.

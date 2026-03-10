@@ -32,6 +32,23 @@ Common mistake: reading only the last line.
 - In CI logs, identify the first failing step, not just the final job summary.
 - In browser failures, inspect console errors, network failures, screenshot or trace artifacts, and DOM timing.
 
+## Error diagnosis workflow
+
+For application errors, move in this order:
+
+1. Extract the concrete context: module, line, function, failing input, environment, and first visible symptom.
+2. Identify the owner layer: transport, schema or validation, domain logic, persistence, async job, external integration, or UI state.
+3. Correlate with recent code, config, dependency, schema, or data-shape changes.
+4. Fix the root cause and add the narrowest regression proof that would have caught it.
+5. Record residual risk if the bug depends on production-only data volume, concurrency, or rollout state.
+
+Useful prompts to answer before editing:
+
+- What exact input or state made this path fail?
+- Did the code assume a field, relation, env var, cache entry, or timing guarantee that is not actually guaranteed?
+- Is the symptom happening at the true owner layer, or only surfacing there from a deeper fault?
+- What smaller test or reproduction isolates the fault without the rest of the stack?
+
 ## CI-only failure workflow
 
 When something fails only in CI:
@@ -113,6 +130,23 @@ Good proof patterns:
 - browser traces and performance profiles for UI regressions
 - memory snapshots for leaks or runaway caches
 
+## Performance diagnosis workflow
+
+1. Capture a baseline: response time, query count, retry count, CPU, memory, render time, or queue latency.
+2. Identify the dominant cost class: database, network, render, serialization, lock contention, retry storm, or unbounded iteration.
+3. Reproduce with the smallest realistic dataset or request shape that still shows the problem.
+4. Change the dominant cost driver first instead of spreading small guesses across many layers.
+5. Re-measure the same scenario after the fix.
+
+Common root causes:
+
+- N+1 queries or repeated API calls in loops
+- missing indexes, full scans, or unbounded result sets
+- repeated serialization or expensive derived fields on hot paths
+- loading large datasets into memory instead of streaming or chunking
+- retry loops without backoff, cancellation, or deduplication
+- browser work tied to every render instead of meaningful state changes
+
 ## Observability-led debugging
 
 If logs, metrics, traces, or artifacts already exist, use them before adding new instrumentation.
@@ -125,6 +159,13 @@ Useful evidence sources:
 - queue retries, dead-letter queues, worker heartbeats
 
 Add instrumentation only after confirming existing signals are insufficient, and remove temporary noise once the issue is resolved.
+
+If the failing path is:
+
+- request-driven: follow request or trace IDs across gateway, app, datastore, and downstream calls
+- queue-driven: inspect enqueue time, retry history, dead-letter flow, and worker logs together
+- browser-driven: inspect network waterfall, console, performance trace, and UI state transitions together
+- rollout-driven: compare release version, config, feature flags, migration state, and environment scope
 ---
 
 ## Error Pattern Reference

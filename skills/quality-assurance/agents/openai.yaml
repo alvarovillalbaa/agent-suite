@@ -1,4 +1,4 @@
 interface:
   display_name: "Quality Assurance"
-  short_description: "Review, test, debug, and harden CI/CD"
-  default_prompt: "Use $quality-assurance to choose the right review, testing, debugging, and CI strategy for this repo."
+  short_description: "Review code, debug failures, and harden tests and CI"
+  default_prompt: "Use $quality-assurance to choose the right review, testing, failure-triage, debugging, and CI strategy for this repo."
