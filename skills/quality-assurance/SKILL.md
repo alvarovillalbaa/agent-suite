@@ -1,32 +1,34 @@
 ---
-name: "quality-assurance"
-description: "End-to-end quality assurance for any software repo: code review, test strategy, bug triage, debugging, flaky-test repair, coverage improvement, suite architecture, and CI/CD quality gates for frontend, backend, or full-stack systems. Use when reviewing PRs, receiving review feedback, writing tests, fixing failing or flaky tests, scaling large suites, enforcing lint/type/build/test/security checks, improving release confidence, or wiring reliable verification into local workflows and CI."
+name: quality-assurance
+description: "End-to-end quality assurance for any software repo: code review, test strategy, bug triage, debugging, flaky-test repair, coverage improvement, suite architecture, and CI/CD quality gates for frontend, backend, or full-stack systems. Use when reviewing PRs, receiving review feedback, writing or repairing tests, debugging failing or flaky suites, proving browser behavior, hardening frontend or backend CI, or improving release confidence with reliable verification."
 ---
 
 # Quality Assurance
 
 Quality assurance is a delivery system, not a phase. Reconstruct intended behavior, choose the cheapest evidence that can prove or falsify it, then wire the same verification into repeatable local and CI workflows.
 
+In command examples below, `<skill-dir>` means the installed `quality-assurance` skill directory and `<repo-root>` means the target repository root.
+
 ## Start Here
 
-1. Run `python .agents/skills/quality-assurance/scripts/qa-scan.py .` from the repo root.
-2. Reuse existing repo commands from `Makefile`, `package.json`, `pyproject.toml`, `tox.ini`, `noxfile.py`, `justfile`, `Taskfile.yml`, or CI config before inventing new ones.
-3. Read repo-local instructions before deciding whether to run tests, what thresholds apply, or which folders own coverage.
-4. Load only the reference files that match the task.
-5. State the verification command before making any success claim.
+1. Run `python <skill-dir>/scripts/qa-scan.py <repo-root>` when the bundled scanner is available; otherwise perform the same stack and CI inventory manually.
+2. Reconstruct the intended behavior and the cheapest proof that can falsify or confirm it.
+3. Reuse repo commands from `Makefile`, `package.json`, `pyproject.toml`, `tox.ini`, `noxfile.py`, `justfile`, `Taskfile.yml`, or CI config before inventing new ones.
+4. Read repo-local instructions before deciding whether tests may be run, which suites are mandatory, or how evidence must be reported.
+5. Load only the reference files that match the task, and state the proof command before making any success claim.
 
 ## Operating Rules
 
 - Evidence before claims. Do not say fixed, passing, or complete without fresh command output.
-- Reproduce before repair. A regression test is part of the fix.
+- Reproduce before repair. A regression test is part of the fix whenever the repo and task permit it.
 - Use the lowest-fidelity test that can actually prove the behavior. Escalate only when cheaper layers cannot prove it.
 - Mock boundaries, not business logic.
-- Test behavior, contracts, and side effects. Avoid implementation-detail assertions unless the implementation itself is the contract.
-- Respect repo-local rules for when tests may be run, which suites are mandatory, and how CI is wired.
+- Frontend QA must prove user-visible state transitions, not just that markup rendered.
 - Review comments are technical claims to evaluate, not social cues to obey.
 - Flaky tests are bugs. Quarantine is temporary containment, not completion.
 - Coverage is a lagging indicator. Use it to find blind spots, not to justify weak tests.
-- At scale, speed comes from suite architecture, hermetic setup, sharding, and disciplined selection.
+- CI-only failures usually mean environment, ordering, timing, data, or cache assumptions were hidden locally. Debug those assumptions directly.
+- At scale, speed comes from suite architecture, hermetic setup, sharding, disciplined test selection, and high-signal artifacts.
 
 ## QA Router
 
@@ -62,7 +64,9 @@ Read [references/backend-testing.md](./references/backend-testing.md) for:
 Read [references/frontend-testing.md](./references/frontend-testing.md) for:
 - component, integration, browser, accessibility, and visual testing
 - async UI control
-- network and time handling
+- provider and fixture setup
+- network, storage, and time handling
+- flake repair and incremental test workflow
 
 ### Failure triage and debugging
 
@@ -100,8 +104,8 @@ Read [references/anti-patterns.md](./references/anti-patterns.md) for fast smell
 
 ### Review loop
 
-1. Reconstruct intended behavior from the issue, PR description, or diff.
-2. Review highest-risk paths first: correctness, data integrity, auth, concurrency, performance.
+1. Reconstruct intended behavior from the issue, PR description, diff, or failing report.
+2. Review highest-risk paths first: correctness, data integrity, auth, concurrency, performance, and user-visible regressions.
 3. Emit findings with severity, impact, and concrete file or command evidence.
 4. Propose the smallest safe fix or the precise follow-up question needed to unblock.
 5. Verify changed behavior with focused commands.
@@ -111,8 +115,16 @@ Read [references/anti-patterns.md](./references/anti-patterns.md) for fast smell
 1. Reproduce.
 2. Isolate the smallest failing case.
 3. Add or identify a failing regression test.
-4. Fix the root cause.
+4. Fix the root cause, not just the symptom.
 5. Run the focused proof command, then broader regression commands.
+
+### Frontend verification loop
+
+1. Choose the correct test layer: unit, component, integration, browser, or visual.
+2. Render through realistic providers and control network, time, storage, and viewport explicitly.
+3. Assert loading, empty, error, success, retry, disabled, and optimistic states when they matter.
+4. Verify accessible names, keyboard flow, and focus behavior for user-facing changes.
+5. Run the smallest proof first, then broaden only when necessary.
 
 ### Test-authoring loop
 
@@ -120,7 +132,8 @@ Read [references/anti-patterns.md](./references/anti-patterns.md) for fast smell
 2. Build data with factories, builders, or fixtures instead of ad hoc duplication.
 3. Assert observable outcomes.
 4. Remove timing, order, and environment sensitivity.
-5. Wire the command into local scripts and CI if it protects a critical behavior.
+5. For large scopes, work incrementally: one file or behavior slice at a time, verify, then continue.
+6. Wire the command into local scripts and CI if it protects a critical behavior.
 
 ### CI hardening loop
 
@@ -139,9 +152,9 @@ Read [references/anti-patterns.md](./references/anti-patterns.md) for fast smell
 
 ## Skill Orchestration
 
-- Use `test-assistant` when the bottleneck is writing or repairing concrete tests.
+- Use `agentic-development` when repo orientation, architecture choice, or the code-change path itself is the bottleneck.
 - Use `gh-fix-ci` when GitHub Actions failures need log retrieval and implementation.
-- Use security or cloud-specific skills when the QA problem depends on those systems.
+- Use security, browser, visual, performance, or cloud-specific skills when the QA problem depends on those systems.
 - Use repo-specific build, deploy, or observability skills when the failure depends on that tooling.
 
 ## Exit Criteria

@@ -118,6 +118,28 @@
 6. Re-check logs, metrics, health endpoints, and deployment state.
 7. Capture the exact command sequence and root cause.
 
+## Role-Specific Checks for Multi-Runtime Backends
+
+### Web
+
+- health endpoint, target registration, ingress, and recent deploy events
+- dependency reachability to database, cache, secrets, and storage
+
+### Worker
+
+- queue depth, retry storms, consumer concurrency, and memory pressure
+- secret, database, and cache reachability without public ingress assumptions
+
+### Realtime
+
+- websocket or stream connection health, timeout settings, and backplane or cache reachability
+- load balancer and proxy behavior for long-lived connections
+
+### Scheduler and Admin
+
+- trigger history, missed runs, and least-privilege identity
+- keep dashboards and admin UIs private unless there is an explicit reason to expose them
+
 ## Common Failure Classes
 
 ### Wrong Context

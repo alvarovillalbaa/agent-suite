@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 from typing import Iterable
@@ -71,13 +72,17 @@ def detect_ci(root: Path) -> list[str]:
         providers.append("buildkite")
     if (root / "azure-pipelines.yml").exists():
         providers.append("azure-pipelines")
+    if (root / "buildspec.yml").exists() or (root / "buildspec.yaml").exists():
+        providers.append("aws-codebuild")
     return providers
 
 
 def detect_test_runners(root: Path) -> list[str]:
     runners: list[str] = []
     package_json = read_text(root / "package.json")
-    if has_any(root, ["pytest.ini", "conftest.py"]) or "pytest" in read_text(root / "pyproject.toml"):
+    pyproject = read_text(root / "pyproject.toml")
+    requirements = read_text(root / "requirements.txt")
+    if has_any(root, ["pytest.ini", "conftest.py"]) or "pytest" in pyproject or "pytest" in requirements:
         runners.append("pytest")
     if '"vitest"' in package_json:
         runners.append("vitest")
@@ -100,9 +105,10 @@ def detect_linters(root: Path) -> list[str]:
     tools: list[str] = []
     package_json = read_text(root / "package.json")
     pyproject = read_text(root / "pyproject.toml")
-    if "ruff" in pyproject or (root / "ruff.toml").exists() or (root / ".ruff.toml").exists():
+    requirements = read_text(root / "requirements.txt")
+    if "ruff" in pyproject or "ruff" in requirements or (root / "ruff.toml").exists() or (root / ".ruff.toml").exists():
         tools.append("ruff")
-    if "mypy" in pyproject:
+    if "mypy" in pyproject or "mypy" in requirements:
         tools.append("mypy")
     if "pyright" in package_json or "pyright" in pyproject:
         tools.append("pyright")
@@ -164,7 +170,11 @@ def suggested_references(languages: list[str], frameworks: list[str], ci: list[s
 
 
 def main() -> None:
-    root = Path(".").resolve()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("path", nargs="?", default=".", help="repository path")
+    args = parser.parse_args()
+
+    root = Path(args.path).resolve()
 
     languages = detect_languages(root)
     frameworks = detect_frameworks(root)

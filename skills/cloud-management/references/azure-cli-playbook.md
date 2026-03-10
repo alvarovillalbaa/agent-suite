@@ -9,7 +9,7 @@
 - Automatic deployments
 - Troubleshooting
 - Optimization
-- Cloush-style mapping
+- Multi-runtime backend mapping
 
 ## Scope and Identity
 
@@ -160,7 +160,7 @@ Common failure classes:
 - clean up unused public IPs, NAT, gateways, and stale revisions
 - keep Key Vault references and managed identity wiring consistent instead of duplicating secrets
 
-## Cloush-Style Azure Mapping
+## Multi-Runtime Backend Mapping
 
 - `web`: Azure Container App with ingress
 - `worker`: Azure Container App without ingress
@@ -170,3 +170,4 @@ Common failure classes:
 - `files`: Blob Storage
 - `secrets`: Key Vault
 - `events`: Event Grid or Service Bus
+- `admin`: keep dashboards and internal control-plane surfaces private unless the user explicitly wants public exposure

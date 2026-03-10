@@ -9,7 +9,7 @@
 - Automatic deployments
 - Troubleshooting
 - Optimization
-- Cloush-style mapping
+- Multi-runtime backend mapping
 
 ## Scope and Identity
 
@@ -100,6 +100,8 @@ aws ecs update-service \
 aws ecs describe-services --cluster app --service web --profile my-dev
 ```
 
+Prefer immutable tags or image digests for rollouts when the repo allows it. If the repo still deploys mutable `latest` tags, record the commit SHA and rollout command so rollback stays concrete.
+
 ### Static Sites
 
 ```bash
@@ -145,6 +147,7 @@ Useful command surfaces:
 - `aws ecs register-task-definition`
 - `aws ecs update-service`
 - `aws lambda update-function-code`
+- `buildspec.yml` when AWS CodeBuild drives multi-image builds or deploy steps
 
 ## Troubleshooting
 
@@ -179,6 +182,7 @@ Common failure classes:
 - task definition references a missing image tag or secret
 - ECS tasks cannot reach RDS, Redis, or ALB targets
 - CloudFormation stack is blocked by IAM or immutable-resource constraints
+- ALB idle timeout or target-group wiring breaks websocket or long-poll traffic
 
 ## Optimization
 
@@ -189,7 +193,7 @@ Common failure classes:
 - add S3 lifecycle and reduce unnecessary retention
 - use VPC endpoints when egress or NAT cost is the problem
 
-## Cloush-Style AWS Mapping
+## Multi-Runtime Backend Mapping
 
 - `web`: ECS Fargate service behind ALB
 - `worker`: ECS Fargate service without public ingress
@@ -199,3 +203,4 @@ Common failure classes:
 - `files`: S3
 - `secrets`: Secrets Manager
 - `scheduler`: EventBridge
+- `admin`: keep Flower, dashboards, or internal control-plane surfaces private unless the user explicitly wants public access

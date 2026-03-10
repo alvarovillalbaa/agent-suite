@@ -9,7 +9,7 @@
 - Automatic deployments
 - Troubleshooting
 - Optimization
-- Cloush-style mapping
+- Multi-runtime backend mapping
 
 ## Scope and Identity
 
@@ -159,7 +159,7 @@ Common failure classes:
 - add bucket lifecycle rules and reduce cross-region egress
 - use Cloud Asset Inventory to find stale resources and policy sprawl
 
-## Cloush-Style GCP Mapping
+## Multi-Runtime Backend Mapping
 
 - `web`: Cloud Run service
 - `worker`: Cloud Run service or job, or GKE if long-lived queue consumers need more control
@@ -169,3 +169,4 @@ Common failure classes:
 - `files`: Cloud Storage
 - `secrets`: Secret Manager
 - `events`: Pub/Sub and Cloud Scheduler
+- `admin`: keep dashboards and internal control-plane surfaces private unless the user explicitly wants public exposure

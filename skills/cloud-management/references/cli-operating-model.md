@@ -1,5 +1,7 @@
 # CLI Operating Model
 
+In command examples below, `<skill-dir>` means the installed `cloud-management` skill directory and `<repo-root>` means the target repository root.
+
 ## Contents
 
 - Non-negotiables
@@ -38,7 +40,7 @@ Do not rely on implicit defaults when the repo has multiple environments.
 Start with:
 
 ```bash
-python .agents/skills/cloud-management/scripts/detect_repo_stack.py .
+python <skill-dir>/scripts/detect_repo_stack.py <repo-root>
 ```
 
 Then validate the result manually:
@@ -48,6 +50,9 @@ Then validate the result manually:
 - workload shape: static site, API, worker, websocket or realtime, scheduled jobs, serverless, or k8s-heavy
 - cloud ownership by concern: runtime, database, storage, secrets, registry, DNS, monitoring
 - environment boundaries: dev, staging, prod, sandbox, ephemeral preview
+- likely primary cloud versus merely supported clouds
+- runtime surfaces such as `web`, `worker`, `realtime`, `scheduler`, or admin-only processes
+- operational risks such as startup migrations, mutable image tags, or multi-process containers
 
 Prefer extending what already exists unless the user explicitly wants migration.
 
@@ -108,6 +113,7 @@ Default to the least-complex managed service that fits the repo:
 - multi-service backend: separate web, worker, and socket or realtime runtimes
 - scheduled or async work: provider-native queues, schedulers, jobs, or functions
 - Kubernetes only when the repo already needs k8s primitives or lower-level control
+- Prefer one long-running responsibility per service. If the repo currently runs migrations at startup or multiple daemons in one container, treat that as a constraint to manage carefully, not a default to copy.
 
 Default to dev-sized capacity unless the user explicitly requests production-ready HA or multi-region.
 

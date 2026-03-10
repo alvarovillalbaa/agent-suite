@@ -2,93 +2,144 @@
 
 ## Scope
 
-Use this reference for browser and UI behavior: components, state flows, async interactions, accessibility, routing, networked UI, and visual regressions.
+Use this reference when behavior lives in the browser or in UI-facing state: components, hooks, reducers or stores, forms, routing, async data, optimistic updates, accessibility, visual regressions, or browser-only failures.
 
-## Pick the right UI test layer
+## Start Here
+
+1. Identify the risk and the smallest layer that can prove it.
+2. Inspect the repo's runner, helpers, providers, fixtures, and existing test commands before writing new test code.
+3. Reuse existing render helpers and factories when they exist.
+4. State the proof command before editing.
+5. For multi-file scopes, work one file or behavior slice at a time and verify each step before continuing.
+
+## Frontend QA Loop
+
+1. Identify the risk and choose the cheapest test layer that can prove it.
+2. Recreate realistic state with the same providers, router context, and feature flags the app uses in production.
+3. Control network, time, storage, randomness, and viewport explicitly.
+4. Assert the user-visible state transitions, not just final markup.
+5. Run the focused proof first, then broaden only when the task or repo requires it.
+
+## Pick the Right Layer
 
 | Behavior to prove | Preferred layer |
 |---|---|
 | pure formatter, selector, reducer, helper | unit |
-| component behavior from a user perspective | component test |
-| multi-component flow with mocked network | integration test |
-| auth, routing, browser storage, real navigation | end-to-end |
+| hook, store, or state machine behavior | unit or hook harness |
+| single component behavior from a user perspective | component test |
+| multi-component flow with mocked network or router | integration test |
+| auth, routing, storage, drag-and-drop, uploads, layout, or browser APIs | end-to-end/browser |
 | layout or styling regressions that matter visually | visual regression |
+| semantic and keyboard regressions | component or integration test, plus browser audit if needed |
 
-Do not use full-browser tests for logic that a component or integration test can prove more cheaply.
+Do not use full-browser tests for logic that a unit, component, or integration test can prove more cheaply.
 
-## Core rules
+## Core Rules
 
-- Query the UI the way users perceive it: role, label, text, placeholder.
-- Prefer user interactions over calling component internals directly.
-- Assert loading, empty, error, success, and retry states.
-- Control time and network explicitly.
-- Avoid brittle selectors tied to DOM structure unless test IDs are the actual contract.
+- Query the UI the way users perceive it: role, label, text, placeholder, and accessible name.
+- Prefer `userEvent` or equivalent real interaction helpers over calling component internals directly.
+- Mock boundaries, not business logic.
+- Assert loading, empty, error, success, retry, disabled, and optimistic states when relevant.
+- Test IDs are a last resort unless the ID is itself the stable contract.
+- Snapshots are a narrow tool. Prefer behavior assertions unless the visual structure is the contract.
+- One behavior per test is the default. Group only when the behavior is inseparable.
 
-## Component and integration testing
+## Component and Integration Patterns
 
 For component-heavy apps:
+
 - render through the same providers used in production when context matters
 - keep data realistic but minimal
-- use `userEvent` or equivalent for actual interaction semantics
-- use `waitFor` or explicit async helpers, not arbitrary sleeps
-- test accessibility names and keyboard flows where relevant
+- prefer real child components and shared primitives over mocking the entire tree
+- mock network, auth, analytics, or third-party side-effect boundaries instead of internal business logic
+- use explicit assertions for forms, keyboard paths, focus moves, toasts, and inline errors
 
 What to cover:
+
 - input validation and disabled states
 - optimistic updates and rollback on failure
 - stale data and refetch behavior
 - error banners, toasts, and inline errors
 - routing transitions and preserved state
+- long lists, empty lists, and permission-restricted states
 
-## Network control
+When starting from scratch, use the templates in:
 
-Use request interception or a service worker layer rather than mocking every hook separately.
+- `assets/frontend-component-test.template.tsx`
+- `assets/frontend-hook-test.template.ts`
+- `assets/frontend-utility-test.template.ts`
 
-Good options:
-- `msw` for browser and component tests
-- explicit fetch or client stubs at the boundary for low-level tests
-- contract fixtures for large API payloads
+## Network, Storage, and Time Control
 
-Bad options:
-- mocking every hook, selector, component, and cache object in the tree
-- snapshots of entire rendered apps instead of behavioral assertions
+- Use request interception or a boundary stub instead of mocking every hook separately.
+- Good options:
+  - `msw` or equivalent request interception for component and integration tests
+  - explicit client or fetch stubs at the network boundary for low-level tests
+  - contract fixtures for large payloads
+- Bad options:
+  - mocking every hook, selector, component, and cache object in the tree
+  - relying on real network calls in routine frontend tests
+- Fake timers are appropriate only when the behavior actually depends on time: debounce, polling, retry, delayed transitions, or timeouts.
+- If fake timers are used, keep them consistent within the test and restore real timers cleanly.
+- Reset mocks, storage, and global state between tests so order does not matter.
 
-## Browser and end-to-end tests
+## Browser and Visual Tests
 
-Use Playwright, Cypress, or equivalent for flows where the browser itself is part of the risk:
-- auth
-- routing and redirects
+Use Playwright, Cypress, or equivalent when the browser itself is part of the risk:
+
+- auth flows and redirects
+- navigation and history behavior
 - cookies, storage, or session persistence
-- multi-page workflows
-- rich drag-and-drop or upload flows
+- uploads, drag-and-drop, clipboard, or media APIs
 - accessibility or visual checks that require the real browser
+- responsive layout bugs that do not reproduce in a jsdom-style environment
 
-Keep E2E stable by:
+Use browser tests only when the browser itself is part of the risk. Do not jump to them when unit, component, or integration tests can prove the behavior more cheaply.
+
+Keep browser tests stable by:
+
 - seeding deterministic data
-- using dedicated accounts or isolated environments
-- resetting server state between tests
-- collecting screenshots, videos, and traces on failure
+- using isolated accounts or environments
+- fixing viewport and locale assumptions
+- collecting screenshots, videos, or traces on failure
+- keeping the critical-path browser suite small and intentional
 
-## Accessibility and visual quality
+Visual regression helps when layout matters, but keep the baseline small and review diffs like code, not as auto-approved noise.
 
-Accessibility is part of QA, not a separate project.
+## Incremental Workflow for Large Frontend Scopes
 
-Minimum checks for user-facing changes:
-- semantic roles and accessible names
-- keyboard access for primary flows
-- visible focus states
-- error messages tied to inputs
-- color contrast or design-system guarantees where available
+When the request covers a directory, feature area, or many files:
 
-Visual regression helps when layout matters, but keep the baseline small and intentional. Review diffs like code, not as auto-approved noise.
+1. List the files or behaviors that need proof.
+2. Order them from simplest to most coupled: utilities, hooks, presentational components, stateful components, container flows, browser journeys.
+3. Process one file or behavior slice at a time.
+4. Run the focused command after each slice.
+5. Do not queue a pile of failing specs before debugging the first one.
 
-## Frontend flake patterns
+This keeps failures attributable and prevents mock or provider mistakes from spreading across the entire batch.
+
+## Frontend Flake Patterns
 
 Most frontend flakes come from:
-- waiting on implementation timing instead of state
+
+- waiting on implementation timing instead of observable state
 - real network calls leaking into tests
 - fake timers mixed with real promises incorrectly
+- unawaited user interactions
 - animations and transitions not disabled or awaited
 - selectors tied to unstable DOM structure
+- leaked global state, storage, or feature flags
+- viewport, locale, or timezone assumptions hidden in the test environment
 
-Fix flakes by making state transitions explicit and observable.
+Fix flakes by making state transitions explicit and observable, not by sprinkling longer sleeps.
+
+## Review Checklist
+
+For user-facing changes, verify:
+
+- the chosen test layer matches the risk
+- accessible names and semantics are asserted
+- keyboard access and focus behavior are covered when relevant
+- provider setup matches production shape closely enough
+- network, storage, and time are controlled explicitly
+- the final proof command is scoped, repeatable, and actually run

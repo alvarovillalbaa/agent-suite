@@ -1,5 +1,7 @@
 # Approval Policy
 
+In command examples below, `<skill-dir>` means the installed `cloud-management` skill directory.
+
 ## Mandatory Approval Cases
 
 Require explicit user confirmation before executing commands that:
@@ -48,13 +50,14 @@ Treat these as approval-worthy even before you have exact pricing:
 - blast radius: service, app, resource group, project, subscription, or org
 - rollback or restore path
 - whether downtime, restart, or data movement is expected
+- whether migrations run as a one-off job or inside a steady-state runtime rollout
 
 ## Use the Guard Script
 
 Example:
 
 ```bash
-python .agents/skills/cloud-management/scripts/cloud_change_guard.py \
+python <skill-dir>/scripts/cloud_change_guard.py \
   --provider azure \
   --environment prod \
   --operation "update container app ingress and dns" \

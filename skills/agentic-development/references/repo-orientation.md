@@ -2,9 +2,11 @@
 
 Start every substantial task with a fast orientation pass. The goal is to learn the repo's rules, shape, and existing seams before you touch code.
 
+In command examples below, `<skill-dir>` means the installed `agentic-development` skill directory and `<repo-root>` means the target repository root.
+
 ## Startup Pass
 
-1. Run `python .agents/skills/agentic-development/scripts/repo_scan.py`.
+1. Run `python <skill-dir>/scripts/repo_scan.py <repo-root>`.
 2. Read the instruction files it finds. Prefer the hierarchy the repo defines. If the repo exposes `AGENTS.md`, `SOUL.md`, `PRINCIPLES.md`, and `PLANS.md`, treat them as operations, identity, decision heuristics, and planning protocol respectively.
 3. Read the nearest docs for the area you will change. Root docs explain global behavior; package, service, or directory docs explain local behavior.
 4. Inspect git context: current branch, dirty files, worktrees, and whether the current task is already tied to a PR.
@@ -33,6 +35,6 @@ When local docs conflict with global docs, prefer the more specific doc unless t
 - What commands prove the change works?
 - What existing logging, analytics, or tracing should I inspect before adding new instrumentation?
 
-## Cloush-Style Reading
+## Centralized-Instruction-Chain Repos
 
-In repos that resemble Cloush, look for a centralized instruction chain and follow it instead of inventing new process. Expect thin transport layers, service-owned business logic, centralized logging, and strong reuse rules.
+In repos with a centralized instruction chain, follow it instead of inventing new process. Expect thin transport layers, service-owned business logic, centralized logging, and strong reuse rules.

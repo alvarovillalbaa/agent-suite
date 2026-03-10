@@ -4,6 +4,12 @@
 
 Use this reference for backend or service-heavy systems: APIs, domain services, databases, queues, schedulers, external integrations, and migrations.
 
+## Policy First
+
+- Read repo-local rules before deciding whether tests may be run, which suites are mandatory, where tests live, and what evidence format is expected.
+- If the repo or user does not want tests run proactively, still choose the right proof path and state what should be run later.
+- Choose the lowest environment that can prove the claim: in-memory, test DB, containerized stack, or production-like harness.
+
 ## Test shape by layer
 
 | Layer | What to prove | Typical tools |
@@ -12,6 +18,7 @@ Use this reference for backend or service-heavy systems: APIs, domain services, 
 | Integration | DB writes, HTTP handlers, serialization, auth, queues, jobs | pytest-django, supertest, rspec request specs |
 | Contract | request or event shape to external systems | pact, schema assertions, fixture-based contract tests |
 | End-to-end | high-value workflows across multiple layers | browser or API-driven flows |
+| Migration or rollout | schema safety, backfills, compatibility | migration tests, fixture snapshots, production-like harnesses |
 
 ## API and transport tests
 
@@ -24,7 +31,9 @@ For API routes or controllers:
 Useful checks:
 - content type and status code
 - auth and permission boundaries
+- tenant or account scoping
 - pagination, filtering, ordering
+- retrieval depth, field expansion, or include semantics
 - idempotency for create or retry paths
 - error payload stability
 
@@ -36,6 +45,7 @@ If the architecture uses a service layer, treat it as the primary home for busin
 - integration-test services that touch DB, queues, or multiple repositories
 - avoid mocking the service under test from one layer above if that hides behavior you actually care about
 - verify side effects directly: rows written, events emitted, calls made to true external boundaries
+- keep transport tests focused on routing, auth, validation, and serialization instead of duplicating every service branch
 
 ## Database tests
 
@@ -52,6 +62,7 @@ Test migration and rollout risk when schemas change:
 - rollback viability if the platform expects it
 - mixed-version compatibility when old and new app versions may overlap
 - backfills on realistic data volume if the change is risky
+- enqueue-after-commit or equivalent transaction handoff when async work follows writes
 
 ## Jobs, queues, and async workers
 
@@ -66,6 +77,9 @@ Common bugs to catch:
 - stale reads before transaction commit
 - missing correlation IDs or logging context
 - jobs that succeed only because tests execute synchronously
+- handlers that do too much instead of delegating to an owning service
+
+If the repo uses signals, webhooks, or schedulers, prefer at least one test path that triggers the real entrypoint when the handoff itself matters.
 
 ## External integrations
 
@@ -75,6 +89,16 @@ Mock or emulate the boundary, not the internal caller.
 - assert both outbound request shape and inbound failure handling
 - test rate limits, timeouts, partial failures, and malformed payloads
 - prefer contract fixtures or schema checks over hand-built dict fragments
+
+## Security and Multi-Tenancy
+
+Backend regressions often leak data before they throw errors. Add explicit tests for:
+
+- authenticated vs unauthenticated behavior
+- permission downgrade or missing-role behavior
+- tenant, company, or account isolation
+- redaction of secrets or sensitive fields in responses and logs
+- file upload validation and cleanup when the backend accepts files
 
 ## Concurrency and correctness
 
@@ -95,6 +119,8 @@ When true concurrency is hard to automate, define the exact manual or load-test 
 - use real DB for ORM behavior
 - freeze time when temporal logic matters
 - keep fixtures in `conftest.py` or local factories
+- for Django or DRF, exercise the real API client when routing, auth, middleware, or serializers matter
+- for async Python, test the framework-approved sync/async boundary instead of silently mixing blocking I/O into async code
 
 ### Node or TypeScript
 
@@ -102,6 +128,7 @@ When true concurrency is hard to automate, define the exact manual or load-test 
 - `supertest` for HTTP layers
 - use `msw` or explicit fetch mocking for outbound HTTP
 - assert runtime and type contracts separately
+- for Express, Fastify, or Nest, boot the real app or module when middleware and serialization are part of the contract
 
 ### Ruby
 

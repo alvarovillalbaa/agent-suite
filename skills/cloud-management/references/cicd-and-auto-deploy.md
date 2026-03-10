@@ -89,6 +89,26 @@ When stateful resources are involved:
 6. roll out websocket or realtime services
 7. verify health, queue drain behavior, and logs
 
+## Multi-Runtime Backend Rollout
+
+For repos with separate web, worker, realtime, scheduler, or admin surfaces:
+
+1. build the shared artifact once if the repo already uses one image for multiple roles
+2. run migrations as a one-off job or controlled pre-deploy step
+3. roll out workers before or alongside web only when queue compatibility requires it
+4. roll out public web and realtime services independently so ingress and timeout changes stay isolated
+5. keep admin-only surfaces such as Flower or dashboards private by default
+
+If the repo currently runs migrations during service startup, treat each rollout as higher-risk and confirm rollback posture before deploying.
+
+## Anti-Patterns to Flag
+
+- mutable `latest` tags without a recorded immutable tag, digest, or commit SHA
+- startup migrations inside the steady-state web service when a one-off job would be safer
+- one long-running container process trying to serve public traffic, background work, and control-plane jobs at once
+- public exposure for internal admin surfaces
+- CI identity spread across static secrets when one short-lived identity flow would work
+
 ## CI System Notes
 
 ### GitHub Actions

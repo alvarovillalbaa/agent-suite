@@ -23,9 +23,20 @@ Start investigations with the observability the repo already has. Adding new log
 
 1. Reproduce the issue as narrowly as possible.
 2. Capture the identifiers that let you correlate events: request id, user id, job id, conversation id, run id, trace id.
-3. Inspect the existing logs, traces, or analytics first.
+3. Follow the request, job, or event path through the logs, traces, metrics, or analytics the repo already emits.
 4. If those signals are insufficient, add the minimum new instrumentation in the system the repo already uses.
 5. Remove temporary debug noise before finishing unless the repo explicitly keeps it.
+
+## Correlation Checklist
+
+Useful fields vary by stack, but the goal is consistent:
+
+- request, trace, and span ids
+- job, run, task, or queue ids
+- user, tenant, org, or account ids
+- domain entity ids such as order, conversation, or document
+- external provider ids, retry counts, and feature flag states
+- release version, worker name, region, or environment when rollout behavior matters
 
 ## Adding Instrumentation
 
@@ -35,6 +46,14 @@ Start investigations with the observability the repo already has. Adding new log
 - Put backend logs near service boundaries and side effects, not scattered through every call site.
 - Put frontend analytics on meaningful user actions and state transitions, not every click or render.
 
-## Cloush-Style Example
+## Backend Signal Patterns
 
-Cloush uses both operational logger output and database-backed critical logging. That is a good pattern when the repo already distinguishes between routine telemetry and investigation-grade incidents. Reuse the established distinction instead of inventing new logging channels.
+- Log queue dispatch and queue execution with the same correlation ids when the system is async.
+- Time external calls, expensive queries, and retry loops with the repo's current metrics or tracing helpers.
+- Prefer one durable, well-structured failure signal over duplicate error logs at every layer.
+- Use stable error categories or event names when the repo already has them.
+- If a bug depends on load, ordering, or race conditions, define the exact proof path instead of adding broad speculative logging.
+
+## Multi-Channel Logging
+
+Some repos use both operational logger output and a second channel for investigation-grade incidents, audit events, or durable error records. That is a good pattern when the repo already distinguishes between routine telemetry and high-value diagnostic events. Reuse the established distinction instead of inventing new logging channels.

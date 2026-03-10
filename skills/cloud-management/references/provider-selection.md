@@ -6,9 +6,10 @@
 - Decision framework
 - Multi-cloud rule set
 - Workload mapping
+- Service topology cues
 - Managed-service bias
 - Existing estate versus greenfield
-- Cloush-style example
+- Multi-runtime backend example
 
 ## What to Collect First
 
@@ -63,6 +64,14 @@ Prefer the provider already operating that concern unless the improvement from m
 | Secrets | Secrets Manager or Parameter Store | Key Vault | Secret Manager |
 | K8s-heavy repo | EKS | AKS | GKE |
 
+## Service Topology Cues
+
+- public web traffic and internal workers usually deserve separate runtimes
+- websocket or realtime traffic often wants its own service, timeout policy, and scaling rules
+- schedulers and admin-only surfaces should be isolated from user-facing ingress
+- if the repo already runs several long-lived responsibilities inside one image, keep the runtime split explicit even when the build artifact is shared
+- if migrations run during steady-state startup, treat every rollout as higher-risk and prefer moving to a one-off migration job when the repo permits it
+
 ## Managed-Service Bias
 
 - Prefer managed containers over VMs for modern apps unless the repo depends on VM-specific behavior.
@@ -104,7 +113,7 @@ Prefer the provider already operating that concern unless the improvement from m
 - Existing estate: extend the current account, subscription, or project footprint unless there is a clear reason to split or migrate.
 - Migration: do not split data, secrets, DNS, or identity across providers without a deliberate steady-state design.
 
-## Cloush-Style Backend Example
+## Multi-Runtime Backend Example
 
 For a Django or API backend with worker queues, websocket traffic, Redis, PostgreSQL, file storage, and scheduled jobs:
 

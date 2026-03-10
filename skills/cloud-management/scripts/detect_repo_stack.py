@@ -18,6 +18,9 @@ except ModuleNotFoundError:  # pragma: no cover - Python < 3.11 fallback
 
 
 SKIP_DIRS = {
+    ".agents",
+    ".codex",
+    ".cursor",
     ".git",
     ".venv",
     ".mypy_cache",
@@ -30,6 +33,10 @@ SKIP_DIRS = {
     "dist",
     "build",
     "coverage",
+    "docs",
+    "examples",
+    "assets",
+    "references",
     "htmlcov",
 }
 
@@ -51,6 +58,7 @@ CI_PATTERNS = {
     "buildkite": [".buildkite/*.yml", ".buildkite/*.yaml"],
     "circleci": [".circleci/config.yml"],
     "cloud-build": ["cloudbuild.yml", "cloudbuild.yaml"],
+    "aws-codebuild": ["buildspec.yml", "buildspec.yaml"],
 }
 
 IAC_PATTERNS = {
@@ -78,8 +86,6 @@ FRAMEWORK_HINTS = {
     "nestjs": ["@nestjs/core"],
     "express": ["express"],
     "spring": ["spring-boot"],
-    "rails": ["rails"],
-    "laravel": ["laravel"],
 }
 
 DATA_HINTS = {
@@ -94,14 +100,17 @@ DATA_HINTS = {
 }
 
 CLOUD_HINTS = {
-    "aws": ["aws_", "ecs", "ecr", "rds", "elasticache", "cloudformation", "eventbridge"],
-    "azure": ["azure_", "containerapp", "key vault", "acr", "postgres flexible"],
-    "gcp": ["gcloud", "cloud run", "artifact registry", "cloud sql", "pub/sub"],
+    "aws": ["aws_", "ecs", "ecr", "rds", "elasticache", "cloudformation", "eventbridge", "buildspec"],
+    "azure": ["azure_", "containerapp", "key vault", "acr", "postgres flexible", "azure-pipelines"],
+    "gcp": ["gcloud", "cloud run", "artifact registry", "cloud sql", "pub/sub", "cloudbuild"],
 }
 
 PROVIDER_FILE_PATTERNS = {
     "aws": [
         "cdk.json",
+        "buildspec.yml",
+        "buildspec.yaml",
+        "**/*ecs*.json",
         "**/*task-definition*.json",
         "**/*cloudformation*.yml",
         "**/*cloudformation*.yaml",
@@ -122,8 +131,9 @@ PROVIDER_FILE_PATTERNS = {
 }
 
 DEPLOYMENT_PATTERNS = {
-    "dockerfile": ["Dockerfile", "**/Dockerfile", "**/Dockerfile.*"],
+    "dockerfile": ["Dockerfile", "DockerFile", "**/Dockerfile", "**/DockerFile", "**/Dockerfile.*", "**/DockerFile.*"],
     "procfile": ["Procfile"],
+    "buildspec": ["buildspec.yml", "buildspec.yaml"],
     "static-build": ["next.config.js", "next.config.mjs", "vite.config.ts", "vite.config.js"],
 }
 
@@ -131,6 +141,14 @@ CI_IDENTITY_HINTS = {
     "aws-oidc": ["aws-actions/configure-aws-credentials", "role-to-assume"],
     "azure-federated-identity": ["azure/login", "client-id:", "subscription-id:", "tenant-id:"],
     "gcp-workload-identity": ["google-github-actions/auth", "workload_identity_provider"],
+}
+
+RUNTIME_PATTERNS = {
+    "web": [r"gunicorn", r"uvicorn", r"runserver", r"nginx"],
+    "worker": [r"celery\s+-a\s+\S+\s+worker", r"rq worker", r"sidekiq", r"\bworker\b"],
+    "realtime": [r"websocket", r"\bsocket\b", r"channels", r"daphne", r"socketio"],
+    "scheduler": [r"celery\s+-a\s+\S+\s+beat", r"eventbridge", r"cloud scheduler", r"\bcron\b", r"\bscheduler\b"],
+    "admin": [r"\bflower\b", r"\bgrafana\b", r"\bprometheus\b", r"admin/flower"],
 }
 
 
@@ -234,6 +252,8 @@ def detect_frameworks(root: Path, files: list[Path]) -> set[str]:
             frameworks.add("django")
         if path.name == "daphne":
             frameworks.add("channels")
+        if path.name == "Gemfile" and "rails" in read_text(path).lower():
+            frameworks.add("rails")
 
     return frameworks
 
@@ -264,20 +284,47 @@ def detect_data_signals(root: Path, files: list[Path]) -> set[str]:
     return signals
 
 
-def detect_cloud_hints(root: Path, files: list[Path]) -> set[str]:
-    hints: set[str] = set()
+def select_high_signal_files(root: Path, files: list[Path], limit: int = 120) -> list[Path]:
     candidate_paths: list[Path] = []
     for path in files:
         relative = path.relative_to(root).as_posix().lower()
-        if re.search(r"(ops|infra|deploy|docker|compose|terraform|bicep|settings|workflow|cloud)", relative):
+        if re.search(
+            r"(\.github/workflows/|buildspec|dockerfile|procfile|compose|terraform|bicep|cloudformation|"
+            r"task-definition|ecs|ecr|containerapp|cloudrun|settings|env|deploy|infra|ops|k8s|helm|skaffold)",
+            relative,
+        ):
             candidate_paths.append(path)
-        if len(candidate_paths) >= 80:
+        if len(candidate_paths) >= limit:
             break
-    combined = "\n".join(read_text(path).lower() for path in candidate_paths)
-    for provider, markers in CLOUD_HINTS.items():
-        if any(marker in combined for marker in markers):
-            hints.add(provider)
-    return hints
+    return candidate_paths
+
+
+def score_cloud_hints(root: Path, files: list[Path]) -> dict[str, int]:
+    scores = {provider: 0 for provider in CLOUD_HINTS}
+    for path in select_high_signal_files(root, files):
+        text = read_text(path).lower()
+        relative = path.relative_to(root).as_posix().lower()
+        for provider, markers in CLOUD_HINTS.items():
+            hits = sum(1 for marker in markers if marker in text)
+            if not hits:
+                continue
+            weight = 1
+            if provider == "aws" and re.search(r"(buildspec|ecs|ecr|cloudformation|task-definition|\.aws/)", relative):
+                weight = 3
+            elif provider == "azure" and re.search(r"(azure-pipelines|containerapp|bicep|azure\.ya?ml)", relative):
+                weight = 3
+            elif provider == "gcp" and re.search(r"(cloudbuild|cloudrun)", relative):
+                weight = 3
+            scores[provider] += hits * weight
+    return scores
+
+
+def infer_primary_clouds(scores: dict[str, int]) -> list[str]:
+    strongest = max(scores.values(), default=0)
+    if strongest <= 0:
+        return []
+    threshold = max(2, strongest // 2)
+    return sorted(provider for provider, score in scores.items() if score >= threshold)
 
 
 def detect_provider_context_files(relative_paths: list[str]) -> dict[str, list[str]]:
@@ -298,7 +345,10 @@ def detect_ci_identity_hints(root: Path, files: list[Path]) -> list[str]:
     workflow_files = [
         path
         for path in files
-        if re.search(r"(\.github/workflows/|\.gitlab-ci\.yml|azure-pipelines|cloudbuild|Jenkinsfile|\.buildkite/)", path.as_posix())
+        if re.search(
+            r"(\.github/workflows/|\.gitlab-ci\.yml|azure-pipelines|cloudbuild|buildspec|Jenkinsfile|\.buildkite/)",
+            path.as_posix(),
+        )
     ]
     combined = "\n".join(read_text(path).lower() for path in workflow_files[:25])
     hints = [
@@ -307,6 +357,33 @@ def detect_ci_identity_hints(root: Path, files: list[Path]) -> list[str]:
         if all(marker in combined for marker in markers)
     ]
     return sorted(hints)
+
+
+def detect_runtime_surfaces(root: Path, files: list[Path]) -> list[str]:
+    combined = "\n".join(read_text(path).lower() for path in select_high_signal_files(root, files, limit=40))
+    surfaces = [
+        name
+        for name, patterns in RUNTIME_PATTERNS.items()
+        if any(re.search(pattern, combined) for pattern in patterns)
+    ]
+    return sorted(surfaces)
+
+
+def detect_operational_risks(root: Path, files: list[Path]) -> list[str]:
+    combined = "\n".join(read_text(path).lower() for path in select_high_signal_files(root, files, limit=40))
+    risks: list[str] = []
+
+    if any(
+        token in combined
+        for token in ("manage.py migrate", "alembic upgrade", "prisma migrate", "flyway", "liquibase")
+    ):
+        risks.append("startup-migrations")
+    if "trap 'kill 0'" in combined or (" & " in combined and re.search(r"\bwait\b", combined)):
+        risks.append("multi-process-runtime")
+    if re.search(r":latest\b", combined):
+        risks.append("mutable-image-tags")
+
+    return sorted(risks)
 
 
 def infer_app_shape(
@@ -318,7 +395,7 @@ def infer_app_shape(
     shapes: list[str] = []
     if "nextjs" in frameworks and not {"django", "fastapi", "flask", "express", "nestjs", "spring"} & frameworks:
         shapes.append("frontend-webapp")
-    if {"django", "fastapi", "flask", "express", "nestjs", "spring", "rails", "laravel"} & frameworks:
+    if {"django", "fastapi", "flask", "express", "nestjs", "spring", "rails"} & frameworks:
         shapes.append("web-api")
     if "celery" in frameworks:
         shapes.append("background-worker")
@@ -326,7 +403,7 @@ def infer_app_shape(
         shapes.append("websocket-or-realtime")
     if "serverless" in iac:
         shapes.append("serverless")
-    if {"dockerfile", "procfile"} & {name for name, matches in deployment_files.items() if matches}:
+    if {"dockerfile", "procfile", "buildspec"} & {name for name, matches in deployment_files.items() if matches}:
         shapes.append("containerized")
     if {"docker-compose", "terraform", "pulumi", "bicep", "cloudformation", "aws-cdk"} & iac:
         shapes.append("infra-managed")
@@ -384,10 +461,12 @@ def main() -> None:
     iac = detect_iac(relative_paths)
     frameworks = detect_frameworks(root, files)
     data_signals = detect_data_signals(root, files)
-    cloud_hints = detect_cloud_hints(root, files)
+    cloud_scores = score_cloud_hints(root, files)
     provider_context_files = detect_provider_context_files(relative_paths)
     deployment_files = detect_deployment_files(relative_paths)
     ci_identity_hints = detect_ci_identity_hints(root, files)
+    runtime_surfaces = detect_runtime_surfaces(root, files)
+    operational_risks = detect_operational_risks(root, files)
     app_shape = infer_app_shape(frameworks, data_signals, iac, deployment_files)
     likely_deploy_bias = infer_deploy_bias(app_shape)
 
@@ -399,10 +478,14 @@ def main() -> None:
         "ci_identity_hints": ci_identity_hints,
         "iac": sorted(iac),
         "data_signals": sorted(data_signals),
-        "cloud_hints": sorted(cloud_hints),
+        "cloud_hints": sorted(provider for provider, score in cloud_scores.items() if score > 0),
+        "cloud_scores": {provider: score for provider, score in sorted(cloud_scores.items()) if score > 0},
+        "likely_primary_clouds": infer_primary_clouds(cloud_scores),
         "cloud_context_files": provider_context_files,
         "deployment_files": deployment_files,
         "app_shape": app_shape,
+        "runtime_surfaces": runtime_surfaces,
+        "operational_risks": operational_risks,
         "likely_deploy_bias": likely_deploy_bias,
         "recommended_managed_targets": recommend_targets(app_shape),
     }

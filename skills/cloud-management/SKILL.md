@@ -7,6 +7,8 @@ description: Cross-cloud CLI-first cloud operations for AWS, Azure, and GCP. Use
 
 Operate AWS, Azure, and GCP from the terminal as the control plane. Use provider CLIs plus terminal-invoked tools such as `docker`, `terraform`, `pulumi`, `kubectl`, `helm`, and CI runners. Do not fall back to a portal unless the user explicitly asks for a console workflow.
 
+In command examples below, `<skill-dir>` means the installed `cloud-management` skill directory and `<repo-root>` means the target repository root.
+
 ## Non-Negotiables
 
 1. Start read-only. Inspect the repo, current provider scope, existing IaC, and deployed state before proposing writes.
@@ -19,10 +21,11 @@ Operate AWS, Azure, and GCP from the terminal as the control plane. Use provider
 8. Prefer short-lived credentials, SSO, managed identity, workload identity, or OIDC federation over static keys.
 9. When a command surface is uncertain, inspect `--help`, provider docs, or existing repo automation before guessing.
 10. Finish the loop: apply, verify, capture outputs, and record rollback posture.
+11. Treat startup migrations and multi-process runtime containers as inherited constraints, not fresh defaults. Prefer one-off migration jobs and one long-running responsibility per service unless the repo already depends on a combined entrypoint.
 
 ## Start Sequence
 
-1. Run `python .agents/skills/cloud-management/scripts/detect_repo_stack.py .` from the repo root.
+1. Run `python <skill-dir>/scripts/detect_repo_stack.py <repo-root>`.
 2. Read [cli-operating-model.md](./references/cli-operating-model.md) for the shared operating discipline.
 3. Load only the references needed for the task:
    - mixed-cloud selection and workload mapping: [provider-selection.md](./references/provider-selection.md)
@@ -37,10 +40,11 @@ Operate AWS, Azure, and GCP from the terminal as the control plane. Use provider
    - AWS: profile or role, account, region
    - Azure: cloud, tenant, subscription, resource group
    - GCP: configuration, account, project, enabled APIs
-5. For any non-trivial mutation, run the guard script before presenting or executing the change:
+5. Use the repo scan output to identify likely primary clouds, runtime surfaces such as `web`, `worker`, `realtime`, and scheduler roles, and operational risks such as startup migrations or mutable image tags.
+6. For any non-trivial mutation, run the guard script before presenting or executing the change:
 
 ```bash
-python .agents/skills/cloud-management/scripts/cloud_change_guard.py \
+python <skill-dir>/scripts/cloud_change_guard.py \
   --provider aws \
   --environment prod \
   --operation "create ecs service, alb, and rds postgres instance" \
@@ -68,7 +72,7 @@ Use this loop for every cloud task:
 
 ### Identify the Right Provider or Multi-Cloud Shape
 
-1. Use `detect_repo_stack.py` to infer frameworks, CI, IaC, cloud hints, and likely runtime bias.
+1. Use `detect_repo_stack.py` to infer frameworks, CI, IaC, supported clouds, likely primary clouds, runtime surfaces, and operational risks.
 2. Load [provider-selection.md](./references/provider-selection.md).
 3. Determine ownership by concern:
    - runtime
@@ -86,7 +90,8 @@ Use this loop for every cloud task:
 2. Estimate recurring and one-time cost before provisioning.
 3. Run `cloud_change_guard.py` and request approval if required.
 4. Prefer the repo's existing IaC path. If none exists, use the provider CLI or CLI-invoked IaC in the smallest reasonable footprint.
-5. Wait, verify, and return the exact endpoints, IDs, and health evidence.
+5. Split long-running concerns by role when the workload needs it: public web, background workers, realtime, schedulers, and admin-only surfaces should not collapse into one service unless the repo already operates that way.
+6. Wait, verify, and return the exact endpoints, IDs, and health evidence.
 
 ### Wire Automatic Deployments
 
@@ -127,12 +132,13 @@ Favor the simplest managed platform that fits the repo:
 - Event-driven jobs or schedulers: use provider-native schedulers and queues instead of cron inside app containers.
 - Kubernetes: choose only when the repo already needs k8s primitives, advanced ingress, sidecars, daemon workloads, or node-level tuning.
 
-For Cloush-style backends, use this as the baseline example, not a hard requirement:
+For multi-runtime backends, use this as the baseline example, not a hard requirement:
 
 - separate `web`, `worker`, and `socket` or `realtime` runtime surfaces
 - managed PostgreSQL, managed Redis or Valkey, object storage, registry, and secrets
 - provider-native schedulers and queues
 - registry push plus rolling or revision-based service updates, not hand-managed VMs
+- internal admin or observability surfaces should stay private unless the user explicitly wants public exposure
 
 ## Approval Model
 
