@@ -2,6 +2,16 @@
 
 Do not claim success without evidence. If you did not run the command that proves the claim, say what you did verify and what remains unverified.
 
+## Binary Gates
+
+If a gate is allowed to block or advance work, it must be binary pass or fail.
+
+- lint, typecheck, test, build, schema, or review gates cannot be treated as “close enough”
+- warn-only output can inform a human, but it cannot justify “ready” in a looped or autonomous flow
+- if a repo lacks a single local verify command, chain the minimum relevant commands explicitly
+
+Weak or noisy gates cause false green results. Do not hide that.
+
 ## Verification Ladder
 
 Use the narrowest checks that prove the current claim:
@@ -10,6 +20,16 @@ Use the narrowest checks that prove the current claim:
 2. run the focused test, lint, build, or manual scenario that proves the fix
 3. inspect the diff for unintended spillover
 4. inspect `git status` before finishing
+
+If the change touched shared infrastructure, core types, public APIs, or other high-fanout seams, run the next broader relevant check before declaring completion.
+
+## Verification Output Hygiene
+
+Prefer output that is useful for decisions:
+
+- use quiet or focused flags when available
+- prefer failure-first output over pages of passing logs
+- keep screenshots, traces, and manual test notes tied to the exact acceptance criterion they prove
 
 If the repo or user says not to run tests automatically, respect that and state it plainly.
 

@@ -1,20 +1,20 @@
 ---
 name: agentic-development
-description: End-to-end repository execution workflow for implementing, debugging, refactoring, reviewing, instrumenting, explaining architecture, assessing refactor impact, and shipping code in any software repo. Use when the assistant needs to orient in an unfamiliar codebase, answer how a system works, decide how to work safely on main, branches, or worktrees, separate specs from plans from tests, coordinate parallel agents, handle PR and review feedback, inspect observability, or land cross-cutting frontend/backend changes without leaving loose ends.
+description: End-to-end repository execution workflow for implementing, debugging, refactoring, reviewing, instrumenting, explaining architecture, assessing refactor impact, and shipping code in any software repo. Use when the assistant needs to orient in an unfamiliar codebase, choose between direct execution and supervised harness loops, keep specs, plans, and tests distinct, coordinate builder and reviewer passes, handle PR feedback, inspect observability, or land cross-cutting frontend and backend changes without leaving loose ends.
 ---
 
 # Agentic Development
 
-Drive work through one loop: orient, classify the task, choose the execution mode, implement, review, verify, and compound. Treat repo-local instructions and existing architecture as the source of truth.
+Drive work through one loop: orient, classify the task, choose the execution mode, implement, review, verify, and compound. Treat repo-local instructions and existing architecture as the source of truth. For repeated or long-running work, keep the loop supervised: fresh context each iteration, state on disk, one task at a time, hard gates, and explicit reviewer output.
 
 ## Start Here
 
 1. Run the repo scan helper if the skill bundles one; otherwise do the same discovery manually from the repo root.
 2. Map the repo before touching code: instruction files, package or service boundaries, entrypoints, build and test commands, deployment surfaces, and current git state.
 3. For frontend-heavy work, map framework boundaries, route ownership, design-system sources, shared primitives, state owners, and existing analytics or error-reporting seams before choosing an edit path.
-4. Decide the task type: direct implementation, architecture explanation, debugging, review, spec clarification, plan execution, refactor, instrumentation, or release cleanup.
+4. Decide the task type and execution mode: implementation, review, architecture explanation, debugging, refactor, instrumentation, or release cleanup; then choose direct execution or a supervised harness loop if code will be written.
 5. Choose the authoritative path for the change or explanation: the existing module, service, component, hook, page, command, model, or workflow that already owns the behavior.
-6. Decide the proof before editing: what command, test, log, screenshot, trace, or dependency search will confirm the result.
+6. Decide the proof before editing: what command, test, log, screenshot, trace, dependency search, or reviewer output will confirm the result.
 7. Load only the reference files relevant to the current task.
 
 ## Core Rules
@@ -23,11 +23,24 @@ Drive work through one loop: orient, classify the task, choose the execution mod
 - Work with the current git reality. Do not force a branch or worktree change just because `main` is active; choose the safest path that fits the user's intent.
 - Extend existing seams. Reuse current services, hooks, stores, component primitives, models, logging, analytics, and scripts instead of creating parallel abstractions.
 - Architecture claims need evidence. Trace entrypoints, ownership, dependencies, and contracts before explaining how the system works or what a refactor will affect.
-- Separate concerns intentionally: specs define behavior, plans define execution, tests prove behavior, and instrumentation explains production behavior.
+- Separate concerns intentionally: specs define behavior, plans define execution, progress files record loop state, tests prove behavior, and instrumentation explains production behavior.
+- Treat context as scarce. Keep instruction files, prompts, and scratchpads compact; use index files and on-demand references instead of stuffing every loop with full docs.
+- One task per loop. If work spans multiple iterations, persist state on disk and restart with fresh context instead of dragging a swollen transcript forward.
+- Hard gates decide readiness. In harness or agent-loop mode, gates that can block or advance work must be binary pass or fail, not advisory.
+- Structured review beats narrative when another agent or loop must consume the result. Emit compact findings with severity, file, line, risk, and expected fix.
+- When broad permissions or network access are required, prefer the smallest blast radius: isolated branch or worktree, sandbox or ephemeral environment, and least-privilege credentials.
 - Verification gates claims. Do not say fixed, complete, passing, or ready without fresh evidence.
 - Frontend work is product behavior, not decoration. Preserve design systems, router conventions, state ownership, accessibility, and interaction quality the same way you would preserve API boundaries in a backend.
 - Choose the right frontend artifact level before coding: primitive, composed control, domain component, page section, hook, store, or route. A bad boundary choice causes more churn than a small implementation bug.
 - Finish cleanly. Make the next integration step explicit instead of silently leaving the repo in an ambiguous state.
+
+## Execution Modes
+
+- Direct execution: use for small, clear changes with a single coherent proof path.
+- Supervised harness loop: use for repeated or backlog-style work only when the spec is clear, the change surface is isolated, and the repo has trustworthy gates. Keep each iteration fresh and single-purpose.
+- Review or explanation mode: use for architecture mapping, impact analysis, code review, or debugging passes where the immediate output is understanding or findings rather than code.
+
+Switch modes when the evidence changes. If a harness starts flailing, shrink the task, tighten the spec, or return to direct execution.
 
 ## Architecture Bias
 
@@ -47,6 +60,10 @@ Apply these defaults unless the repo clearly prefers something else:
 ### Orientation and repo policy
 
 Read [repo-orientation.md](./references/repo-orientation.md) for startup discovery, instruction-file handling, repo-shape detection, and initial command selection.
+
+### Harness loops and persistent task state
+
+Read [harness-loops.md](./references/harness-loops.md) when the task is large enough for repeated agent iterations, when specs or plans live on disk between runs, when builder and reviewer passes should be split, or when you need to decide whether a repo is ready for higher-autonomy execution.
 
 ### Architecture analysis and refactor impact
 

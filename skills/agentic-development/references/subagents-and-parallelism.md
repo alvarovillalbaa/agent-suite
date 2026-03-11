@@ -16,6 +16,14 @@ Use subagents to improve focus, not to outsource thinking. The controller remain
 - you have not yet understood the architecture
 - the prompt to the subagent would just be “figure it out”
 
+## Human on the Loop
+
+Do not let the worker decide the overall strategy.
+
+- the controller chooses when to continue, stop, or rescope
+- the controller decides whether a failure means “fix again” or “task definition was wrong”
+- the controller owns the blast radius when permissions, secrets, or destructive actions are involved
+
 ## Controller Responsibilities
 
 Before dispatching, provide each subagent:
@@ -33,6 +41,15 @@ After dispatching:
 - verify claims independently
 - integrate in a deterministic order
 
+## Builder and Reviewer Split
+
+When quality matters more than raw speed, split implementation from review.
+
+- builder brief: task slice, existing patterns, relevant files, and verification commands
+- reviewer brief: spec excerpt, rejection criteria, verification expectations, and expected findings format
+
+The reviewer should return either explicit findings or an explicit pass. Do not blur those roles into one vague “take a look” prompt.
+
 ## Parallel Investigation Pattern
 
 Parallelize exploration when the domains are independent. Typical split:
@@ -49,7 +66,7 @@ For large tasks, a strong pattern is:
 
 1. implementer agent
 2. spec or behavior review
-3. code quality review
+3. code quality or risk review
 4. controller integrates and verifies
 
 Do not let “self-review” replace independent review.
