@@ -26,26 +26,23 @@ jobs:
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
 
-      - name: Detect changed skills
-        id: changed
-        run: |
-          set -euo pipefail
-          CHANGED=$(git diff --name-only HEAD~1 HEAD | awk -F/ '/^skills\/[^\/]+\/./ {print $2}' | sort -u | tr '\n' ' ')
-          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
-          echo "Changed skills: $CHANGED"
-
-      - name: Publish changed skills
-        if: steps.changed.outputs.changed != ''
+      - name: Publish skills that differ from targets
         env:
           TOKEN: ${{ secrets.SKILL_PUBLISH_TOKEN }}
-          CHANGED: ${{ steps.changed.outputs.changed }}
         run: |
           set -euo pipefail
 
           # guard: never run without token
           [ -n "${TOKEN:-}" ] || (echo "Missing SKILL_PUBLISH_TOKEN" && exit 1)
 
-          for SKILL in $CHANGED; do
+          SKILLS=$(yq -r '.skills | keys[]' publish_targets.yml)
+
+          if [ -z "${SKILLS:-}" ]; then
+            echo "No skills configured in publish_targets.yml"
+            exit 0
+          fi
+
+          for SKILL in $SKILLS; do
             DEST_REPO=$(yq -r ".skills.${SKILL}.repo" publish_targets.yml)
 
             if [ "$DEST_REPO" = "null" ] || [ -z "$DEST_REPO" ]; then
