@@ -58,8 +58,10 @@ jobs:
             # wipe destination (keep .git)
             find /tmp/mirror -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 
-            # copy skill contents to repo root
-            rsync -av --delete "./skills/${SKILL}/" /tmp/mirror/
+            # copy skill contents to repo root (--exclude .git: rsync --delete would
+            # otherwise remove the clone metadata; find already kept .git, but rsync
+            # still prunes paths not present in the source tree)
+            rsync -av --delete --exclude='.git/' "./skills/${SKILL}/" /tmp/mirror/
 
             # add shared public files if you want
             if [ -f ./public/LICENSE ]; then cp ./public/LICENSE /tmp/mirror/LICENSE; fi
