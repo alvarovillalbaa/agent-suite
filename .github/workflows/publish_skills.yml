@@ -68,17 +68,16 @@ jobs:
             if [ -f "${ROOT}/public/LICENSE" ]; then cp "${ROOT}/public/LICENSE" /tmp/mirror/LICENSE; fi
             if [ -f "${ROOT}/public/CONTRIBUTING.md" ]; then cp "${ROOT}/public/CONTRIBUTING.md" /tmp/mirror/CONTRIBUTING.md; fi
 
-            # commit & push
-            cd /tmp/mirror
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A
+            # commit & push (stay in ROOT: never cd into /tmp/mirror or rm -rf breaks the shell cwd)
+            git -C /tmp/mirror config user.name "github-actions[bot]"
+            git -C /tmp/mirror config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git -C /tmp/mirror add -A
 
-            if git diff --cached --quiet; then
+            if git -C /tmp/mirror diff --cached --quiet; then
               echo "No changes for $SKILL"
               continue
             fi
 
-            git commit -m "Publish ${SKILL} from agent-suite"
-            git push origin HEAD:main
+            git -C /tmp/mirror commit -m "Publish ${SKILL} from agent-suite"
+            git -C /tmp/mirror push origin HEAD:main
           done
