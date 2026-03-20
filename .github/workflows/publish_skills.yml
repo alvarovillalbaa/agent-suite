@@ -31,11 +31,12 @@ jobs:
           TOKEN: ${{ secrets.SKILL_PUBLISH_TOKEN }}
         run: |
           set -euo pipefail
+          ROOT="${GITHUB_WORKSPACE}"
 
           # guard: never run without token
           [ -n "${TOKEN:-}" ] || (echo "Missing SKILL_PUBLISH_TOKEN" && exit 1)
 
-          SKILLS=$(yq -r '.skills | keys[]' publish_targets.yml)
+          SKILLS=$(yq -r '.skills | keys[]' "${ROOT}/publish_targets.yml")
 
           if [ -z "${SKILLS:-}" ]; then
             echo "No skills configured in publish_targets.yml"
@@ -43,7 +44,7 @@ jobs:
           fi
 
           for SKILL in $SKILLS; do
-            DEST_REPO=$(yq -r ".skills.${SKILL}.repo" publish_targets.yml)
+            DEST_REPO=$(yq -r ".skills.${SKILL}.repo" "${ROOT}/publish_targets.yml")
 
             if [ "$DEST_REPO" = "null" ] || [ -z "$DEST_REPO" ]; then
               echo "No target repo configured for skill: $SKILL. Skipping."
@@ -61,11 +62,11 @@ jobs:
             # copy skill contents to repo root (--exclude .git: rsync --delete would
             # otherwise remove the clone metadata; find already kept .git, but rsync
             # still prunes paths not present in the source tree)
-            rsync -av --delete --exclude='.git/' "./skills/${SKILL}/" /tmp/mirror/
+            rsync -av --delete --exclude='.git/' "${ROOT}/skills/${SKILL}/" /tmp/mirror/
 
             # add shared public files if you want
-            if [ -f ./public/LICENSE ]; then cp ./public/LICENSE /tmp/mirror/LICENSE; fi
-            if [ -f ./public/CONTRIBUTING.md ]; then cp ./public/CONTRIBUTING.md /tmp/mirror/CONTRIBUTING.md; fi
+            if [ -f "${ROOT}/public/LICENSE" ]; then cp "${ROOT}/public/LICENSE" /tmp/mirror/LICENSE; fi
+            if [ -f "${ROOT}/public/CONTRIBUTING.md" ]; then cp "${ROOT}/public/CONTRIBUTING.md" /tmp/mirror/CONTRIBUTING.md; fi
 
             # commit & push
             cd /tmp/mirror

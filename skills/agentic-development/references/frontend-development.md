@@ -91,10 +91,23 @@ Do not start by adding JSX to the nearest file. Decide what should own the behav
 - Verify short, average, and very long content on narrow and dense layouts.
 - Keep copy specific enough that errors and actions remain clear after localization.
 
+## Tech Stack Context
+
+When the stack is React, Next.js, TypeScript, and Tailwind CSS (or a close variant), apply these defaults on top of the general rules below:
+
+- Use TypeScript strictly. Avoid `any`; prefer narrowed unions, discriminated unions, and explicit return types on non-trivial functions.
+- Prefer Next.js App Router conventions: Server Components by default, push `'use client'` as far down the tree as possible, use Server Actions for mutations.
+- Use Tailwind utility classes and the repo's design tokens. Do not introduce raw CSS for layout or spacing unless Tailwind cannot express it.
+- Lean on `cn()` (clsx + tailwind-merge) for conditional class composition. Avoid string concatenation for class lists.
+- Keep React Native in mind when the repo targets both web and native; avoid web-only primitives in shared components.
+
+For concrete hard rules on Tailwind stack defaults, accessible primitives, animation budget, typography helpers, z-index discipline, and design guardrails (no unsolicited gradients, one accent color, empty-state affordances), read [ui-constraints.md](./ui-constraints.md).
+
 ## Performance and Observability
 
 - Prioritize fixes in this order: waterfalls, excess client JavaScript, misplaced server or client ownership, rerender churn, then large-surface rendering cost.
 - Measure before optimizing. Use the repo's existing profilers, bundle tools, traces, or browser tooling.
+- When the repo provides a bundle analyzer script (e.g., `scripts/bundle_analyzer.py`), run it before and after significant JS changes to baseline and verify impact.
 - Start promises early and await as late as correctness allows. Parallelize independent fetches.
 - Avoid unnecessary client-side JS, repeated derived work, broad subscriptions, and layout thrash.
 - Keep heavy widgets, editors, charts, and low-priority panels behind route or feature boundaries when the framework supports it.
@@ -133,6 +146,28 @@ Use these extraction rules:
 - Extract subcomponents when sections can render from explicit props without hidden state coupling.
 - Replace deep conditionals with guard clauses, lookup tables, or explicit state objects when that makes behavior clearer.
 
+## Automation Scripts
+
+When the repo provides frontend automation scripts, use them as the preferred path for repetitive scaffolding and analysis tasks:
+
+- **Component generator** (`scripts/component_generator.py` or equivalent): Use for scaffolding new components to enforce consistent structure, naming conventions, and file layout. Prefer this over manual file creation when it exists.
+- **Bundle analyzer** (`scripts/bundle_analyzer.py` or equivalent): Run before and after significant changes to measure JS bundle impact. Review recommendations and apply fixes that are within the current task scope. Integrate into the quality-check step of each frontend task.
+- **Frontend scaffolder** (`scripts/frontend_scaffolder.py` or equivalent): Use for broader page, feature, or route scaffolding when provided. Check `--help` or the skill's README before running to understand the available options.
+
+Always prefer repo-provided scripts over manual scaffolding — they encode the repo's conventions and reduce structural drift.
+
+**Quality check workflow when scripts are present:**
+```bash
+# Analyze bundle before changes
+python scripts/bundle_analyzer.py .
+
+# Scaffold new components with the generator
+python scripts/component_generator.py <project-path> [options]
+
+# Re-run analyzer after changes to confirm impact
+python scripts/bundle_analyzer.py . --verbose
+```
+
 ## Done Checklist
 
 Before declaring frontend work complete, confirm:
@@ -143,3 +178,4 @@ Before declaring frontend work complete, confirm:
 - responsive behavior is checked
 - analytics or error reporting are integrated if required
 - the proof command, manual path, or screenshot evidence is recorded
+- if a bundle analyzer exists, it has been run and the delta is acceptable

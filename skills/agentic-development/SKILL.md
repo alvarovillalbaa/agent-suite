@@ -95,7 +95,23 @@ Read [backend-development.md](./references/backend-development.md) for service-l
 
 ### Frontend execution
 
-Read [frontend-development.md](./references/frontend-development.md) for framework boundary detection, reusable component design, UI implementation, refactor workflow, async UX, accessibility, responsive quality, performance priorities, and analytics.
+Read [frontend-development.md](./references/frontend-development.md) for framework boundary detection, reusable component design, UI implementation, refactor workflow, async UX, accessibility, responsive quality, performance priorities, analytics, and automation scripts (component generator, bundle analyzer, frontend scaffolder).
+
+### UI constraints and patterns
+
+Read [ui-constraints.md](./references/ui-constraints.md) for hard MUST/NEVER/SHOULD rules covering stack defaults (Tailwind, motion/react, cn), accessible component primitives, interaction patterns (AlertDialog, skeletons, h-dvh, safe-area-inset), animation budget and compositor-only rules, typography helpers (text-balance, tabular-nums), layout conventions (z-index scale, size-*), performance guards, and design constraints (no unsolicited gradients, one accent color, empty-state affordances). Apply these on top of frontend-development.md whenever touching UI code.
+
+### Web interface guidelines review
+
+Read [web-design-guidelines.md](./references/web-design-guidelines.md) when the user asks to review UI code, audit design, check accessibility, or validate a page against best practices. This procedure fetches the live Web Interface Guidelines ruleset and applies it to the target files, emitting findings in `file:line` format. Run alongside ui-constraints.md for a full UI audit.
+
+### Component refactoring
+
+Read [component-refactoring.md](./references/component-refactoring.md) when the task is specifically to reduce component complexity, split a large component, extract hooks, consolidate modal state, simplify conditional logic, or restructure a component's directory layout. Use alongside frontend-development.md for the broader delivery context.
+
+### Building reusable components and libraries
+
+Read [building-components.md](./references/building-components.md) when the task is to design a component API, build a component library or primitive, implement accessibility patterns (ARIA, keyboard nav, focus management), choose between controlled and uncontrolled state, use composition patterns (compound components, asChild, polymorphism), set up styling systems (cn, CVA, design tokens, data-state, data-slot), or decide on a distribution strategy (registry, npm, marketplace).
 
 ### Verification and completion
 
@@ -118,7 +134,7 @@ If the current environment exposes more specialized skills, route work through t
 - Use `quality-assurance` when verification strategy, flaky tests, review findings, or CI triage becomes the bottleneck.
 - Use `gh-address-comments` for GitHub review-thread triage and inline replies.
 - Use `gh-fix-ci` when GitHub Actions checks are failing.
-- Use dedicated component-building, frontend-design, refactoring, browser-testing, observability, analytics, or release skills when they exist. Otherwise, use the references in this skill.
+- Use dedicated component-building, frontend-design, browser-testing, observability, analytics, or release skills when they exist. Otherwise, use the references in this skill. For component complexity reduction specifically, use [component-refactoring.md](./references/component-refactoring.md). For building reusable components or libraries (API design, a11y patterns, composition, styling systems, distribution), use [building-components.md](./references/building-components.md). For UI compliance reviews, design audits, or accessibility checks against the official Web Interface Guidelines, use [web-design-guidelines.md](./references/web-design-guidelines.md).
 
 ## Completion Hook
 
