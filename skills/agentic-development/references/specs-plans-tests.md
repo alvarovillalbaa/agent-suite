@@ -88,6 +88,90 @@ If a slice cannot be explained and verified compactly, it is probably too large.
 
 A list of steps is not a behavior contract. A user story is not an execution recipe. Keep both artifacts distinct so you can tell whether you have a product ambiguity or an implementation ambiguity.
 
+## Test-Driven Development
+
+TDD is the default delivery mode for any behavioral change. Violating the letter of the rules violates the spirit.
+
+### Iron Law
+
+```
+NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
+```
+
+Code written before its test must be deleted and rewritten from tests. No exceptions: do not keep it as reference, do not adapt it while writing tests. Delete means delete.
+
+### When TDD applies
+
+**Always:** new features, bug fixes, refactoring, behavior changes.
+
+**Ask the user:** throwaway prototypes, generated scaffolding, configuration files.
+
+Thinking "skip TDD just this once"? That is rationalization.
+
+### Red-Green-Refactor
+
+**RED — Write one failing test**
+
+Write one minimal test showing what should happen. Clear name, tests real behavior, one thing. Run it and confirm it fails because the feature is missing, not due to a typo.
+
+```bash
+npm test path/to/test.test.ts  # confirm fails for expected reason
+```
+
+If the test passes immediately, it is testing existing behavior — fix the test.
+
+**GREEN — Write minimal code to pass**
+
+Write the simplest code that makes the test pass. Do not add features, refactor other code, or generalize beyond what the test requires. YAGNI.
+
+Verify: run the test suite and confirm the new test passes and no other tests broke.
+
+**REFACTOR — Clean up under green**
+
+After all tests are green: remove duplication, improve names, extract helpers. Keep tests green. Do not add behavior.
+
+**Repeat** with the next failing test for the next behavior slice.
+
+### Bug Fix Pattern
+
+1. Write a failing test that reproduces the bug.
+2. Confirm it fails for the right reason.
+3. Fix the root cause (not just the symptom).
+4. Verify the regression test and full suite pass.
+
+Never fix a bug without a test.
+
+### Pre-Completion Checklist
+
+Before marking work complete:
+
+- [ ] Every new function or method has a test written before the implementation
+- [ ] Watched each test fail before implementing
+- [ ] Each test failed for the expected reason (feature missing, not a typo)
+- [ ] Wrote minimal code to pass each test
+- [ ] All tests pass
+- [ ] Output is clean (no errors or unexpected warnings)
+- [ ] Tests use real code (mocks only where unavoidable)
+- [ ] Edge cases and error paths are covered
+
+Cannot check all boxes? TDD was skipped. Start over.
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|--------|---------|
+| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
+| "I'll write tests after to verify it works" | Tests written after code pass immediately; you never see them catch the bug. |
+| "Tests after achieve the same goals" | Tests-after answer "what does this do?" Tests-first answer "what should this do?" |
+| "Already manually tested all edge cases" | No record, can't re-run, easy to forget under pressure. |
+| "Deleting X hours of work is wasteful" | Sunk cost. Keeping unverified code is technical debt. |
+| "Need to explore first" | Fine. Throw away the exploration code, then start with TDD. |
+| "TDD will slow me down" | TDD is faster than debugging production failures. |
+
+### Testing Anti-Patterns
+
+When writing mocks or test utilities, read `testing-anti-patterns.md` in the `quality-assurance` skill to avoid: testing mock behavior instead of real behavior, adding test-only methods to production classes, mocking without understanding dependency chains, and incomplete mocks that hide structural assumptions.
+
 ## Test Strategy Notes
 
 - If the repo has a strong test culture, use tests as the main proof.

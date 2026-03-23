@@ -2,6 +2,38 @@
 
 Start by identifying where this backend expects business logic to live. Do not impose a generic architecture on a repo that already has strong patterns.
 
+## Platform Architecture Pattern
+
+All modern platform backends follow a strict layering rule:
+
+```
+API → Serializer → Service
+API → Serializer → Service
+API → Celery Task → Service
+
+AI Agent → Tool Call → Service
+
+Service → BaseService
+Service → BaseService
+Service → BaseService
+```
+
+**Rules this diagram encodes:**
+- Transport (API/Task/Tool) is always thin — it validates and delegates, never owns logic.
+- Every service inherits from a shared `BaseService`. Never duplicate cross-cutting concerns (auth, tenancy, logging, error mapping) across individual services.
+- AI agent tool calls route through the same service layer as HTTP endpoints — no special-cased agent logic paths.
+- Async jobs (Celery, queue workers) also funnel through services, not bespoke task logic.
+
+## Core Philosophy
+
+Before writing any backend code, verify the change satisfies these invariants:
+
+- **Maximize LOC reuse** — every new line should displace an old one or reuse an existing path.
+- **Minimize total LOC** — the codebase should shrink or stay flat with each feature.
+- **Single Point of Truth (SPoT)** — consolidate logic into one canonical location; never let the same rule live in two places.
+- **No repeated logic** — no duplicated behavior. Also no near-duplicate code with the same _purpose_ even if the implementation differs.
+- **No over-modularization** — monoliths are acceptable. Split only when ownership or readability materially improves, never for aesthetic reasons.
+
 ## First Pass
 
 Before editing backend code, answer these questions:
@@ -25,6 +57,13 @@ Before editing backend code, answer these questions:
 
 Before adding a new table, model, collection, field, or index, ask whether an existing entity or relation can carry the concept cleanly.
 
+**Hard rules for data models:**
+
+- **Minimize the number of models** — make models multi-purpose rather than creating a new model per concept.
+- **Minimize fields per model** — before adding a column, ask whether it belongs in a `JSONField` or a new related model (one-to-one or FK) instead.
+- **Prefer relations over repeated fields** — if two models share the same data, relate them rather than duplicating the field.
+- **Use composable mixins** — common patterns (`created_at`, `updated_at`, `uuid`, soft-delete, tenancy) live in shared model mixins and serializer mixins. Apply them consistently; never inline the same fields on each model separately.
+
 When the repo already prefers generalized models:
 
 - favor reuse over new entity sprawl
@@ -46,6 +85,12 @@ For schema work in any backend:
 ## API and DTO Bias
 
 In REST-oriented backends, prefer stable resource URLs and cohesive object-owned endpoints over parameter-heavy catch-all routes. If the repo already groups CRUD methods around one resource surface, keep doing that.
+
+**Hard rules for API design:**
+
+- **UUID in the URL path, not query params** — use `/api/x/<uuid>/` rather than `/api/x/?id=<uuid>`. Resource identity belongs in the path.
+- **One view per data model** — all of POST, PUT, PATCH, DELETE (and GET) for a given model live in the same API view class. Never split a single model's behavior across multiple views.
+- **Everything for a concept in one place** — if it is about `Message`, it goes in the `Message` API view. Avoid satellite endpoints or helper routes for the same object.
 
 - Keep one clear owner for create, update, delete, and side-effect behavior.
 - Validate once at the boundary, then operate on normalized data.

@@ -46,11 +46,35 @@ Opinionated hard rules for building interfaces. Apply these on top of the genera
 - MUST use `tabular-nums` for data.
 - SHOULD use `truncate` or `line-clamp` for dense UI.
 - NEVER modify `letter-spacing` (`tracking-*`) unless explicitly requested.
+- SHOULD use `font-variant-numeric: oldstyle-nums` for inline numbers in prose; `lining-nums tabular-nums` for data tables.
+- SHOULD enable `font-variant-numeric: slashed-zero` in code-adjacent UIs (disambiguates `0` from `O`).
+- SHOULD enable `font-feature-settings: "ss02"` in code-facing UIs (disambiguates `I`, `l`, `1`).
+- SHOULD set `font-optical-sizing: auto` (never disable it — browser uses size-adaptive glyph shapes).
+- SHOULD set `-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale` on retina surfaces.
+- SHOULD set `text-underline-offset: 3px; text-decoration-skip-ink: auto` on anchor links.
+- SHOULD set `font-synthesis: none` on display or icon fonts to prevent browser-generated faux bold/italic.
+- SHOULD use `font-display: swap` in `@font-face` declarations.
+- SHOULD add `letter-spacing: 0.05em` to uppercase or small-caps text.
 
 ## Layout
 
 - MUST use a fixed `z-index` scale (no arbitrary `z-*`).
 - SHOULD use `size-*` for square elements instead of `w-*` + `h-*`.
+
+## CSS Pseudo-Elements
+
+- MUST add `content: ""` to `::before` / `::after` — they will not render without it.
+- SHOULD use pseudo-elements for decorative content instead of extra DOM nodes (`<span className="bg" />`).
+- MUST set `position: relative` on the parent when positioning pseudo-elements absolutely.
+- MUST set `z-index: -1` on pseudo-elements that should render behind the element's text content.
+- SHOULD use `::before` with negative `inset` values (e.g. `inset: -8px -12px`) to expand hit targets without markup overhead.
+- MUST assign `view-transition-name` to elements participating in the View Transitions API.
+- MUST ensure each `view-transition-name` is unique on the page during a transition; clear stale names in the `startViewTransition` callback.
+- SHOULD prefer the native View Transitions API over JS animation libraries for page-level transitions.
+- SHOULD use `::backdrop` for `<dialog>` and popover overlay backgrounds instead of a separate overlay `<div>`.
+- SHOULD use `::placeholder` for input placeholder styling.
+- SHOULD use `::marker` for custom list bullet styles instead of `list-style: none` + background-image hacks.
+- SHOULD use `::selection` to style text selection highlighting.
 
 ## Performance
 
@@ -67,3 +91,9 @@ Opinionated hard rules for building interfaces. Apply these on top of the genera
 - MUST give empty states one clear next action.
 - SHOULD limit accent color usage to one per view.
 - SHOULD use existing theme or Tailwind CSS color tokens before introducing new ones.
+- SHOULD use concentric border radius for nested rounded elements: inner radius = outer radius minus padding. Using the same radius on both creates uneven curves.
+- SHOULD layer 2–3 `box-shadow` values for realistic depth rather than a single shadow.
+- MUST keep all `box-shadow` offsets in the same direction across the UI (single virtual light source). Mixed directions look broken.
+- SHOULD use semi-transparent or neutral dark colors for shadows (`rgba(17,24,39,0.08)`), not pure `rgba(0,0,0,X)`.
+- SHOULD use semi-transparent border colors (e.g. `var(--gray-a4)`) that adapt to any background instead of hardcoded hex.
+- NEVER animate `box-shadow` directly — it triggers expensive repaints. Animate a pseudo-element's `opacity` instead.

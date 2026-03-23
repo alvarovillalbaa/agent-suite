@@ -19,7 +19,7 @@ Write a technical report for:
 ### Structure
 
 ```
-docs/reports/YYYY-MM-DD/report-name.md
+docs/audits/YYYY/MM-DD/report-name.md
 ```
 
 **Standard report structure:**
@@ -157,9 +157,9 @@ services/jobs/ARCHITECTURE.md  ← inline ADR section at the bottom
 
 Good for: decisions that are local to one service, team prefers single file.
 
-**Option B — In docs/reports:**
+**Option B — In docs/audits:**
 ```
-docs/reports/2026-01-15/adr-object-item-polymorphic.md
+docs/audits/2026/01-15/adr-object-item-polymorphic.md
 ```
 
 Good for: cross-cutting decisions, decisions that need to be linked from multiple places, decisions with significant detail.

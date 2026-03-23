@@ -116,6 +116,8 @@ For concrete hard rules on Tailwind stack defaults, accessible primitives, anima
 - Virtualize large lists or use `content-visibility` when the surface is large enough to justify it.
 - Track meaningful user intent and workflow transitions, not every render.
 
+For React and Next.js codebases, apply the 45 rules in [react-performance-rules.md](./react-performance-rules.md). The quick-audit checklist at the bottom of that file covers the most common review gaps: waterfall checks, barrel import checks, `React.cache()` deduplication, effect dependency shapes, and `&&`-with-number conditional rendering bugs.
+
 ## Refactor Triggers
 
 Refactor when you see:

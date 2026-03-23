@@ -4,25 +4,29 @@ Continuous docs are written and maintained as part of the regular development fl
 
 ---
 
-## Daily Development Logs
+## Development Logs (`docs/memories/logs/`)
 
 ### Purpose
 
-The daily log is the engineering team's shared memory. It answers: "what changed today, and why?" — a question that becomes critically important during incident debugging, code archaeology, and onboarding.
+The development log is the engineering team's shared memory. It answers: "what changed today, and why?" — a question that becomes critically important during incident debugging, code archaeology, and onboarding.
 
 ### Finding the Right File
 
 **Rule: Always append to the latest existing date file. Never create new files unless today's date doesn't exist yet.**
 
-```bash
-# Find the latest daily log file
-ls docs/daily/ | sort | tail -1
+File path convention: `docs/memories/logs/YYYY/MM-DD/<filename>.md`
 
-# Append a log entry
-echo "- Fixed failing OAuth tests by mocking token exchange properly" >> docs/daily/2026-03-08.md
+```bash
+# Find the latest log directory
+YEAR=$(ls docs/memories/logs/ | sort | tail -1)
+DAY=$(ls docs/memories/logs/$YEAR/ | sort | tail -1)
+# → docs/memories/logs/2026/03-21/
+
+# Append a log entry to the latest file in that directory
+echo "- Fixed failing OAuth tests by mocking token exchange properly" >> docs/memories/logs/$YEAR/$DAY/dev.md
 ```
 
-If today's date file doesn't exist, check repo conventions — some teams create files weekly or sprint-by-sprint. Follow whatever pattern the latest files show.
+If today's date directory doesn't exist, create `docs/memories/logs/YYYY/MM-DD/dev.md`.
 
 ### Format
 
@@ -70,62 +74,16 @@ Technical, not narrative. Write it for your future debugging self, not for a blo
 
 ---
 
-## Changelogs
+## Versioned Release Notes
 
-### Two Changelog Audiences
+For services or libraries that have versioned releases, document version history in a `CHANGELOG.md` at the service or package root — not in `docs/`. This keeps the changelog co-located with what it describes.
 
-**Internal (daily logs):** What changed in the code and why — for engineers.
-
-**Customer-facing (docs/changelog/):** What changed in the product — for users and stakeholders.
-
-These serve completely different audiences and must be written separately.
-
-### Customer-Facing Changelog
-
-**Location:** `docs/changelog/YYYY-MM-DD/` or `docs/changelog/YYYY-MM-DD-release-name.md`
-
-**When to write:** At every public release. Written after the release is live, not before.
-
-**Tone:** Plain language. Present tense ("Job matching now considers..."). No technical jargon. No internal class names. No error codes. User-impact focused.
-
-**Structure:**
-```markdown
-## [Version or Date] — Release Name (optional)
-
-### New
-- Job matching now considers candidate work preferences when scoring roles
-- Notifications now support digest mode — batch daily or weekly instead of per-event
-
-### Improved
-- Candidate search is 3x faster on large datasets
-- Dashboard load time reduced from 4s to under 1s
-
-### Fixed
-- Fixed an issue where some users saw duplicate notifications after reconnecting
-- Fixed a layout issue in the sidebar on smaller screens
-
-### Removed
-- Removed legacy CSV export format — use the new Excel export instead
+```
+services/auth/
+├── CHANGELOG.md    ← version history for the auth service
 ```
 
-**Anti-patterns:**
-```
-# Bad — technical, jargon-heavy
-- Migrated CandidateSerializer to RetrievalLevelMixin (removed to_representation override)
-- Fixed N+1 query in JobListView via select_related('company', 'location')
-
-# Good — user-focused
-- Improved job list loading time for companies with many active roles
-```
-
-### Semantic Versioning in Changelogs
-
-When the repo uses semver:
-- **MAJOR** (1.0.0 → 2.0.0): Breaking changes — document migration path
-- **MINOR** (1.0.0 → 1.1.0): New features — document what's new
-- **PATCH** (1.0.0 → 1.0.1): Bug fixes — document what was fixed
-
-For internal tools and APIs, document breaking changes with an upgrade guide in `docs/plans/`.
+When using semver, structure entries as: breaking changes (document migration path in `docs/plans/`), new features, and bug fixes.
 
 ---
 
@@ -314,16 +272,160 @@ components/CandidateCard/
 
 ---
 
+---
+
+## Memory Artifacts (`docs/memories/`)
+
+Memory artifacts are the team's collective knowledge base — the human-readable output of continuous learning. All types use date-based subdirectories: `docs/memories/<type>/YYYY/MM-DD/*.md`.
+
+---
+
+### Lessons (`docs/memories/lessons/`)
+
+**Purpose:** Reusable insights from code experience that should change future behavior.
+
+**Write when:** You discovered something non-obvious that you or a teammate will need again and that can't be derived just by reading the code.
+
+**Gate:** Must be verified by real work (not theory), reusable across sessions, specific enough to change behavior, non-trivial.
+
+**Format:**
+```markdown
+# [Concise lesson title — active verb + subject]
+
+**Date:** YYYY-MM-DD
+**Tags:** [domain, component]
+
+## Problem
+
+[What was ambiguous or unknown that prompted the investigation]
+
+## Context / When This Applies
+
+[Specific conditions under which this lesson is relevant]
+
+## Insight
+
+[What was learned — the non-obvious finding]
+
+## Verification
+
+[How this was confirmed — test, observation, or user feedback]
+
+## Related
+
+- [Link to fix, procedure, or audit if applicable]
+```
+
+---
+
+### Facts (`docs/memories/facts/`)
+
+**Purpose:** Stable facts about the user, company, or project context not derivable from code.
+
+**Write when:** A teammate (or future agent) would make a wrong assumption without this fact.
+
+**Gate:** Durable (won't change frequently), non-sensitive, clearly true.
+
+**Format:**
+```markdown
+# [Fact title — declarative statement]
+
+**Date:** YYYY-MM-DD
+**Category:** team | infrastructure | business | process
+
+## Fact
+
+[The fact itself — one clear statement]
+
+## Why This Matters
+
+[What goes wrong without knowing this]
+
+## Source / Evidence
+
+[Where this was learned or confirmed]
+```
+
+---
+
+### Procedures (`docs/memories/procedures/`)
+
+**Purpose:** Documented repeatable workflows — how things should be done after discovery.
+
+**Write when:** You've figured out the right way to do something that would require rediscovery without notes.
+
+**Gate:** Repeatable, non-trivial to rediscover, tested at least once.
+
+**Format:**
+```markdown
+# [Procedure title — verb phrase]
+
+**Date:** YYYY-MM-DD
+**Last verified:** YYYY-MM-DD
+
+## When to Use
+
+[Trigger condition — when should someone follow this procedure?]
+
+## Steps
+
+1. [Step one with expected output]
+2. [Step two]
+3. ...
+
+## Notes / Caveats
+
+[Known edge cases, prerequisites, gotchas]
+```
+
+---
+
+### Fixes (`docs/memories/fixes/`)
+
+**Purpose:** Solutions to errors or bugs that were non-obvious or likely to recur.
+
+**Write when:** A fix was hard to find or the error is likely to appear again.
+
+**Gate:** Non-obvious cause or solution, fix is specific and reproducible.
+
+**Format:**
+```markdown
+# Fix: [Error description or symptom]
+
+**Date:** YYYY-MM-DD
+**Tags:** [domain, error-type]
+
+## Symptom
+
+[What the error looks like — exact message or behavior]
+
+## Root Cause
+
+[Why it happens]
+
+## Fix
+
+[Exact steps or code change to resolve it]
+
+## Prevention
+
+[How to avoid hitting this again, if applicable]
+```
+
+---
+
 ## Continuous Doc Quality Signals
 
 ### Good continuous doc signals:
-- Daily logs written within hours of the change, not days later
+- Development logs written within hours of the change, not days later
 - Changelogs readable by a non-engineer
 - Inline docs updated in the same PR as the code change
 - READMEs that pass their own quick-start instructions
+- Memory artifacts written when insights are fresh, not reconstructed from memory
 
 ### Warning signals:
-- Daily log entries written in bulk days after the changes
+- Log entries written in bulk days after the changes
 - Changelogs with implementation details ("fixed N+1 query")
 - Inline docs that reference deleted parameters
 - "TODO: document this" comments older than one sprint
+- Lessons or fixes written without a concrete trigger or verification

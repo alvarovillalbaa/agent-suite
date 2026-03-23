@@ -184,7 +184,7 @@ Service docs live at the root of each service or module directory. They document
 
 Project docs are repo-wide and live in the `docs/` directory.
 
-### Daily Development Logs (`docs/daily/`)
+### Memory Logs (`docs/memories/logs/YYYY/MM-DD/`)
 
 **Purpose:** Chronological log of what changed and why — the engineering team's shared memory.
 
@@ -196,9 +196,43 @@ Project docs are repo-wide and live in the `docs/` directory.
 
 See: `references/continuous-docs.md` for full format guide.
 
-### Technical Reports (`docs/reports/YYYY-MM-DD/`)
+### Memory Lessons (`docs/memories/lessons/YYYY/MM-DD/`)
 
-**Purpose:** Structured investigation or analysis artifacts — audits, findings, performance analyses.
+**Purpose:** Reusable insights that should change future behavior — verified discoveries from real work.
+
+**Audience:** Engineers and agents encountering the same situation later.
+
+**Freshness:** Written once when the insight is verified. Updated if the lesson is later disproved.
+
+See: `references/continuous-docs.md` for format guide.
+
+### Memory Facts (`docs/memories/facts/YYYY/MM-DD/`)
+
+**Purpose:** Stable facts about the team, company, or project not derivable from code.
+
+**Audience:** Agents and engineers who would make wrong assumptions without this fact.
+
+**Freshness:** Updated when the fact changes. Removed when no longer true.
+
+### Memory Procedures (`docs/memories/procedures/YYYY/MM-DD/`)
+
+**Purpose:** Repeatable workflows — the right way to do something after discovery.
+
+**Audience:** Anyone performing the procedure again in the future.
+
+**Freshness:** Update the "last verified" date each time the procedure is successfully followed.
+
+### Memory Fixes (`docs/memories/fixes/YYYY/MM-DD/`)
+
+**Purpose:** Solutions to non-obvious errors or bugs likely to recur.
+
+**Audience:** Engineers (or agents) hitting the same error.
+
+**Freshness:** Written once. Update if the fix stops working or a better solution is found.
+
+### Audits (`docs/audits/YYYY/MM-DD/`)
+
+**Purpose:** Structured investigation or analysis artifacts — audits, ADRs, post-mortems, findings, performance analyses.
 
 **Audience:** Engineering leads, the team, future engineers investigating similar problems.
 
@@ -206,7 +240,7 @@ See: `references/continuous-docs.md` for full format guide.
 
 See: `references/one-off-docs.md` for structure guide.
 
-### Plans and Specs (`docs/plans/`)
+### Plans (`docs/plans/YYYY/MM-DD/`)
 
 **Purpose:** Source of truth for planned features, migrations, or architectural changes.
 
@@ -214,15 +248,13 @@ See: `references/one-off-docs.md` for structure guide.
 
 **Freshness:** Updated as the plan evolves during execution. Archived after completion.
 
-### Customer-Facing Changelog (`docs/changelog/YYYY-MM-DD/`)
+### Specs (`docs/specs/YYYY/MM-DD/`)
 
-**Purpose:** Product-level release notes for users and stakeholders.
+**Purpose:** Feature requirements, API contracts, and behavior specifications before implementation.
 
-**Audience:** Non-technical users, customer success, product stakeholders.
+**Audience:** Implementors, reviewers, QA.
 
-**Freshness:** Written at release. Never updated after publishing (corrections are new entries).
-
-**Tone:** Plain language. No technical jargon. User-impact focused.
+**Freshness:** Written before implementation begins. Updated if requirements change.
 
 ### Cookbook (`docs/cookbook/`)
 
@@ -232,11 +264,31 @@ See: `references/one-off-docs.md` for structure guide.
 
 **Freshness:** Updated when the pattern changes. Flat structure, no timestamps.
 
-### Snapshots (`docs/snapshots/`)
+---
 
-**Purpose:** Deep-dive analyses commissioned at a point in time — performance baselines, architecture snapshots, dependency audits.
+## Tier 3b: In-Folder Documentation
 
-**When to create:** Only when explicitly requested. These are expensive to produce and should be rare.
+In-folder docs orient readers to a directory — what it contains, how it's organized, and how to navigate it. They apply at every directory level, not just service roots.
+
+| File | Purpose | Create when |
+|------|---------|-------------|
+| `README.md` | Overview and navigation | Any directory a reader might enter without context |
+| `ARCHITECTURE.md` | Technical deep-dive — structure, data flows, design decisions | Non-obvious internal organization |
+| `OVERVIEW.md` | High-level concepts before diving into details | Complex domains with concepts that precede code |
+| `TESTS.md` | Testing patterns, how to run, what's covered | Any directory with a meaningful test suite |
+| `SETUP.md` | Config, install, env — non-obvious setup steps | When installation alone isn't sufficient |
+| `CHANGELOG.md` | Version history | Versioned services, libraries, or packages (not in `docs/`) |
+| `FAQ.md` | Common questions and troubleshooting | After 3+ repeated questions about the same directory |
+
+**Applies at every level:**
+- `docs/README.md` — navigation index for the docs folder
+- `docs/memories/README.md` — what memory artifacts are and how to write them
+- `docs/memories/logs/README.md` — log format, rules, finding the latest file
+- `services/auth/README.md` — auth service overview
+- `services/auth/handlers/README.md` — handlers sub-module
+- `src/components/README.md` — component library overview
+
+**`README.md` is always the highest priority.** It's the entry point for any directory. Leaf directories (date-stamped day folders like `2026/03-21/`) do not need in-folder docs.
 
 ---
 
@@ -287,23 +339,41 @@ New information to document?
 │   ├─ External behavior → README.md
 │   └─ Internal design → ARCHITECTURE.md
 │
-├─ Is it about what changed today?
-│   └─ Daily log (docs/daily/)
+├─ Is it what changed today?
+│   └─ Memory log (docs/memories/logs/YYYY/MM-DD/)
+│
+├─ Is it a lesson learned from real work?
+│   └─ Memory lesson (docs/memories/lessons/YYYY/MM-DD/)
+│
+├─ Is it a stable fact about the team/project/company?
+│   └─ Memory fact (docs/memories/facts/YYYY/MM-DD/)
+│
+├─ Is it the right way to do something?
+│   └─ Memory procedure (docs/memories/procedures/YYYY/MM-DD/)
+│
+├─ Is it a non-obvious error solution?
+│   └─ Memory fix (docs/memories/fixes/YYYY/MM-DD/)
 │
 ├─ Is it a decision with non-obvious trade-offs?
-│   └─ ADR in docs/reports/YYYY-MM-DD/
+│   └─ ADR in docs/audits/YYYY/MM-DD/
 │
 ├─ Is it a structured investigation or analysis?
-│   └─ Technical report in docs/reports/YYYY-MM-DD/
+│   └─ Technical report in docs/audits/YYYY/MM-DD/
 │
 ├─ Is it a production incident?
-│   └─ Post-mortem in docs/reports/YYYY-MM-DD/
+│   └─ Post-mortem in docs/audits/YYYY/MM-DD/
+│
+├─ Is it a feature spec or API contract?
+│   └─ Spec doc in docs/specs/YYYY/MM-DD/
 │
 ├─ Is it a plan or migration?
-│   └─ Plan doc in docs/plans/
+│   └─ Plan doc in docs/plans/YYYY/MM-DD/
 │
-├─ Is it user-facing release notes?
-│   └─ Changelog in docs/changelog/YYYY-MM-DD/
+├─ Is it a versioned release history?
+│   └─ CHANGELOG.md at the service or package root (not in docs/)
+│
+├─ Is it navigation/orientation for a directory?
+│   └─ README.md (or ARCHITECTURE.md / OVERVIEW.md) in that directory
 │
 └─ Is it a reusable how-to?
     └─ Cookbook entry in docs/cookbook/

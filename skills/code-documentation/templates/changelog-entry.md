@@ -6,7 +6,7 @@ Two separate changelogs serve different audiences. Use this template for both, b
 
 ## Customer-Facing Changelog
 
-**Location:** `docs/changelog/YYYY-MM-DD/` or `docs/changelog/YYYY-MM-DD-release-name.md`
+**Location:** `CHANGELOG.md` at the service or package root (not in `docs/`). For libraries/packages this is often the repo root.
 
 **Write after release is live. Use plain language — no code names, no error codes, no class names.**
 
@@ -57,7 +57,7 @@ Two separate changelogs serve different audiences. Use this template for both, b
 
 ## Internal Engineering Changelog / Release Notes
 
-**Location:** Part of release PR description, or `docs/reports/YYYY-MM-DD/release-notes.md`
+**Location:** Part of release PR description, or `docs/audits/YYYY/MM-DD/release-notes.md`
 
 **For engineers — can include technical details, migration steps, breaking changes.**
 

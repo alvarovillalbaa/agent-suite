@@ -36,38 +36,47 @@ Two axes govern every documentation decision:
 
 | Task | Type | Location |
 |------|------|----------|
-| What changed today | Continuous | `docs/daily/YYYY-MM-DD.md` |
+| What changed today | Memory | `docs/memories/logs/YYYY/MM-DD/*.md` |
+| Lesson learned from work | Memory | `docs/memories/lessons/YYYY/MM-DD/*.md` |
+| Facts from user/company context | Memory | `docs/memories/facts/YYYY/MM-DD/*.md` |
+| How things should be done | Memory | `docs/memories/procedures/YYYY/MM-DD/*.md` |
+| Error solution discovered | Memory | `docs/memories/fixes/YYYY/MM-DD/*.md` |
+| Navigate a directory / orient a reader | In-folder | `README.md` in that directory |
+| Internal design of a directory | In-folder | `ARCHITECTURE.md` in that directory |
+| Version history of a service/package | In-folder | `CHANGELOG.md` at service root |
 | What this service does | Service-level | `services/name/README.md` |
-| Why this architecture decision | One-off | `docs/reports/YYYY-MM-DD/adr-name.md` |
-| Customer-facing release notes | Continuous | `docs/changelog/YYYY-MM-DD/` |
+| Why this architecture decision | One-off | `docs/audits/YYYY/MM-DD/adr-name.md` |
 | API endpoint behavior | Inline + schema | docstrings + OpenAPI/schema file |
-| Incident post-mortem | One-off | `docs/reports/YYYY-MM-DD/post-mortem.md` |
-| Migration steps | One-off | `docs/plans/YYYY-MM-DD/migration-name.md` |
+| Incident post-mortem | One-off | `docs/audits/YYYY/MM-DD/post-mortem.md` |
+| Migration steps | One-off | `docs/plans/YYYY/MM-DD/migration-name.md` |
+| Feature spec | Project-level | `docs/specs/YYYY/MM-DD/spec-name.md` |
+| Implementation plan | Project-level | `docs/plans/YYYY/MM-DD/plan-name.md` |
 | Complex function explanation | Inline | comment above function |
 | Component props/usage | Inline | JSDoc / TSDoc / Storybook |
 | Component, hook, or route contract | Inline + local feature doc | TSDoc plus nearby README or feature doc when behavior spans files |
-| Testing patterns | Service-level | `services/name/TESTS.md` |
-| Investigation findings | One-off | `docs/reports/YYYY-MM-DD/report-name.md` |
+| Testing patterns | In-folder / service-level | `TESTS.md` in the relevant directory |
+| Investigation findings | One-off | `docs/audits/YYYY/MM-DD/report-name.md` |
 | How-to guide | Project-level | `docs/cookbook/guide-name.md` |
 
 ---
 
 ## Continuous Documentation
 
-### Daily Logs
+### Development Logs (`docs/memories/logs/`)
 
-Daily logs are the single most important continuous documentation habit. Write them after every meaningful change — new features, bug fixes, refactors, config changes.
+Development logs are the single most important continuous documentation habit. Write them after every meaningful change — new features, bug fixes, refactors, config changes.
 
 **Rules (non-negotiable):**
 - Append to the **latest existing date file** — never create new files
-- **2 bullet points max** per change
+- **2 lines max** per change
 - Format: **what happened + why** (not how — the code shows that)
 - Past tense, active voice
 
 **Finding the latest file:**
 ```bash
-ls docs/daily/ | sort | tail -1
-# Or use the helper script: .agents/skills/code-documentation/scripts/find-docs.sh
+# Year folder, then MM-DD subfolder: docs/memories/logs/YYYY/MM-DD/
+ls docs/memories/logs/ | sort | tail -1  # → latest year
+# Or use the helper script: skills/code-documentation/scripts/find-docs.sh
 ```
 
 **Format:**
@@ -76,13 +85,19 @@ ls docs/daily/ | sort | tail -1
 - Refactored candidate serializer to use RetrievalLevelMixin — removed ad-hoc to_representation override
 ```
 
-### Changelogs
+### Memory Documentation (`docs/memories/`)
 
-Two distinct changelog types serve different audiences:
+The `memories/` folder is the team's collective knowledge base — accumulated wisdom from working in this codebase. All memory artifacts use `docs/memories/<type>/YYYY/MM-DD/*.md`.
 
-**Customer-facing** (`docs/changelog/YYYY-MM-DD/`): Features, fixes, improvements visible to users. Plain language. No implementation details. Written after release.
+**Lessons** (`docs/memories/lessons/`) — Reusable insights from code experience. Write when a discovery should change future behavior and can't be derived from reading the code alone. Gate: verified by real work, non-trivial, reusable.
 
-**Internal** (`docs/daily/`): Technical changes, refactors, infrastructure for the engineering team.
+**Facts** (`docs/memories/facts/`) — Stable facts about the user, company, or project context not derivable from code. Write when a teammate would make wrong assumptions without it. Gate: durable, non-sensitive, clearly true.
+
+**Procedures** (`docs/memories/procedures/`) — Documented workflows that would require rediscovery without notes. Write after discovering or refining how something should be done. Gate: repeatable, non-trivial to rediscover, tested at least once.
+
+**Fixes** (`docs/memories/fixes/`) — Solutions to errors or bugs that recurred or were non-obvious. Write when a fix is specific, reproducible, and likely to be needed again. Gate: non-obvious, fix is reproducible.
+
+See `references/continuous-docs.md` for detailed format guidance on each artifact type.
 
 ### Inline Documentation
 
@@ -104,13 +119,13 @@ Inline docs are the highest signal-to-noise documentation — they live next to 
 
 ## One-Off Documentation
 
-### Technical Reports
+### Technical Reports / Audits
 
 Use for: architecture audits, investigation findings, performance analyses, security reviews.
 
 Structure: `summary → context → findings → evidence → recommendations`
 
-Location: `docs/reports/YYYY-MM-DD/report-name.md`
+Location: `docs/audits/YYYY/MM-DD/report-name.md`
 
 ### Architecture Decision Records (ADRs)
 
@@ -120,7 +135,7 @@ Format: `context → decision → consequences → alternatives considered`
 
 Write an ADR when: the decision is irreversible or expensive to reverse, the trade-offs are non-obvious, or the decision contradicts a common pattern for good reason.
 
-Location: inline in service README *or* `docs/reports/YYYY-MM-DD/adr-name.md`
+Location: inline in service README *or* `docs/audits/YYYY/MM-DD/adr-name.md`
 
 ### Post-Mortems
 
@@ -130,7 +145,7 @@ Structure: `impact → timeline → root cause → contributing factors → acti
 
 Tone: blameless, factual, forward-looking. Never assign individual blame.
 
-Location: `docs/reports/YYYY-MM-DD/post-mortem-incident-name.md`
+Location: `docs/audits/YYYY/MM-DD/post-mortem-incident-name.md`
 
 ### Migration Guides
 
@@ -138,7 +153,41 @@ Use for: schema changes, API breaking changes, service restructuring.
 
 Structure: `motivation → before/after state → step-by-step → rollback plan → verification`
 
-Location: `docs/plans/YYYY-MM-DD/migration-name.md`
+Location: `docs/plans/YYYY/MM-DD/migration-name.md`
+
+### Specs (`docs/specs/`)
+
+Use for: feature requirements, API contracts, and behavior specifications before implementation.
+
+Structure: `problem statement → requirements → acceptance criteria → out of scope`
+
+Write a spec first, then an implementation plan in `docs/plans/`, then implement. The spec is the contract; the plan is the execution strategy.
+
+Location: `docs/specs/YYYY/MM-DD/spec-name.md`
+
+---
+
+## In-Folder Documentation
+
+Any directory with substantial content can carry its own documentation files. These files orient readers to the directory — what lives there, how it's organized, and how to navigate it. They apply at every level: repo root, `docs/`, `docs/memories/`, `services/`, `services/auth/`, `services/auth/handlers/`, and so on.
+
+| File | Purpose | Create when |
+|------|---------|-------------|
+| `README.md` | Overview and navigation — what's here and how to use it | Any directory a reader might enter without context |
+| `ARCHITECTURE.md` | Technical deep-dive — how it works, data flows, design decisions | Any directory with non-obvious internal structure |
+| `OVERVIEW.md` | High-level concepts — mental model before diving into code | Complex domains where concepts precede details |
+| `TESTS.md` | Testing patterns, how to run, what's covered | Any directory with a test suite |
+| `SETUP.md` | Config, install, environment — non-obvious setup steps | When `install` alone isn't enough to get running |
+| `CHANGELOG.md` | Version history — what changed between releases | Versioned services, libraries, or packages |
+| `FAQ.md` | Common questions and troubleshooting | After 3+ repeated questions about the same directory |
+
+**`README.md` is the most important.** It's the entry point for anyone exploring a directory. Always create one when the directory has more than a handful of files or when the contents aren't self-evident from filenames.
+
+**Depth guidance:**
+- **Root-level directories** (`docs/`, `services/`, `src/`) — always have a `README.md`
+- **Sub-directories** (`docs/memories/`, `services/auth/`) — add `README.md` when the subdirectory has its own structure or purpose that isn't obvious from the parent
+- **Leaf directories** (`docs/memories/logs/2026/03-21/`) — no in-folder docs needed; the content files themselves are the documentation
+- **`docs/` subdirectories** (`docs/memories/`, `docs/audits/`, `docs/cookbook/`) — each should have a `README.md` that explains what kind of content lives there and how to navigate it
 
 ---
 
@@ -153,7 +202,22 @@ services/service-name/
 └── TESTS.md          # Testing patterns, how to run, what's covered
 ```
 
-Additional files as needed:
+Sub-directories within the service can carry their own docs at each level:
+
+```
+services/service-name/
+├── README.md
+├── ARCHITECTURE.md
+├── TESTS.md
+├── handlers/
+│   └── README.md     # What the handlers sub-module does
+├── models/
+│   └── README.md     # Data model overview for this service
+└── migrations/
+    └── README.md     # Migration history and conventions
+```
+
+Additional service-level files as needed:
 - `SETUP.md` — non-obvious configuration or initialization
 - `OVERVIEW.md` — high-level conceptual overview for newcomers
 - `CHANGELOG.md` — version history (if the service has versioned releases)
@@ -194,18 +258,26 @@ Frontend docs should capture contracts that types and screenshots alone do not m
 
 ## Project Documentation Placement Rules
 
-**Never create new top-level directories in `docs/`**. Use the existing structure:
+**Never create new directories in `docs/` outside this structure**. Use:
 
 ```
 docs/
-├── daily/          ← development logs (append only, YYYY-MM-DD.md)
-├── reports/        ← audits, analyses, investigations (YYYY-MM-DD/ folders)
-├── plans/          ← specs, plans, migrations (YYYY-MM-DD/ folders or flat)
-├── changelog/      ← customer-facing releases (YYYY-MM-DD/ folders)
-├── cookbook/       ← how-to guides (flat, no timestamps)
-├── references/     ← code references, schemas (flat)
-└── snapshots/      ← deep-dive analyses (YYYY-MM-DD/ folders, explicit request only)
+├── README.md        ← navigation index for the docs folder
+├── memories/
+│   ├── README.md    ← what memory artifacts are and how to write them
+│   ├── logs/        ← dev logs (append only, YYYY/MM-DD/*.md, 2 lines max)
+│   ├── lessons/     ← lessons learned (YYYY/MM-DD/*.md)
+│   ├── facts/       ← facts from user/company context (YYYY/MM-DD/*.md)
+│   ├── procedures/  ← how things should be done (YYYY/MM-DD/*.md)
+│   └── fixes/       ← error solutions (YYYY/MM-DD/*.md)
+├── audits/          ← comprehensive reports, ADRs, post-mortems (YYYY/MM-DD/ folders)
+├── references/      ← code references, schemas (flat, no timestamps)
+├── cookbook/        ← technical how-to guides (flat, no timestamps)
+├── plans/           ← implementation plans, migrations (YYYY/MM-DD/ folders)
+└── specs/           ← feature specs, API contracts (YYYY/MM-DD/ folders)
 ```
+
+Each `docs/` subdirectory should have its own `README.md` explaining what lives there. See the "In-Folder Documentation" section below.
 
 **Repo-local instructions override this structure** — always check for `AGENTS.md`, `CLAUDE.md`, or similar files that define project-specific doc placement rules before writing anything.
 
@@ -244,11 +316,14 @@ For in-depth guidance, consult:
 ### Templates
 
 Ready-to-use templates in `templates/`:
-- **`templates/daily-log.md`** — Daily log format, examples, edge cases
-- **`templates/technical-report.md`** — Technical report structure
+- **`templates/daily-log.md`** — Development log format, examples, edge cases
+- **`templates/memory-lesson.md`** — Lesson learned artifact
+- **`templates/memory-fact.md`** — Fact artifact
+- **`templates/memory-procedure.md`** — Procedure artifact
+- **`templates/memory-fix.md`** — Fix artifact
+- **`templates/technical-report.md`** — Technical report / audit structure
 - **`templates/adr.md`** — Architecture Decision Record
 - **`templates/service-readme.md`** — Service README skeleton
-- **`templates/changelog-entry.md`** — Changelog entry for both audiences
 - **`templates/post-mortem.md`** — Post-mortem structure
 
 ### Scripts

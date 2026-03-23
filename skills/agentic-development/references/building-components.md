@@ -36,6 +36,49 @@ Classification rule:
 
 Break a monolithic component into cooperating subcomponents. Each subcomponent wraps one element and gets its own exported type.
 
+### Avoid Boolean Prop Proliferation
+
+**CRITICAL — prevents unmaintainable component variants.**
+
+Don't add boolean props (`isThread`, `isEditing`, `isDMThread`) to customize behavior. Each boolean doubles possible states and creates unmaintainable conditional logic. Use composition instead.
+
+```tsx
+// ❌ boolean props — exponential complexity
+function Composer({ onSubmit, isThread, channelId, isDMThread, isEditing }: Props) {
+  return (
+    <form>
+      <Input />
+      {isDMThread ? <AlsoSendToDMField /> : isThread ? <AlsoSendToChannelField /> : null}
+      {isEditing ? <EditActions /> : <DefaultActions />}
+    </form>
+  )
+}
+
+// ✅ composition — each variant is explicit and self-contained
+function ThreadComposer({ channelId }: { channelId: string }) {
+  return (
+    <Composer.Frame>
+      <Composer.Input />
+      <AlsoSendToChannelField id={channelId} />
+      <Composer.Footer><Composer.Submit /></Composer.Footer>
+    </Composer.Frame>
+  )
+}
+
+function EditComposer() {
+  return (
+    <Composer.Frame>
+      <Composer.Input />
+      <Composer.Footer><Composer.CancelEdit /><Composer.SaveEdit /></Composer.Footer>
+    </Composer.Frame>
+  )
+}
+```
+
+Create **explicit variant components** instead of boolean modes. Each variant is self-documenting — readable at the call site, no hidden conditionals.
+
+### Compound Components
+
 ```tsx
 // ❌ Monolithic — impossible to customize individual layers
 <Accordion data={data} />
@@ -72,6 +115,76 @@ export const Root = ({ open, setOpen, ...props }: RootProps) => (
   </AccordionContext.Provider>
 )
 ```
+
+### State/Actions/Meta Provider Pattern
+
+For complex compound components, define a **generic context interface** with three parts — `state`, `actions`, `meta` — so any provider can implement it and all UI subcomponents are fully decoupled from the state management implementation.
+
+```tsx
+// Generic interface — the contract any provider must implement
+interface ComposerState { input: string; isSubmitting: boolean }
+interface ComposerActions { update: (updater: (s: ComposerState) => ComposerState) => void; submit: () => void }
+interface ComposerMeta { inputRef: React.RefObject<HTMLInputElement> }
+
+const ComposerContext = createContext<{ state: ComposerState; actions: ComposerActions; meta: ComposerMeta } | null>(null)
+
+// Subcomponents consume the interface, not the implementation
+function ComposerInput() {
+  const { state, actions: { update }, meta } = use(ComposerContext)!
+  return <input ref={meta.inputRef} value={state.input} onChange={e => update(s => ({ ...s, input: e.target.value }))} />
+}
+
+// Provider A: local state
+function ForwardMessageProvider({ children }) {
+  const [state, setState] = useState(initialState)
+  return <ComposerContext value={{ state, actions: { update: setState, submit: useForwardMessage() }, meta: { inputRef: useRef(null) } }}>{children}</ComposerContext>
+}
+
+// Provider B: global synced state — same UI, swapped provider
+function ChannelProvider({ channelId, children }) {
+  const { state, update, submit } = useGlobalChannel(channelId)
+  return <ComposerContext value={{ state, actions: { update, submit }, meta: { inputRef: useRef(null) } }}>{children}</ComposerContext>
+}
+```
+
+Key insight: **the provider boundary is what matters, not visual nesting.** Components outside the main UI subtree (e.g., a submit button in a dialog footer) can still access state and actions as long as they are inside the provider:
+
+```tsx
+function ForwardMessageDialog() {
+  return (
+    <ForwardMessageProvider>
+      <Dialog>
+        <Composer.Frame><Composer.Input /></Composer.Frame>
+        <MessagePreview />          {/* reads state from context */}
+        <ForwardButton />           {/* calls actions.submit — outside Frame, inside Provider */}
+      </Dialog>
+    </ForwardMessageProvider>
+  )
+}
+```
+
+Swap the provider, keep the UI. The same `Composer.Input` works with local `useState`, Zustand, or a server-sync hook.
+
+### Children Over Render Props
+
+Use `children` for composition instead of `renderX` props. Children are more readable and compose naturally without requiring understanding of callback signatures.
+
+```tsx
+// ❌ render props — awkward and inflexible
+<Composer renderHeader={() => <CustomHeader />} renderActions={() => <Submit />} />
+
+// ✅ children — clear and composable
+<Composer.Frame>
+  <CustomHeader />
+  <Composer.Input />
+  <Composer.Footer>
+    <Composer.Formatting />
+    <Submit />
+  </Composer.Footer>
+</Composer.Frame>
+```
+
+Use render props when the **parent needs to pass data into the child** (e.g., `renderItem={({ item }) => <Item item={item} />}`). Use children for composing static structure.
 
 ## TypeScript Patterns
 
@@ -381,3 +494,33 @@ Every published component needs:
 8. **Changelog** — semver, breaking changes with before/after migration examples
 
 Preferred documentation frameworks: Fumadocs (Next.js), Nextra, VitePress, Docusaurus.
+
+## React 19 API Changes
+
+> **React 19+ only.** Skip if on React 18 or earlier.
+
+### `ref` as a regular prop — no more `forwardRef`
+
+```tsx
+// ❌ React 18 — forwardRef wrapper required
+const ComposerInput = forwardRef<HTMLInputElement, Props>((props, ref) => (
+  <input ref={ref} {...props} />
+))
+
+// ✅ React 19 — ref is a plain prop
+function ComposerInput({ ref, ...props }: Props & { ref?: React.Ref<HTMLInputElement> }) {
+  return <input ref={ref} {...props} />
+}
+```
+
+### `use()` replaces `useContext()`
+
+```tsx
+// ❌ React 18
+const value = useContext(MyContext)
+
+// ✅ React 19 — also callable conditionally, unlike useContext
+const value = use(MyContext)
+```
+
+When reading context in compound component subcomponents, prefer `use(Context)` in React 19 projects — it reads more clearly and can be called inside conditionals or loops.

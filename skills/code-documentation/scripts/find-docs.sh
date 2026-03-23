@@ -3,13 +3,15 @@
 #
 # Usage:
 #   ./find-docs.sh            Print locations for common doc targets
-#   ./find-docs.sh daily      Print path to latest daily log
-#   ./find-docs.sh report     Print path for a new report (today's date folder)
+#   ./find-docs.sh log        Print path to latest memory log
+#   ./find-docs.sh audit      Print path for a new audit (today's date folder)
 #   ./find-docs.sh service    Print service-level doc locations (requires being in a service dir)
 
 set -euo pipefail
 
 TODAY=$(date +%Y-%m-%d)
+YEAR=$(date +%Y)
+MONTH_DAY=$(date +%m-%d)
 DOCS_ROOT="docs"
 
 # Find repo root (walk up until we find a docs/ directory or .git)
@@ -35,27 +37,30 @@ cmd="${1:-all}"
 
 case "$cmd" in
 
-    daily)
-        DAILY_DIR="$REPO_ROOT/$DOCS_ROOT/daily"
-        if [[ -d "$DAILY_DIR" ]]; then
-            LATEST=$(ls "$DAILY_DIR" | sort | tail -1)
-            echo "Latest daily log: $DAILY_DIR/$LATEST"
+    log)
+        LOG_DIR="$REPO_ROOT/$DOCS_ROOT/memories/logs"
+        if [[ -d "$LOG_DIR" ]]; then
+            LATEST_YEAR=$(ls "$LOG_DIR" | sort | tail -1)
+            LATEST_DAY=$(ls "$LOG_DIR/$LATEST_YEAR" 2>/dev/null | sort | tail -1)
+            LATEST_FILE=$(ls "$LOG_DIR/$LATEST_YEAR/$LATEST_DAY" 2>/dev/null | sort | tail -1)
+            echo "Latest log: $LOG_DIR/$LATEST_YEAR/$LATEST_DAY/$LATEST_FILE"
             echo ""
             echo "Append with:"
-            echo "  echo '- Your log entry here' >> $DAILY_DIR/$LATEST"
+            echo "  echo '- Your log entry here' >> $LOG_DIR/$LATEST_YEAR/$LATEST_DAY/$LATEST_FILE"
         else
-            echo "No docs/daily/ directory found in repo root: $REPO_ROOT"
-            echo "Create it with: mkdir -p $REPO_ROOT/$DOCS_ROOT/daily"
+            echo "No docs/memories/logs/ directory found in repo root: $REPO_ROOT"
+            echo "Create it with: mkdir -p $REPO_ROOT/$DOCS_ROOT/memories/logs/$YEAR/$MONTH_DAY"
+            echo "Then create:    touch $REPO_ROOT/$DOCS_ROOT/memories/logs/$YEAR/$MONTH_DAY/dev.md"
         fi
         ;;
 
-    report)
-        REPORT_DIR="$REPO_ROOT/$DOCS_ROOT/reports/$TODAY"
-        echo "New report location: $REPORT_DIR/"
+    audit)
+        AUDIT_DIR="$REPO_ROOT/$DOCS_ROOT/audits/$YEAR/$MONTH_DAY"
+        echo "New audit location: $AUDIT_DIR/"
         echo ""
         echo "Create with:"
-        echo "  mkdir -p $REPORT_DIR"
-        echo "  touch $REPORT_DIR/report-name.md"
+        echo "  mkdir -p $AUDIT_DIR"
+        echo "  touch $AUDIT_DIR/report-name.md"
         ;;
 
     service)
@@ -84,43 +89,59 @@ case "$cmd" in
         print_separator
         echo ""
 
-        # Daily logs
-        DAILY_DIR="$REPO_ROOT/$DOCS_ROOT/daily"
-        echo "📓 DAILY LOGS"
-        if [[ -d "$DAILY_DIR" ]]; then
-            LATEST=$(ls "$DAILY_DIR" 2>/dev/null | sort | tail -1)
-            if [[ -n "$LATEST" ]]; then
-                echo "   Latest: $DAILY_DIR/$LATEST"
+        # Memory logs
+        LOG_DIR="$REPO_ROOT/$DOCS_ROOT/memories/logs"
+        echo "📓 MEMORY LOGS (docs/memories/logs/YYYY/MM-DD/)"
+        if [[ -d "$LOG_DIR" ]]; then
+            LATEST_YEAR=$(ls "$LOG_DIR" 2>/dev/null | sort | tail -1)
+            if [[ -n "$LATEST_YEAR" ]]; then
+                LATEST_DAY=$(ls "$LOG_DIR/$LATEST_YEAR" 2>/dev/null | sort | tail -1)
+                LATEST_FILE=$(ls "$LOG_DIR/$LATEST_YEAR/$LATEST_DAY" 2>/dev/null | sort | tail -1 2>/dev/null || echo "")
+                echo "   Latest: $LOG_DIR/$LATEST_YEAR/$LATEST_DAY/$LATEST_FILE"
             else
-                echo "   Directory exists but is empty: $DAILY_DIR"
+                echo "   Directory exists but is empty: $LOG_DIR"
             fi
         else
-            echo "   Not found — expected: $DAILY_DIR/"
+            echo "   Not found — expected: $LOG_DIR/"
+            echo "   New log: $LOG_DIR/$YEAR/$MONTH_DAY/dev.md"
         fi
         echo ""
 
-        # Reports
-        echo "📊 REPORTS"
-        echo "   New report: $REPO_ROOT/$DOCS_ROOT/reports/$TODAY/"
-        if [[ -d "$REPO_ROOT/$DOCS_ROOT/reports" ]]; then
-            RECENT=$(ls "$REPO_ROOT/$DOCS_ROOT/reports" 2>/dev/null | sort | tail -3)
+        # Memory lessons/facts/procedures/fixes
+        echo "🧠 MEMORY ARTIFACTS (docs/memories/<type>/YYYY/MM-DD/)"
+        for TYPE in lessons facts procedures fixes; do
+            MEM_DIR="$REPO_ROOT/$DOCS_ROOT/memories/$TYPE"
+            if [[ -d "$MEM_DIR" ]]; then
+                COUNT=$(find "$MEM_DIR" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+                echo "   $TYPE: $COUNT file(s)"
+            else
+                echo "   $TYPE: not found — new: $MEM_DIR/$YEAR/$MONTH_DAY/"
+            fi
+        done
+        echo ""
+
+        # Audits
+        echo "📊 AUDITS (docs/audits/YYYY/MM-DD/)"
+        AUDIT_BASE="$REPO_ROOT/$DOCS_ROOT/audits"
+        if [[ -d "$AUDIT_BASE" ]]; then
+            RECENT=$(find "$AUDIT_BASE" -name "*.md" 2>/dev/null | sort | tail -3)
             if [[ -n "$RECENT" ]]; then
                 echo "   Recent:"
-                echo "$RECENT" | while read -r d; do
-                    echo "     $REPO_ROOT/$DOCS_ROOT/reports/$d/"
+                echo "$RECENT" | while read -r f; do
+                    echo "     $f"
                 done
+            else
+                echo "   Directory exists but is empty"
             fi
+        else
+            echo "   Not found — new audit: $AUDIT_BASE/$YEAR/$MONTH_DAY/report-name.md"
         fi
         echo ""
 
-        # Plans
-        echo "📋 PLANS"
-        echo "   New plan: $REPO_ROOT/$DOCS_ROOT/plans/$TODAY-feature-name.md"
-        echo ""
-
-        # Changelog
-        echo "📢 CHANGELOG"
-        echo "   Customer-facing: $REPO_ROOT/$DOCS_ROOT/changelog/$TODAY/"
+        # Plans and Specs
+        echo "📋 PLANS / SPECS"
+        echo "   New plan: $REPO_ROOT/$DOCS_ROOT/plans/$YEAR/$MONTH_DAY/plan-name.md"
+        echo "   New spec: $REPO_ROOT/$DOCS_ROOT/specs/$YEAR/$MONTH_DAY/spec-name.md"
         echo ""
 
         # Service docs (if in a service dir)
@@ -138,7 +159,7 @@ case "$cmd" in
         fi
 
         print_separator
-        echo "Templates: .agents/skills/code-documentation/templates/"
+        echo "Templates: skills/code-documentation/templates/"
         print_separator
         ;;
 esac

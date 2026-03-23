@@ -2,70 +2,276 @@
 
 Choose the collaboration mode that fits the current branch, risk level, and expected integration path. Do not apply one git workflow mechanically to every repo.
 
+---
+
+## Branch Detection — First Action Every Session
+
+Before touching any code, determine the current branch:
+
+```bash
+git branch --show-current
+git status --short
+```
+
+The result gates everything that follows.
+
+---
+
 ## Working on `main`
 
-If the user is already on `main`, it is acceptable to work there. Do not force a branch or worktree just to satisfy ceremony.
+If the user is already on `main` and **no code changes have been made yet**, work directly on `main`. Do not force a branch or worktree just to satisfy ceremony.
 
-Still apply these limits:
+**Before starting any work on `main`**, pull to sync with the remote:
+
+```bash
+git pull origin main
+```
+
+Only skip the pull if `git status` shows uncommitted local changes that a pull would conflict with.
+
+Limits that still apply on `main`:
 
 - Do not commit, push, merge, or rewrite history on `main` without explicit user intent.
 - Recommend a branch or worktree when the change is large, risky, multi-day, or likely to become a PR.
 - Avoid mixing the user's unrelated local edits with your task. Read `git status` first.
 
-## Working on an Existing Branch
+---
 
-If the current branch is not `main`, treat it as collaborative work by default.
+## Working on a Non-`main` Branch — Default: Use a Worktree
 
-- If the tree is clean, syncing from `main` before new work is often correct.
-- If the tree is dirty, do not auto-rebase or pull in a way that risks conflicts.
-- Keep commits grouped by coherent change slices when the user wants commits.
+When the current branch is **not `main`**, treat the work as feature or fix work that must remain isolated from other active branches. **Use a git worktree** by default for any new change, so the current checkout is not disturbed and multiple efforts can move in parallel.
 
-## When to Use a New Branch
+**Before creating a worktree**, pull `main` to make sure the new branch starts fresh:
 
-Create a new branch when:
+```bash
+git fetch origin
+git pull origin main  # only if tree is clean and no local edits exist yet
+```
 
-- the user wants a PR
-- the task should be isolated from current work
-- multiple changes should land independently
-- you need a safe place for experimental or risky edits
+### Creating the worktree
 
-Use descriptive names such as `feat/...` or `fix/...` when the repo has a naming convention.
+```bash
+git worktree add .worktrees/<branch-name> -b <branch-name>
+```
 
-## When to Use a Worktree
+Preferred directory resolution order:
 
-Use a worktree when you need branch isolation without disturbing the current checkout, or when multiple PR-sized efforts must move in parallel.
+1. Existing `.worktrees/` directory in the repo root
+2. Existing `worktrees/` directory
+3. Repo-documented preferred location
+4. Ask the user
 
-Prefer this directory order:
+If the worktree directory lives inside the repo, verify it is listed in `.gitignore` before creating a worktree there.
 
-1. existing `.worktrees/`
-2. existing `worktrees/`
-3. repo-documented preferred location
-4. ask the user
+Use descriptive branch names matching the repo's naming convention:
 
-If the worktree directory lives inside the repo, verify it is ignored before creating a worktree there.
+- `feat/<short-description>` for new features
+- `fix/<short-description>` for bug fixes
+- `refactor/<short-description>` for refactors
+- `chore/<short-description>` for non-behavioral changes
 
-## Pull Requests
+### When to skip the worktree
 
-PRs are collaboration artifacts, not a formality.
+If the current (non-`main`) branch **is** the correct isolation boundary (e.g., the user already created the branch for this task), work directly in it without creating a nested worktree. Confirm by checking the branch name and asking the user if uncertain.
 
-- Check whether the current branch already has a PR before creating a new one.
-- Keep one branch per PR whenever practical.
-- Summarize what changed, how it was verified, and what remains risky.
-- If the repo uses `gh`, prefer inline review-thread replies over top-level comments for line-specific feedback.
+---
+
+## Git Pulls — When to Pull
+
+| Situation | Action |
+|-----------|--------|
+| On `main`, tree is clean, no changes made | `git pull origin main` before starting |
+| On a feature branch, tree is clean, starting fresh work | `git fetch origin && git rebase origin/main` |
+| Tree is dirty (uncommitted changes exist) | Do **not** pull. Work from the current state. |
+| Worktree just created | Already branched from current HEAD; no pull needed unless HEAD is behind |
+
+Never auto-rebase or pull when the tree has uncommitted edits — this risks merge conflicts that destroy in-progress work.
+
+---
+
+## Commits — Multiple, Semantic, and Descriptive
+
+Every PR should contain **multiple commits**, each representing one logical unit of change. Do not squash all work into a single commit. Separation of concerns in commits:
+
+- makes the PR easier to review
+- makes `git bisect` and `git blame` useful
+- makes rollback surgical
+
+### Commit naming rules
+
+Commit messages must be **descriptive and precise**. The subject line should complete the sentence "This commit will…":
+
+**Format:**
+```
+<type>(<scope>): <imperative short description>
+
+[optional body explaining WHY, not WHAT]
+```
+
+**Types:** `feat`, `fix`, `refactor`, `test`, `chore`, `docs`, `style`, `perf`, `ci`
+
+**Good examples:**
+```
+feat(auth): add JWT refresh token rotation on expiry
+fix(api): return 404 instead of 500 when resource not found
+refactor(dashboard): extract useMetrics hook from DashboardPage
+test(auth): add integration tests for refresh token flow
+chore(deps): upgrade React to 19.1.0
+```
+
+**Bad examples (never use):**
+```
+fix: fix bug
+update: changes
+WIP
+stuff
+```
+
+### Commit cadence
+
+Commit after each discrete, passing unit of work — not at arbitrary time intervals, and not only at the end of the PR:
+
+1. Initial scaffolding or skeleton
+2. Core implementation of each logical piece
+3. Tests for each implemented piece
+4. Bug fixes discovered during testing
+5. Documentation or type updates
+6. Final cleanup (removing debug code, unused imports)
+
+---
+
+## Pull Requests — Before Opening
+
+Gate PRs on CI/CD passing. Do not open a PR while tests are red or the build is broken on the branch:
+
+1. Push the branch: `git push origin <branch-name>`
+2. Confirm CI checks pass (GitHub Actions, CircleCI, etc.)
+3. If CI fails: fix on the branch, push again, wait for green
+4. Open the PR only once CI is green
+
+If the repo has no CI, run the local test suite and build and confirm they pass before opening the PR.
+
+---
+
+## Pull Requests — Description Quality
+
+PR descriptions are **comprehensive collaboration artifacts**, not a formality. Every PR must have:
+
+### Required sections
+
+```markdown
+## Summary
+
+[1–3 sentence plain-English description of WHAT changed and WHY. Context that is not in the code.]
+
+## Changes
+
+- [Bullet list of concrete changes: files touched, behavior changed, new APIs added, deprecated paths removed]
+- Group related changes. Never write "Various changes" or "See commits".
+
+## How to Test
+
+[Step-by-step instructions for a reviewer to manually verify the change, including:
+- Any environment setup required
+- Specific user flows to exercise
+- Expected outcome for each step]
+
+## Screenshots / Recordings
+
+[Required for any UI change. Optional but encouraged for other changes.]
+
+## Risk and Notes
+
+[What could go wrong? What assumptions were made? What was left out intentionally?
+If risk is low, say so explicitly: "Low risk — changes are isolated to X".]
+
+## Related
+
+[Links to issue, ticket, Slack thread, ADR, or spec that motivated this PR.]
+```
+
+### Quality standards
+
+- Never write a one-line PR description.
+- Never copy-paste commit messages as the PR body.
+- Write for a reviewer who does not have the conversation context you have.
+- If the change is large, summarize the review strategy (e.g., "start with `auth/tokens.ts`, then the tests").
+- If there are known limitations or follow-up tasks, list them explicitly in "Risk and Notes".
+
+### Inline PR comments
+
+When leaving review comments on others' PRs:
+
+- Be precise about file, line, and the specific concern.
+- Distinguish blockers from suggestions: prefix with **[blocker]** or **[nit]**.
+- Explain *why* something should change, not just *what* to change.
+- Never leave vague comments ("This seems off", "I'd do this differently").
+
+---
+
+## Pull Requests — Merging
+
+When a PR is approved and CI is green, merge it correctly:
+
+### Merge strategy
+
+| Repo convention | Strategy |
+|-----------------|----------|
+| Linear history enforced | Squash merge or rebase merge |
+| History preserved | Merge commit |
+| No stated convention | Prefer merge commit (preserves branch history) |
+
+Check the repo's `CONTRIBUTING.md` or existing PR merge history to determine the convention before merging.
+
+### Steps before merging
+
+1. Confirm all CI checks are green.
+2. Confirm required reviewers have approved.
+3. Confirm no unresolved blocker comments remain.
+4. If the branch is behind `main`, update it: `git fetch origin && git merge origin/main` (or rebase per convention).
+5. Re-run CI if the branch was updated.
+6. Merge.
+
+### After merging
+
+1. Delete the remote branch (unless the repo policy retains it).
+2. If a worktree was used, remove it: `git worktree remove .worktrees/<branch-name>`.
+3. Delete the local branch: `git branch -d <branch-name>`.
+4. On `main`, pull to update: `git pull origin main`.
+
+---
+
+## When to Use a New Branch (Without Worktree)
+
+Create a plain branch (no worktree) when:
+
+- The current checkout is already `main` and you want a lightweight PR branch without parallel work
+- The change is small enough that switching branches is not disruptive
+- The repo's convention discourages worktrees
+
+Prefer worktrees for anything involving parallel work, long-running tasks, or when the current checkout must stay functional.
+
+---
 
 ## Review Comments and Thread Hygiene
 
-- Resolve comments with code or technical reasoning, not performative agreement.
+- Resolve comments with code or technical reasoning, not performative agreement ("Good point, fixed!").
 - Reply in-thread when the platform supports it.
 - Distinguish blocker comments from optional cleanup so you can sequence work correctly.
+- When all blockers are resolved, re-request review rather than merging silently.
+
+---
 
 ## Cleanup and Completion
 
-When implementation is complete on a branch or worktree, do not silently stop. Present the next integration choice:
+When implementation is complete on a branch or worktree:
 
-1. merge locally
-2. push and create or update a PR
-3. keep the branch or worktree as-is
-4. discard the work
+1. Confirm CI is green.
+2. Present the next integration choice to the user:
+   - merge locally into `main`
+   - push and create or update a PR
+   - keep the branch or worktree open for more work
+   - discard the work
+3. If discard is chosen, require explicit confirmation before deleting a branch or worktree.
 
-If discard is chosen, require explicit confirmation before deleting a branch or worktree.
+Do not silently stop work in an ambiguous state. Make the next step explicit.
