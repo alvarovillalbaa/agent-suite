@@ -74,16 +74,60 @@ Technical, not narrative. Write it for your future debugging self, not for a blo
 
 ---
 
-## Versioned Release Notes
+## Changelogs
 
-For services or libraries that have versioned releases, document version history in a `CHANGELOG.md` at the service or package root — not in `docs/`. This keeps the changelog co-located with what it describes.
+Two distinct changelog types serve different audiences. Never mix them — they require completely different writing styles.
 
+### Two Changelog Audiences
+
+**Customer-facing (`CHANGELOG.md` at service or package root):** What changed in the product — for users and stakeholders. Plain language, no technical jargon, no internal class names.
+
+**Internal engineering (`docs/audits/YYYY/MM-DD/release-notes.md` or PR description):** Technical changes, refactors, infrastructure details — for engineers.
+
+### Customer-Facing Changelog
+
+**Location:** `CHANGELOG.md` at the service or package root. Co-located with the code it describes.
+
+**When to write:** At every public release. Written after the release is live, not before.
+
+**Tone:** Plain language. Present tense ("Job matching now considers..."). No technical jargon. No internal class names. No error codes. User-impact focused.
+
+**Structure:**
+```markdown
+## [Version or Date] — Release Name (optional)
+
+### New
+- Job matching now considers candidate work preferences when scoring roles
+- Notifications now support digest mode — batch daily or weekly instead of per-event
+
+### Improved
+- Candidate search is 3× faster on large datasets
+- Dashboard load time reduced from 4s to under 1s
+
+### Fixed
+- Fixed an issue where some users saw duplicate notifications after reconnecting
+- Fixed a layout issue in the sidebar on smaller screens
+
+### Removed
+- Removed legacy CSV export format — use the new Excel export instead
 ```
-services/auth/
-├── CHANGELOG.md    ← version history for the auth service
+
+**Anti-patterns:**
+```
+# Bad — technical, jargon-heavy
+- Migrated CandidateSerializer to RetrievalLevelMixin (removed to_representation override)
+- Fixed N+1 query in JobListView via select_related('company', 'location')
+
+# Good — user-focused
+- Improved job list loading time for companies with many active roles
 ```
 
-When using semver, structure entries as: breaking changes (document migration path in `docs/plans/`), new features, and bug fixes.
+### Semantic Versioning in Changelogs
+
+When the repo uses semver:
+- **MAJOR** (1.0.0 → 2.0.0): Breaking changes — document migration path in `docs/plans/`
+- **MINOR** (1.0.0 → 1.1.0): New features — document what's new
+- **PATCH** (1.0.0 → 1.0.1): Bug fixes — document what was fixed
 
 ---
 

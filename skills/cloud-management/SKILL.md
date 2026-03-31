@@ -93,6 +93,25 @@ Use this loop for every cloud task:
 5. Split long-running concerns by role when the workload needs it: public web, background workers, realtime, schedulers, and admin-only surfaces should not collapse into one service unless the repo already operates that way.
 6. Wait, verify, and return the exact endpoints, IDs, and health evidence.
 
+### Choose a Deployment Strategy
+
+Load [deployment-strategies.md](./references/deployment-strategies.md) when choosing between rolling, blue/green, canary, or recreate patterns. Contains:
+- Strategy selection matrix (when to use each, rollback speed, risk, downtime)
+- Provider-specific commands for each strategy (ECS, Container Apps, Cloud Run, Kubernetes)
+- Health-check gate checklist before traffic cutover
+- IaC tool selection guide (Terraform/OpenTofu default; Pulumi for code-preferring teams; provider-native tools only when fully committed to a single cloud)
+
+Use `scripts/deployment_manager.py` to generate a provider-specific deployment plan with steps and rollback commands:
+
+```bash
+python <skill-dir>/scripts/deployment_manager.py <repo_root> \
+  --provider aws \
+  --strategy blue-green \
+  --service my-service \
+  --image 123456789.dkr.ecr.us-east-1.amazonaws.com/my-service:abc1234 \
+  --dry-run
+```
+
 ### Wire Automatic Deployments
 
 1. Reuse the existing CI system when it exists.
@@ -100,6 +119,8 @@ Use this loop for every cloud task:
 3. Build immutable artifacts once, publish them to the provider registry, then roll out by reference.
 4. Split infra deploys from runtime deploys when stateful resources or migrations are involved.
 5. Load [cicd-and-auto-deploy.md](./references/cicd-and-auto-deploy.md).
+
+**Bootstrapping a new CI pipeline:** If the repo has no CI workflow yet, use the `agentic-development` skill's stack-detection + pipeline-generation workflow to generate a baseline CI YAML first (`stack_detector.py` → `pipeline_generator.py`). Then return here to add cloud-specific deploy stages on top of that baseline.
 
 ### Inventory and Optimize
 
@@ -158,3 +179,10 @@ Use `cloud_change_guard.py` to classify risk and generate the checklist or appro
   - Inspect a repo and emit deploy-relevant signals: languages, frameworks, CI, IaC, cloud hints, identity hints, and recommended runtime bias.
 - `scripts/cloud_change_guard.py`
   - Score change risk, determine whether approval is required, and emit a structured checklist or approval template before execution.
+- `scripts/pipeline_generator.py`
+  - Scaffold CI/CD workflow files (GitHub Actions or CircleCI) with build, test, security-scan, and **deploy** stages (OIDC auth, image build/push, cloud-specific rollout). Detects runtime signals from the repo. Usage: `python <skill-dir>/scripts/pipeline_generator.py <repo_root> --platform github-actions --dry-run`
+  - **Note:** This script focuses on cloud deploy stages. For a baseline CI pipeline (lint/test/build) generated from stack signals, use the `agentic-development` skill's `scripts/stack_detector.py` + `scripts/pipeline_generator.py` instead.
+- `scripts/deployment_manager.py`
+  - Build a provider-specific deployment plan (rolling, blue/green, canary, recreate) with ordered CLI steps and a rollback command. Supports AWS, Azure, GCP, and Kubernetes. Usage: `python <skill-dir>/scripts/deployment_manager.py <repo_root> --provider gcp --strategy blue-green --service my-svc --image gcr.io/project/image:tag`
+- `scripts/terraform_scaffolder.py`
+  - Generate a Terraform/OpenTofu module scaffold (`versions.tf`, `variables.tf`, `main.tf`, `outputs.tf`, `README.md`) for AWS, Azure, or GCP. Optionally runs `terraform init + validate`. Usage: `python <skill-dir>/scripts/terraform_scaffolder.py <repo_root> --provider aws --module-name my-service --validate`

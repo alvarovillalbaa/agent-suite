@@ -587,6 +587,207 @@ export default async function ProductPage({ params }) {
 
 ---
 
+## Internationalization (i18n) with react-i18next
+
+For multilingual sites, react-i18next is the standard React i18n library. Proper key naming and namespace structure are critical for maintainability.
+
+### Key Naming Convention
+
+Use **flat keys with dot notation** — not nested objects. Pattern: `{feature}.{context}.{action|status}`.
+
+```typescript
+// ✅ Correct — flat keys
+export default {
+  'nav.home.label': 'Home',
+  'nav.home.aria': 'Go to homepage',
+  'auth.login.submit': 'Sign in',
+  'auth.login.error': 'Invalid credentials',
+};
+
+// ❌ Avoid — nested objects (causes type inference issues)
+export default {
+  nav: { home: { label: 'Home' } },
+};
+```
+
+**Parameters:** Use `{{variableName}}` syntax for dynamic values:
+```typescript
+'pricing.plan.desc': 'Includes {{credits}} credits per month',
+```
+
+**Avoid key prefix conflicts** — a key cannot be both a leaf and a namespace prefix:
+```typescript
+// ❌ Conflict: 'user.profile' is both a value and a prefix
+'user.profile': 'Profile',
+'user.profile.edit': 'Edit Profile',
+
+// ✅ Solution: add an explicit suffix on the leaf
+'user.profile.label': 'Profile',
+'user.profile.edit': 'Edit Profile',
+```
+
+### Namespace Strategy
+
+Split translations by feature area to keep bundles small and avoid loading unused strings:
+
+| Namespace | Contents |
+|-----------|----------|
+| `common` | Shared UI: buttons, labels, status messages |
+| `auth` | Login, signup, password flows |
+| `[feature]` | One namespace per major feature/route |
+| `error` | Error messages and validation |
+
+### Usage in Components
+
+```tsx
+import { useTranslation } from 'react-i18next';
+
+// Single namespace
+const { t } = useTranslation('common');
+t('nav.home.label')
+t('pricing.plan.desc', { credits: 1000 })
+
+// Multiple namespaces
+const { t } = useTranslation(['common', 'auth']);
+t('common:nav.home.label')
+t('auth:login.submit')
+```
+
+### Workflow for Adding Translations
+
+1. Add keys to the source locale file (e.g., `locales/en.json` or your default language)
+2. Export any new namespace in the locales index
+3. **Auto-translate to all target languages** using the bundled script (see below)
+4. Ensure `hreflang` alternates are updated when adding a new locale (see `technical-seo.md` → International SEO)
+
+### Auto-Translating i18n Files with `translate_i18n.py`
+
+The skill includes a standalone script at `scripts/translate_i18n.py` that uses an AI provider to translate an entire i18n JSON file while preserving structure, keys, and `{{placeholder}}` variables.
+
+**Requirements:** `pip install requests` plus an API key for your chosen provider.
+
+**Single language:**
+```bash
+python scripts/translate_i18n.py locales/en.json \
+  --target-lang Spanish \
+  --output locales/es.json
+```
+
+**All languages at once (outputs `locales/es.json`, `locales/fr.json`, etc.):**
+```bash
+python scripts/translate_i18n.py locales/en.json \
+  --target-langs Spanish French German Portuguese Japanese \
+  --output-dir locales/
+```
+
+**Using Anthropic Claude instead of OpenAI:**
+```bash
+python scripts/translate_i18n.py locales/en.json \
+  --target-lang French \
+  --output locales/fr.json \
+  --provider anthropic
+```
+
+**Options:**
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--target-lang` | — | Single target language name (e.g. `Spanish`) |
+| `--target-langs` | — | Multiple languages (space-separated) |
+| `--output` / `-o` | — | Output file (single language) |
+| `--output-dir` | — | Output directory (multi-language); files named `<code>.json` |
+| `--source-lang` | `English` | Language of the source file |
+| `--provider` | `openai` | Provider: `openai`, `anthropic`, `groq`, `perplexity`, `openrouter`, `deepseek`, `x` |
+| `--model` | provider default | Override model (e.g. `gpt-4.1`, `claude-sonnet-4-6`) |
+| `--api-key` | env variable | Override API key (falls back to `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.) |
+| `--verbose` / `-v` | off | Print each key as it is translated |
+
+**What the script preserves:**
+- JSON structure and all keys (keys are never translated)
+- URLs (detected and skipped automatically)
+- Numbers, booleans, and `null` values
+- `{{placeholder}}` interpolation variables within strings
+
+**Example source → output:**
+```json
+// locales/en.json (input)
+{
+  "hero": {
+    "title": "Build faster with AI",
+    "cta": "Get started",
+    "learnMore": "Learn more about {{feature}}"
+  }
+}
+
+// locales/es.json (output — Spanish)
+{
+  "hero": {
+    "title": "Construye más rápido con IA",
+    "cta": "Comenzar",
+    "learnMore": "Aprende más sobre {{feature}}"
+  }
+}
+```
+
+**CI/CD integration** — run after adding new keys in the source locale:
+```yaml
+# .github/workflows/translate.yml
+- name: Auto-translate new locale keys
+  run: |
+    python scripts/translate_i18n.py locales/en.json \
+      --target-langs Spanish French German \
+      --output-dir locales/ \
+      --provider anthropic
+  env:
+    ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+### Next.js App Router with i18n
+
+For Next.js multilingual routing, combine react-i18next with locale-based routes:
+
+```tsx
+// app/[locale]/layout.tsx
+import { notFound } from 'next/navigation'
+
+const locales = ['en', 'fr', 'de']
+
+export default async function LocaleLayout({
+  children,
+  params: { locale },
+}: {
+  children: React.ReactNode
+  params: { locale: string }
+}) {
+  if (!locales.includes(locale)) notFound()
+
+  return (
+    <html lang={locale}>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+**Hreflang from dynamic locale routes:**
+```tsx
+// app/[locale]/page.tsx
+export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+  return {
+    alternates: {
+      languages: {
+        'en': '/en',
+        'fr': '/fr',
+        'de': '/de',
+        'x-default': '/en',
+      },
+    },
+  }
+}
+```
+
+---
+
 ## Performance Checklist for Next.js SEO
 
 - [ ] `metadataBase` set in root layout
@@ -600,7 +801,10 @@ export default async function ProductPage({ params }) {
 - [ ] Non-critical JS split with `dynamic()`
 - [ ] API routes excluded from robots.txt
 - [ ] Canonical set on all pages
-- [ ] Hreflang configured if multi-language
+- [ ] Hreflang configured if multi-language (see i18n section above)
+- [ ] i18n: flat key naming with dot notation, no nested objects
+- [ ] i18n: namespaces split by feature to avoid large bundles
+- [ ] i18n: `lang` attribute on `<html>` matches active locale
 - [ ] Schema markup on homepage (Organization, WebSite)
 - [ ] Article schema on blog posts
 - [ ] FAQPage schema where FAQ content exists

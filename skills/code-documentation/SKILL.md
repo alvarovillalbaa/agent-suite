@@ -1,6 +1,6 @@
 ---
 name: code-documentation
-description: This skill should be used when the user asks to "write documentation", "document this", "add a README", "create a changelog", "write a daily log", "document this service", "write an ADR", "create a technical report", "add JSDoc", "add docstrings", "document this API", "write a post-mortem", "create architecture docs", "update the docs", "write a migration guide", "document this decision", "create a service overview", "write a TESTS.md", or asks how to document any code, service, feature, or architectural decision. Covers both continuous documentation (daily logs, changelogs, API docs) and one-off documentation (reports, ADRs, post-mortems, migration guides) for any tech stack.
+description: This skill should be used when the user asks to "write documentation", "document this", "add a README", "create a changelog", "write a daily log", "document this service", "write an ADR", "create a technical report", "add JSDoc", "add docstrings", "document this API", "write a post-mortem", "create architecture docs", "update the docs", "write a migration guide", "document this decision", "create a service overview", "write a TESTS.md", "update documentation for my changes", "check docs for this PR", "what docs need updating", "sync docs with code", "scaffold docs for this feature", "review docs completeness", "add docs for this change", "what documentation is affected", "docs impact", or asks how to document any code, service, feature, or architectural decision. Also use when working with MDX files, docs/01-app, docs/02-pages directories, .mdx files, or reviewing PRs for documentation completeness. Covers both continuous documentation (daily logs, changelogs, API docs) and one-off documentation (reports, ADRs, post-mortems, migration guides) for any tech stack, including Next.js MDX-based documentation.
 version: 1.0.0
 ---
 
@@ -29,7 +29,7 @@ Two axes govern every documentation decision:
 **Axis 2: Placement**
 - **Inline** — docstrings, comments, type annotations (lives in code)
 - **Service-level** — README, ARCHITECTURE, TESTS.md (lives in the service directory)
-- **Project-level** — `daily/`, `reports/`, `plans/`, `changelog/` (lives in `docs/`)
+- **Project-level** — `memories/`, `audits/`, `plans/`, `specs/`, `cookbook/` (lives in `docs/`)
 - **External** — wikis, Notion, Confluence (lives outside the repo)
 
 ## Quick Decision Guide
@@ -99,6 +99,12 @@ The `memories/` folder is the team's collective knowledge base — accumulated w
 
 See `references/continuous-docs.md` for detailed format guidance on each artifact type.
 
+### Changelogs (`CHANGELOG.md` at service/package root)
+
+Two audiences, two files. **Customer-facing** changelogs live in `CHANGELOG.md` at the service or package root — plain language, user-benefit focused, written after release. **Internal engineering** notes live in the release PR description or `docs/audits/YYYY/MM-DD/release-notes.md` — technical details, breaking changes, migration steps.
+
+See `references/continuous-docs.md` for format, structure, and anti-patterns.
+
 ### Inline Documentation
 
 Inline docs are the highest signal-to-noise documentation — they live next to the code they describe.
@@ -164,6 +170,69 @@ Structure: `problem statement → requirements → acceptance criteria → out o
 Write a spec first, then an implementation plan in `docs/plans/`, then implement. The spec is the contract; the plan is the execution strategy.
 
 Location: `docs/specs/YYYY/MM-DD/spec-name.md`
+
+---
+
+## Updating Docs for Code Changes
+
+When code changes on a branch, documentation often needs to follow. Use this workflow to identify and update affected docs systematically — useful for PR reviews, feature work, and post-refactor sweeps.
+
+### Quick Workflow
+
+1. **Analyze changes** — `git diff <base>...HEAD --stat` to see changed files
+2. **Identify affected docs** — map changed source files to documentation paths
+3. **Review and update** — walk through each doc change, confirm with user before editing
+4. **Validate** — run lint/format checks before committing
+5. **Commit** — stage documentation changes separately from code
+
+### Step 1: Get the Diff
+
+```bash
+# See all changed files on this branch
+git diff main...HEAD --stat
+
+# See changes in a specific area
+git diff main...HEAD -- src/
+```
+
+### Step 2: Identify Documentation-Relevant Changes
+
+Focus on changes that affect public contracts:
+- New or changed function signatures, component props, or config options
+- New features, behaviors, or breaking changes
+- Deprecated features requiring migration guidance
+- New file types, conventions, or CLI commands
+
+For Next.js projects, use `references/nextjs-code-to-docs-mapping.md` to find corresponding documentation files.
+
+General mapping heuristics:
+
+| Code Change | Documentation Impact |
+|-------------|---------------------|
+| New/changed component props | Component API reference |
+| Config option added/changed | Configuration reference |
+| New feature or behavior | Guide or concept doc |
+| Breaking change | Migration guide + CHANGELOG |
+| Deprecated feature | Deprecation notice + migration path |
+| Internal utility only | Usually no docs needed |
+
+### Step 3: Apply Updates with Confirmation
+
+For each documentation change:
+1. Show the user what you plan to change
+2. Wait for confirmation before editing
+3. Apply the edit
+4. Move to the next change
+
+### Step 4: Validate Before Committing
+
+Run linting and formatting checks before staging docs:
+
+```bash
+# For Next.js documentation
+pnpm lint
+pnpm prettier-fix
+```
 
 ---
 
@@ -256,6 +325,95 @@ Frontend docs should capture contracts that types and screenshots alone do not m
 
 ---
 
+## Framework Documentation (Next.js / MDX)
+
+For projects using Next.js documentation (MDX-based), follow these conventions. Full details in `references/nextjs-doc-conventions.md`.
+
+### Scaffolding New Feature Docs
+
+When adding documentation for entirely new Next.js features, determine the doc type first:
+
+| Feature Type | Doc Location | Template |
+|---|---|---|
+| New component | `docs/01-app/03-api-reference/02-components/` | API Reference |
+| New function | `docs/01-app/03-api-reference/04-functions/` | API Reference |
+| New config option | `docs/01-app/03-api-reference/05-config/` | Config Reference |
+| New concept/guide | `docs/01-app/02-guides/` | Guide |
+| New file convention | `docs/01-app/03-api-reference/03-file-conventions/` | File Convention |
+
+**File naming:** kebab-case with optional numeric prefix (`05-my-feature.mdx`). Use `templates/nextjs-api-reference.mdx` and `templates/nextjs-guide.mdx` as starting points.
+
+### MDX Conventions (Quick Reference)
+
+**Frontmatter (required):**
+
+```yaml
+---
+title: Page Title (2-3 words)
+description: One or two sentences describing the page.
+---
+```
+
+**Code blocks — TypeScript first, always with `filename`:**
+
+````
+```tsx filename="app/page.tsx" switcher
+// TypeScript example
+```
+
+```jsx filename="app/page.js" switcher
+// JavaScript example
+```
+````
+
+**Router-specific content:**
+
+```mdx
+<AppOnly>Content only for App Router docs.</AppOnly>
+
+<PagesOnly>Content only for Pages Router docs.</PagesOnly>
+```
+
+**Notes:**
+
+```mdx
+> **Good to know**: Single line note.
+
+> **Good to know**:
+>
+> - Multi-line point 1
+> - Multi-line point 2
+```
+
+**Props tables** — wrap in `<div style={{ overflowX: 'auto', width: '100%' }}>` for mobile scroll.
+
+**Shared content (Pages Router):** If a Pages Router doc has `source:` in frontmatter, edit the App Router source file instead — not the Pages Router file.
+
+**Related links in frontmatter:**
+
+```yaml
+related:
+  title: Next Steps
+  description: Learn more about related features.
+  links:
+    - app/api-reference/functions/some-function
+    - app/guides/related-guide
+```
+
+### Pre-Commit Validation Checklist
+
+Before committing Next.js documentation changes:
+
+- [ ] Frontmatter has `title` and `description`
+- [ ] Code blocks have `filename` attribute
+- [ ] TypeScript examples use `switcher` with JS variant
+- [ ] Props tables are wrapped for horizontal scroll
+- [ ] Related links point to valid paths
+- [ ] `pnpm lint` passes
+- [ ] Changes render correctly (if preview available)
+
+---
+
 ## Project Documentation Placement Rules
 
 **Never create new directories in `docs/` outside this structure**. Use:
@@ -312,6 +470,8 @@ For in-depth guidance, consult:
 - **`references/frontend-documentation.md`** — Component, hook, route, design-system, and browser-behavior documentation guidance
 - **`references/one-off-docs.md`** — Full guide for reports, ADRs, post-mortems, migration guides, investigation reports
 - **`references/writing-standards.md`** — Tone, voice, tense, structure, anti-patterns, quality checklist, audience patterns
+- **`references/nextjs-doc-conventions.md`** — Complete Next.js MDX frontmatter schema, code block formatting, MDX component usage, and writing style
+- **`references/nextjs-code-to-docs-mapping.md`** — Next.js source code to documentation path mapping for PR doc reviews
 
 ### Templates
 
@@ -325,6 +485,8 @@ Ready-to-use templates in `templates/`:
 - **`templates/adr.md`** — Architecture Decision Record
 - **`templates/service-readme.md`** — Service README skeleton
 - **`templates/post-mortem.md`** — Post-mortem structure
+- **`templates/nextjs-api-reference.mdx`** — Next.js API reference doc skeleton (components, functions, config)
+- **`templates/nextjs-guide.mdx`** — Next.js guide/how-to doc skeleton
 
 ### Scripts
 

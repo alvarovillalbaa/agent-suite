@@ -127,6 +127,24 @@ WIP
 stuff
 ```
 
+### Commit ordering — bisectable chunks
+
+When a feature or fix produces multiple files, group them into **logically ordered commits** so each commit compiles and passes tests independently. Order matters for `git bisect` and for reviewers scanning history:
+
+1. **Infrastructure first:** migrations, config changes, route additions, environment setup
+2. **Models and services:** new models, services, concerns — together with their test files
+3. **Controllers and views:** controllers, views, React components — together with their test files
+4. **Supporting cleanup:** dead code removal, type updates, documentation updates
+5. **Release metadata last:** VERSION, CHANGELOG, TODOS (always final commit)
+
+Rules for splitting:
+- A model and its test file go in the **same commit**
+- A service and its test file go in the **same commit**
+- A controller, its views, and its test go in the **same commit**
+- Migrations are their own commit (or grouped with the model they support)
+- If the total diff is small (< 50 lines across < 4 files), a single commit is fine
+- Each commit must be independently valid — no broken imports, no references to code that doesn't exist yet
+
 ### Commit cadence
 
 Commit after each discrete, passing unit of work — not at arbitrary time intervals, and not only at the end of the PR:

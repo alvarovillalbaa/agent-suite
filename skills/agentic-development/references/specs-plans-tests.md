@@ -178,6 +178,160 @@ When writing mocks or test utilities, read `testing-anti-patterns.md` in the `qu
 - If tests are not in scope, say so and use the narrowest non-test proof available.
 - For agentic, tool-using, or integration-heavy systems, prefer deterministic stubs, mocks, recordings, or transcript fixtures over relying only on live vendor traffic.
 
+## Test Coverage Audit
+
+When shipping or completing a behavioral change, audit coverage against every codepath introduced — not just what was planned, but what was actually coded.
+
+### How to audit
+
+**1. Trace every codepath changed.** Read each changed file completely (not just the diff hunk). For each entry point, follow data through every branch: where does input come from, what transforms it, where does it go, what can go wrong at each step. Build a mental map of every conditional, error path, and call into other functions.
+
+**2. Map user flows and error states.** Code coverage is not enough — also check:
+- Full user journeys touching the changed code
+- Interaction edge cases: double-submit, navigate-away mid-operation, stale data, slow network
+- Every error state the user can see: can they recover, or are they silently stuck?
+- Empty/zero/boundary states: zero results, maximum-length input, single-character input
+
+**3. Output an ASCII coverage diagram.** Include both code paths and user flows:
+
+```
+CODE PATH COVERAGE
+===========================
+[+] src/services/billing.ts
+    │
+    ├── processPayment()
+    │   ├── [★★★ TESTED] Happy path + card declined — billing.test.ts:42
+    │   ├── [GAP]         Network timeout — NO TEST
+    │   └── [GAP]         Invalid currency — NO TEST
+    │
+    └── refundPayment()
+        └── [★★  TESTED] Full refund — billing.test.ts:89
+
+USER FLOW COVERAGE
+===========================
+[+] Payment checkout
+    ├── [★★★ TESTED] Complete purchase — checkout.e2e.ts:15
+    ├── [GAP] [→E2E] Double-click submit — needs E2E
+    └── [GAP]         Navigate away during payment — unit test sufficient
+
+─────────────────────────────────
+COVERAGE: 3/6 paths tested (50%)
+  Code paths: 2/3 (67%)
+  User flows: 1/3 (33%)
+GAPS: 3 paths need tests (1 needs E2E)
+─────────────────────────────────
+```
+
+Quality scoring rubric:
+- `★★★` Tests behavior with edge cases AND error paths
+- `★★`  Tests correct behavior, happy path only
+- `★`   Smoke test / existence check / trivial assertion
+
+### E2E Test Decision Matrix
+
+**Recommend E2E** (`[→E2E]` in the diagram):
+- User flow spanning 3+ components/services
+- Integration point where mocking hides real failures (API → queue → worker → DB)
+- Auth, payment, or data-destruction flows
+
+**Recommend eval** (`[→EVAL]` in the diagram):
+- Critical LLM call where output quality must be verified
+- Changes to prompt templates, system instructions, or tool definitions
+
+**Stick with unit tests:**
+- Pure function with clear inputs/outputs
+- Internal helper with no side effects
+- Edge case of a single function
+
+### Regression Rule — mandatory
+
+When the coverage audit identifies a regression — code that previously worked but the diff broke — write a regression test immediately. No skipping. Regressions are the highest-priority test because they prove something broke.
+
+A regression is: the diff modifies existing behavior, the existing suite does not cover the changed path, and the change introduces a new failure mode for existing callers.
+
+Format the commit as: `test: regression test for {what broke}`
+
+### Coverage gate
+
+Before shipping, apply this gate using the diagram's coverage percentage:
+
+- **≥ target (default 80%):** PASS. Continue.
+- **≥ minimum (default 60%), < target:** Offer to generate more tests. Maximum 2 generation passes. If still below target after 2 passes, user can accept the risk explicitly.
+- **< minimum (default 60%):** Hard gate — require user override to proceed. Include the override decision in the PR body.
+
+Check `CLAUDE.md` for a `## Test Coverage` section with project-specific `Minimum:` and `Target:` fields before applying defaults.
+
+**Coverage targets by type** (apply when no project-specific override exists):
+
+| Type | Target | Alert Threshold |
+|------|--------|-----------------|
+| Line | 80%+ | < 80% |
+| Branch | 70%+ | < 70% |
+| Function | 90%+ | < 90% |
+| PR delta | — | < -2% drop per PR |
+
+**Critical paths** (auth, payments, data validation, error handlers): 100% required — not negotiable.
+
+**Advanced techniques:** For property-based testing (Hypothesis, fast-check), mutation testing (Stryker, mutmut, PIT), spec-first acceptance criteria traceability, language-specific test patterns (TypeScript/Jest, Python/Pytest, Go table-driven), and bounded autonomy rules for autonomous test generation, read `tdd-advanced.md`.
+
+---
+
+## Plan Completion Audit
+
+When a plan file was written before implementation, cross-reference its actionable items against the diff before shipping. Do not let plan items slip silently.
+
+### Finding the plan file
+
+1. Check if the current conversation or session references an active plan file path.
+2. Search common plan directories: `~/.claude/plans/`, `.gstack/plans/`, `docs/plans/` — find the most recent file mentioning the current branch or repo.
+3. Validate: if found via search, read the first 20 lines and confirm it is relevant to this branch.
+4. If no plan file found, skip this audit.
+
+### Extracting and classifying items
+
+Extract every actionable item: checkbox items, numbered steps, imperative statements ("Add X to Y", "Create Z service"), file-level specifications, test requirements, and data model changes.
+
+Ignore: context/background sections, questions marked TBD, explicitly deferred items (P2+, "Out of scope", "Future:"), and CEO/design decision records.
+
+For each item, classify against the diff:
+
+- **DONE** — clear evidence in the diff that this item was implemented (cite the specific files)
+- **PARTIAL** — some work exists but is incomplete
+- **NOT DONE** — no evidence in the diff
+- **CHANGED** — implemented via a different approach but same goal achieved
+
+Be conservative with DONE: a file being touched is not enough, the specific functionality must be present. Be generous with CHANGED: if the goal is met by different means, that counts as addressed.
+
+### Output format
+
+```
+PLAN COMPLETION AUDIT
+═══════════════════════════════
+Plan: path/to/plan.md
+
+## Implementation Items
+  [DONE]      Create UserService — src/services/user_service.rb (+142 lines)
+  [PARTIAL]   Add validation — model validates but missing controller checks
+  [NOT DONE]  Add caching layer — no cache-related changes in diff
+  [CHANGED]   "Redis queue" → implemented with Sidekiq instead
+
+## Test Items
+  [DONE]      Unit tests for UserService — test/services/user_service_test.rb
+  [NOT DONE]  E2E test for signup flow
+
+─────────────────────────────────
+COMPLETION: 3/5 DONE, 1 PARTIAL, 1 NOT DONE, 1 CHANGED
+─────────────────────────────────
+```
+
+### Gate logic
+
+- **All DONE or CHANGED:** Pass. Continue.
+- **Only PARTIAL (no NOT DONE):** Note in PR body, not blocking.
+- **Any NOT DONE:** Stop and ask — implement the missing items, defer with explicit P1 TODOs, or mark as intentionally dropped. Never let NOT DONE items ship silently.
+
+---
+
 ## Repo Policy Overrides
 
 Always respect local policy for planning and tests. Some repos want plans only on explicit request. Some repos do not want tests run automatically. In those repos, state what you verified and what you intentionally did not run.
