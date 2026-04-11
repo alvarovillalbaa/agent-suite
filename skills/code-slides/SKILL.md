@@ -114,7 +114,7 @@ Design for mobile, tablet, and desktop.
 - `ppt-conversion.md`: PowerPoint extraction and reconstruction workflow.
 - `distribution.md`: `npx skills add`, `git clone`, and manual install guidance.
 
-### assets/
+### templates/
 
 - `templates/html/`: Default iframe-based HTML deck template with remote control page.
 - `templates/react-ts/`: React/TypeScript deck template with library-ready control surface.

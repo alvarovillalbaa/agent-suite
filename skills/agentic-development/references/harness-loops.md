@@ -44,6 +44,16 @@ Prefer a compact index that points to deeper docs over pasting full reference ma
 7. Review separately: run a reviewer pass or separate agent brief before treating the slice as done.
 8. Let the human decide: the supervisor chooses whether to continue, merge, rescope, or stop.
 
+## One Session Per Contract
+
+Each harness iteration should correspond to one task contract. Do not drag unrelated contracts into a shared session.
+
+Long multi-contract sessions produce silent context bleed: information from an earlier contract (its file paths, naming decisions, failure modes) leaks into the context of a later contract and biases or confuses execution. The session that seemed efficient upfront becomes harder to debug and harder to restart cleanly.
+
+Preferred pattern: an orchestration layer spawns a fresh session per contract, passing only what that contract needs as its initial context. Each session terminates cleanly once its contract is fulfilled. This is categorically different from a 24-hour continuous session — even if the wall-clock time is the same, the context boundary is maintained.
+
+**What to keep out of the next session:** previous contract's implementation details, alternative approaches that were considered and rejected, transient error messages, and any state that was only relevant to completing the prior task.
+
 ## Context Economy
 
 - Keep always-loaded instruction files terse and operational.
@@ -51,6 +61,27 @@ Prefer a compact index that points to deeper docs over pasting full reference ma
 - Load detailed references only when a loop actually needs them.
 - Prefer quiet commands and focused scopes.
 - Shape test or log output so the loop sees failures and decision-useful lines, not pages of passing noise.
+
+## Post-Compaction Recovery Protocol
+
+After context compaction fires, agents lose the conversational thread. The critical failure mode is not forgetting — it is **confident assumption-filling**: the agent reconstructs what "must have been" from fragments and proceeds as if it remembered, producing subtly wrong results that are hard to detect because they look plausible.
+
+**Recovery steps before resuming after any compaction event:**
+
+1. Re-read the active task plan or contract file (the disk-backed artifact for the current iteration).
+2. Re-read the primary implementation files touched so far in this iteration.
+3. State the current understood goal and next step before writing any code.
+
+Encode this as a rule in CLAUDE.md using the router pattern:
+
+```
+After compaction:
+  1. Re-read TASK.md (or the active contract)
+  2. Re-read the files modified in the current iteration
+  3. State your current understanding before proceeding
+```
+
+The re-read step is cheap — a few thousand tokens. Skipping it risks hours of work on a subtly incorrect premise. Agents that fill gaps with assumptions produce confident-sounding wrong answers; agents that re-anchor to disk state produce correct ones.
 
 ## Hard Backpressure
 

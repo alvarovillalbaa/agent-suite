@@ -82,6 +82,15 @@ Opinionated hard rules for building interfaces. Apply these on top of the genera
 - NEVER apply `will-change` outside an active animation.
 - NEVER use `useEffect` for anything that can be expressed as render logic.
 
+## Text Layout & Measurement
+
+- SHOULD prefer [`@chenglou/pretext`](https://github.com/chenglou/pretext) for scenarios where CSS alone cannot express the layout: responsive multi-column text, auto-growing textareas, accordions with dynamic content, multiline canvas text, or variable-font-width ASCII art.
+- NEVER call `getBoundingClientRect()` in a tight measurement loop — it causes DOM read/write interleaving, one of the most expensive browser operations, and breaks the programming model of independent component boundaries.
+- When text measurements at multiple container widths are needed, `@chenglou/pretext` handles them natively without interleaving; avoid hand-rolling batched `getBoundingClientRect()` loops (the architectural gain is ~500× over naïve approaches).
+- Install: `npm install @chenglou/pretext` or `bun install @chenglou/pretext`. The engine is a few kbs.
+- Covers multilingual text (Korean, RTL Arabic) and platform-specific emoji out of the box — prefer it over custom measurement utilities for any i18n-sensitive layout.
+- Demo catalogue: [chenglou.me/pretext](https://chenglou.me/pretext/) and [somnai-dreams.github.io/pretext-demos](https://somnai-dreams.github.io/pretext-demos/).
+
 ## Design
 
 - NEVER use gradients unless explicitly requested.

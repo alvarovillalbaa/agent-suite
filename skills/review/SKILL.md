@@ -26,6 +26,10 @@ description: |
   to start coding (to catch architecture issues before implementation).
   Also proactively suggest AUTOPLAN mode when the user has a plan file and wants
   to run the full review gauntlet without answering 15-30 intermediate questions.
+  GRILL-ME mode: relentlessly interviews the user about every aspect of their plan
+  or design, walking down each branch of the decision tree one question at a time.
+  Provides a recommended answer for each question. Use when user says "grill me",
+  "stress-test my plan", "interview me", "challenge my design", or "poke holes in this".
 allowed-tools:
   - Read
   - Grep
@@ -146,6 +150,64 @@ This table lives at the bottom of the plan file under `## Autoplan Decision Log`
 * Artifacts (restore point, test plan, decision log) must exist on disk before proceeding to the next phase.
 * Full depth means full depth — AUTOPLAN does not skip sections or reduce rigor; it only removes the interactive pauses.
 * The two human gates (Premise Confirmation + Final Approval Gate) are inviolable. Never auto-decide a User Challenge.
+
+## GRILL-ME MODE — Relentless Interview Protocol
+
+When the user says "grill me", "stress-test my plan", "interview me", "challenge my design", or "poke holes in this", activate GRILL-ME MODE. In all other cases, use the default interactive review mode.
+
+### What GRILL-ME does differently
+
+Instead of Claude reviewing the plan from the outside in, GRILL-ME inverts the dynamic: Claude becomes the relentless interviewer, drawing understanding *out of the user* by walking every branch of the decision tree until shared understanding is reached.
+
+* Interview the user about every aspect of the plan or design.
+* Walk down each branch of the decision tree, resolving dependencies between decisions one at a time.
+* For each question, provide your **recommended answer** — don't just ask, have a point of view.
+* Ask **one question at a time**. Never batch questions.
+* If a question can be answered by exploring the codebase, **explore the codebase instead** of asking.
+* Don't stop until every branch is resolved and you have a shared, complete understanding of the plan.
+
+### GRILL-ME Execution Order
+
+```
+Step 1 — Codebase scan
+  • Read any plan files, CLAUDE.md, TODOS.md, git log -10
+  • Grep for relevant code to answer structural questions before asking the user
+
+Step 2 — Branch mapping
+  • Mentally enumerate the major decision branches in the plan
+  • Prioritize: unresolved dependencies first, then scope decisions, then implementation details
+
+Step 3 — Sequential questioning
+  • Ask one question at a time
+  • Lead with your recommended answer and the reason behind it
+  • Wait for the user's response before proceeding to the next branch
+  • After each answer, update your internal model and resolve dependent sub-questions
+
+Step 4 — Convergence check
+  • After all branches are resolved, summarize what you now understand
+  • Flag any remaining ambiguity or unresolved tension
+```
+
+### GRILL-ME Question Format
+
+Each question must follow this format:
+```
+**[Branch: <topic>]**
+
+<One clear question about an unresolved decision in the plan>
+
+**My recommendation:** <Your concrete answer + one-sentence rationale>
+
+**Why this matters:** <What breaks or becomes harder if this goes unresolved>
+```
+
+### GRILL-ME Rules
+* No batch questions. One at a time, always.
+* Always have a recommendation. "What do you think?" is not a grilling — it's a dodge.
+* Explore before asking. If the answer is in the codebase, find it yourself.
+* Resolve dependencies in order. Don't ask about deployment strategy before the data model is settled.
+* Never stop early. Keep going until every branch of the decision tree is resolved.
+* At the end, produce a **Decision Summary** — a concise record of every decision made during the interview.
 
 ## Prime Directives
 1. Zero silent failures. Every failure mode must be visible — to the system, to the team, to the user. If a failure can happen silently, that is a critical defect in the plan.

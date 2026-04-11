@@ -74,9 +74,9 @@ What to cover:
 
 When starting from scratch, use the templates in:
 
-- `assets/frontend-component-test.template.tsx`
-- `assets/frontend-hook-test.template.ts`
-- `assets/frontend-utility-test.template.ts`
+- `templates/frontend-component-test.template.tsx`
+- `templates/frontend-hook-test.template.ts`
+- `templates/frontend-utility-test.template.ts`
 
 For detailed patterns and examples, see:
 

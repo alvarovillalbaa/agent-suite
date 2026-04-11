@@ -226,7 +226,7 @@ For comparisons and audits:
 - `visual-directions.md`: Visual systems, palette guidance, and anti-patterns.
 - `output-checklist.md`: Final QA checklist before delivery.
 
-### assets/
+### templates/
 
 - `templates/explainer.html`: Starter shell for explainers and architecture pages.
 - `templates/review.html`: Starter shell for audits, plan reviews, and comparisons.

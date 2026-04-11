@@ -156,7 +156,7 @@ Turn every scrap of fundraising data—decks, models, e-mails, CRM notes—into 
 
 | Resource | Path | Purpose |
 |----------|------|---------|
-| References index | `references.md` | Points to all reference files |
+| References index | `references/README.md` | Points to all reference files |
 | Investor messaging | `references/investor-messaging-frameworks.md` | Core narrative, hooks, FAQ structure |
 | Process benchmarks | `references/process-benchmarks.md` | Stage duration and pipeline health reference |
 | Materials report template | `templates/materials-upgrade-report.md` | Table and priority-fix format |

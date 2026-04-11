@@ -87,6 +87,24 @@ ADVERSARIAL REVIEW SYNTHESIS:
 
 High-confidence findings (agreed on by multiple sources) get priority treatment.
 
+### Three-Agent Verification Trio
+
+For critical changes (auth, payments, data destruction, or any structured review that surfaces ≥3 FIXABLE issues), escalate from a single adversarial pass to a three-agent trio that exploits sycophancy in controlled opposition:
+
+**Agent 1 — Bug-finder** (incentivized to find)
+Prompt: "Review this code. You will be scored: +1 for each low-impact issue, +5 for medium-impact, +10 for critical. Find everything. Report each finding with a score and your reasoning."
+→ Produces the superset: every plausible problem, including false positives.
+
+**Agent 2 — Adversarial Disprover** (incentivized to refute, penalized for errors)
+Give it the bug-finder's output. Prompt: "For each reported finding, you score the bug-finder's points if you can disprove it, but lose 2× those points if you're wrong. Attempt to disprove each finding. Reason carefully before committing."
+→ Aggressively filters the list. Real bugs survive because the penalty for wrongly disproving them is high; false positives get eliminated.
+
+**Agent 3 — Referee** (neutral scorer)
+Give it both outputs. Prompt: "I have the correct ground truth. Score both agents on each item: +1 for a correct call, −1 for incorrect. Emit a confidence classification (HIGH / MEDIUM / LOW) for each finding."
+→ High-confidence findings require human inspection; medium and low can be triaged.
+
+**When to use:** reserve for high-stakes diffs, not routine reviews. The trio is deliberately slow and token-intensive; its value is in the cross-check, not speed.
+
 ---
 
 ## GitHub Helpers

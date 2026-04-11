@@ -199,6 +199,26 @@ Checks:
 - [ ] External references are still reachable
 - [ ] No duplicated or contradictory guidance across references
 
+### Periodic Consolidation Pass
+
+As rules and skills accumulate, they develop contradictions and redundancies. This is a normal consequence of iterative improvement — not a failure. But unresolved contradictions degrade agent performance in ways that are hard to diagnose: the agent sees two conflicting instructions and either picks one arbitrarily or stalls.
+
+**Trigger conditions:**
+- Agent behavior has noticeably degraded without a clear cause
+- More than ~5 new rules or skills have been added since the last consolidation
+- Validation checks surface the same guidance appearing in two or more files with different wording
+- The same rule is found in both a rules file and a skill file (content conflict)
+
+**How to run:**
+Ask the agent: "Review all rules and skill files at [path]. Surface every contradiction and every instance where the same guidance appears in multiple places. For each contradiction, ask me for my current preference. For each duplicate, identify the canonical home and propose removing the copy."
+
+After the user resolves each conflict:
+1. Update the canonical file with the authoritative version.
+2. Replace copies in non-canonical files with pointer sentences ("see X for the authoritative version of this rule").
+3. Log each change using the evolution marker format (`<!-- Evolution: YYYY-MM-DD | source: consolidation | reason: removed contradiction between X and Y -->`).
+
+Treat consolidation as routine maintenance — the same discipline as dependency updates. A skill library that never gets consolidated will eventually be slower than one that is kept lean.
+
 ---
 
 ## Evolution Priority Matrix

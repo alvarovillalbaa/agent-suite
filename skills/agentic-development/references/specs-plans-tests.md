@@ -8,6 +8,7 @@ Do not collapse these ideas into one blob. Each solves a different problem.
 - A `plan` defines how to get there: ordered steps, files likely to change, risks, checkpoints, and verification commands.
 - A `progress file` records loop state across iterations: what is done, what failed, and the next highest-priority slice.
 - A `test` proves behavior. In TDD, the test fails first, then passes after the minimal fix.
+- A `task contract` defines done-ness in operational terms for a single session or iteration: specific tests that must pass, specific behaviors to verify (including screenshots or output traces where relevant), and a stop hook that prevents the session from terminating until every item is satisfied. Contracts differ from specs in that they are per-session execution agreements rather than persistent product definitions. See the Task Contracts section below.
 
 ## Structured Spec Shape
 
@@ -88,9 +89,59 @@ If a slice cannot be explained and verified compactly, it is probably too large.
 
 A list of steps is not a behavior contract. A user story is not an execution recipe. Keep both artifacts distinct so you can tell whether you have a product ambiguity or an implementation ambiguity.
 
+## A Sufficiently Detailed Spec Is Code
+
+A spec that is precise enough to reliably generate a working implementation is, by definition, code — or something so close to code (pseudocode, formal schemas, reference algorithms) that it carries the same cognitive cost.
+
+**Key implications:**
+
+- **Precision cannot be outsourced.** If a spec is vague, a coding agent will fill in the gaps by guessing. The output will be flaky — sometimes correct, sometimes silently wrong. Expanding the spec to fix flakiness only shifts the complexity from the code into the document.
+- **"Spec-shaped" is not the same as "well-specified."** A document can look like a spec (sections, bullet points, headings) while still being a grab-bag of loosely related sentences. That kind of document produces incoherent code. Treat superficially formal prose as a warning sign, not a guarantee of quality.
+- **Thinly-veiled code in a spec is still code.** Prose field listings, reference algorithm pseudocode, and explicit JSON shapes are implementation details, not specifications. If the "spec" reads like code, the work of writing the code has already been done — just write it in the target language instead.
+- **Garbage in, garbage out.** A coding agent is not a mind reader. It cannot supply clarity the spec author never had. The output quality ceiling is set by the input quality — confused inputs produce confused implementations.
+- **Generation from spec is inherently flaky.** Even widely-used, carefully-maintained specifications (e.g., YAML) have no fully-conforming implementations. The specification-to-implementation gap is a known and irreducible problem, not a temporary limitation of current models.
+
+**What this means in practice:**
+
+- Before writing a spec, ask: "Is the work I'm doing on this document equivalent to the work I'd do writing the code?" If yes, write the code.
+- Use specs for what they are genuinely suited for: capturing *what* must be true (acceptance criteria, invariants, non-goals, constraints), not *how* the system achieves it.
+- The interviewer/planner pattern (see [interviewer-pattern.md](./interviewer-pattern.md)) is the correct antidote: surface strategic decisions *before* committing to an approach, not by writing exhaustive pseudocode, but by clarifying intent, constraints, and success criteria.
+- When you receive a spec that reads like pseudocode, treat it as a rough implementation draft, not a specification — and validate it against the actual desired behavior before building.
+
 ## Test-Driven Development
 
 TDD is the default delivery mode for any behavioral change. Violating the letter of the rules violates the spirit.
+
+### Philosophy
+
+Tests verify behavior through public interfaces, not implementation details. Code can change entirely; tests shouldn't.
+
+**Good tests** are integration-style: they exercise real code paths through public APIs and describe *what* the system does, not *how* it does it. A good test reads like a specification — "user can checkout with valid cart" tells you exactly what capability exists. These tests survive refactors because they don't care about internal structure.
+
+**Bad tests** are coupled to implementation: they mock internal collaborators, test private methods, or verify through external means (e.g. querying a database directly instead of using the application interface). The warning sign: the test breaks when you refactor, but behavior hasn't changed.
+
+Red flags for bad tests:
+- Mocking internal collaborators or your own classes/modules
+- Asserting on call counts or call order
+- Test name describes HOW not WHAT
+- Test breaks on rename of internal function with no behavior change
+- Verifying through external means instead of the interface
+
+```typescript
+// BAD: bypasses interface to verify
+test("createUser saves to database", async () => {
+  await createUser({ name: "Alice" });
+  const row = await db.query("SELECT * FROM users WHERE name = ?", ["Alice"]);
+  expect(row).toBeDefined();
+});
+
+// GOOD: verifies through interface
+test("createUser makes user retrievable", async () => {
+  const user = await createUser({ name: "Alice" });
+  const retrieved = await getUser(user.id);
+  expect(retrieved.name).toBe("Alice");
+});
+```
 
 ### Iron Law
 
@@ -132,6 +183,30 @@ After all tests are green: remove duplication, improve names, extract helpers. K
 
 **Repeat** with the next failing test for the next behavior slice.
 
+### Anti-Pattern: Horizontal Slices
+
+**Do NOT write all tests first, then all implementation.** This is "horizontal slicing" — treating RED as "write all tests" and GREEN as "write all code."
+
+Horizontal slicing produces low-quality tests:
+- Tests written in bulk test *imagined* behavior, not *actual* behavior
+- You end up testing the *shape* of things (data structures, function signatures) rather than user-facing behavior
+- Tests become insensitive to real changes — they pass when behavior breaks, fail when behavior is fine
+- You outrun your headlights, committing to test structure before understanding the implementation
+
+```
+WRONG (horizontal):
+  RED:   test1, test2, test3, test4, test5
+  GREEN: impl1, impl2, impl3, impl4, impl5
+
+RIGHT (vertical — tracer bullet loop):
+  RED→GREEN: test1→impl1
+  RED→GREEN: test2→impl2
+  RED→GREEN: test3→impl3
+  ...
+```
+
+**Correct approach:** One test → one implementation → repeat. Each test responds to what you learned from the previous cycle. Because you just wrote the code, you know exactly what behavior matters and how to verify it.
+
 ### Bug Fix Pattern
 
 1. Write a failing test that reproduces the bug.
@@ -171,6 +246,42 @@ Cannot check all boxes? TDD was skipped. Start over.
 ### Testing Anti-Patterns
 
 When writing mocks or test utilities, read `testing-anti-patterns.md` in the `quality-assurance` skill to avoid: testing mock behavior instead of real behavior, adding test-only methods to production classes, mocking without understanding dependency chains, and incomplete mocks that hide structural assumptions.
+
+### Mocking Discipline
+
+Mock **only at system boundaries**:
+- External APIs (payment, email, SMS, etc.)
+- Databases (prefer a test DB; mock only when that's not feasible)
+- Time and randomness
+- File system (when truly necessary)
+
+**Never mock:**
+- Your own classes or modules
+- Internal collaborators
+- Anything you control
+
+Mocking internal collaborators makes tests fragile — they break on refactors that don't change behavior, and they give false confidence by only testing your mocks, not your code.
+
+**Design for mockability at boundaries** — use dependency injection and SDK-style interfaces:
+
+```typescript
+// GOOD: dependency injected, independently mockable per endpoint
+const api = {
+  getUser: (id: string) => fetch(`/users/${id}`),
+  createOrder: (data: OrderData) => fetch('/orders', { method: 'POST', body: JSON.stringify(data) }),
+};
+function processOrder(order: Order, paymentClient: PaymentClient) {
+  return paymentClient.charge(order.total);
+}
+
+// BAD: creates dependency internally (hard to mock), generic fetcher (mocking requires conditional logic)
+function processOrder(order: Order) {
+  const client = new StripeClient(process.env.STRIPE_KEY);
+  return client.charge(order.total);
+}
+```
+
+Prefer functions that **accept dependencies** (don't create them) and **return results** (don't produce side effects) — these two interface properties make tests simple and deterministic.
 
 ## Test Strategy Notes
 
@@ -329,6 +440,64 @@ COMPLETION: 3/5 DONE, 1 PARTIAL, 1 NOT DONE, 1 CHANGED
 - **All DONE or CHANGED:** Pass. Continue.
 - **Only PARTIAL (no NOT DONE):** Note in PR body, not blocking.
 - **Any NOT DONE:** Stop and ask — implement the missing items, defer with explicit P1 TODOs, or mark as intentionally dropped. Never let NOT DONE items ship silently.
+
+---
+
+## Task Contracts
+
+A task contract makes done-ness unambiguous for a single session or iteration. Write it before starting work; let the stop hook enforce it.
+
+### Contract format
+
+```markdown
+# {Feature} Contract
+
+## Must be true before this task is complete
+
+### Tests
+- [ ] `<test command>` passes with no failures
+- [ ] No tests are skipped or pending
+
+### Behavior
+- [ ] <specific observable behavior 1>
+- [ ] <specific observable behavior 2>
+- [ ] Error case: <expected response to X input>
+
+### Verification
+- [ ] Screenshot of <key flow> taken and attached
+- [ ] Screenshot shows <expected state>
+
+## Out of scope (do not implement)
+- <deferred item 1>
+- <deferred item 2>
+```
+
+### Why contracts outperform open-ended task descriptions
+
+Agents know how to start a task. They often don't know how to end it — and "done" is not obvious from a feature description. Without a contract, agents may stop after the first passing test, skip error states, or declare completion based on partial delivery.
+
+A contract with a wired stop hook is binding, not advisory. The session cannot terminate until every checkbox is satisfied. This is the same principle as a CI gate — it converts a social expectation into a mechanical guarantee.
+
+### Wiring the stop hook
+
+Add to Claude Code settings (see the Hooks section of the main SKILL.md for the full hook configuration):
+
+```bash
+# hooks/check-completion.sh checks the active contract before allowing stop
+# Set the CONTRACT_FILE env var to the path of the current contract
+```
+
+The `check-completion.sh` hook shipped with this skill already reads completion state; point it at a contract file to get contract-aware gate behavior.
+
+### Contracts vs specs
+
+| | Spec | Task Contract |
+|---|---|---|
+| Scope | Persistent product definition | Single session/iteration |
+| Audience | Team, multiple sessions | This session's agent |
+| Done-ness | Behavioral invariants | Mechanical checklist |
+| Enforcement | Human review | Stop hook |
+| Lifespan | Lives with the codebase | Discarded when fulfilled |
 
 ---
 

@@ -178,6 +178,41 @@ Service docs live at the root of each service or module directory. They document
 
 **Format:** Q&A pairs. Short questions, concise answers. Link to deeper resources.
 
+### Root Instruction Docs
+
+These are documentation, not miscellaneous meta files. Treat them as first-class repo docs and review them whenever operating rules, delivery expectations, or design guidance change.
+They are valid targets for ongoing hardening by `auto-improve`, just like README or runbook files.
+
+| File | Purpose |
+|---|---|
+| `AGENTS.md` | Repo operating instructions for agents and contributors |
+| `PLAN.md` | Current execution plan and ordering |
+| `SPEC.md` | Scope, requirements, constraints, acceptance criteria |
+| `SOUL.md` | Product intent, voice, and qualitative direction |
+| `PRINCIPLES.md` | Invariants and non-negotiable rules |
+| `DESIGN.md` | Design-system, architecture, UX, or interaction guidance |
+
+### Runbooks
+
+**Purpose:** Step-by-step operational procedures for workflows where order, verification, rollback, or escalation matter.
+
+**When to write:** When a task crosses tools, services, environments, or approvals and should be repeatable by a different engineer or agent.
+
+**Where it lives:**
+- `runbooks/<workflow>.md` for repo-wide or multi-folder workflows
+- `RUNBOOK.md` inside a folder for subsystem-local procedures
+
+Prefer `runbooks/` for shared workflows that span multiple folders. Keep `docs/` for references, audits, specs, and narrative artifacts rather than operational step lists.
+
+**Minimum sections:**
+1. Purpose
+2. Preconditions
+3. Inputs
+4. Procedure
+5. Verification
+6. Rollback / recovery
+7. Escalation / related docs
+
 ---
 
 ## Tier 3: Project-Level Documentation
@@ -269,16 +304,39 @@ See: `references/one-off-docs.md` for structure guide.
 ## Tier 3b: In-Folder Documentation
 
 In-folder docs orient readers to a directory — what it contains, how it's organized, and how to navigate it. They apply at every directory level, not just service roots.
+Outside `docs/`, this is the default folder contract.
+
+### Core
+
+Default set to consider first in every meaningful folder:
 
 | File | Purpose | Create when |
 |------|---------|-------------|
 | `README.md` | Overview and navigation | Any directory a reader might enter without context |
 | `ARCHITECTURE.md` | Technical deep-dive — structure, data flows, design decisions | Non-obvious internal organization |
-| `OVERVIEW.md` | High-level concepts before diving into details | Complex domains with concepts that precede code |
-| `TESTS.md` | Testing patterns, how to run, what's covered | Any directory with a meaningful test suite |
-| `SETUP.md` | Config, install, env — non-obvious setup steps | When installation alone isn't sufficient |
-| `CHANGELOG.md` | Version history | Versioned services, libraries, or packages (not in `docs/`) |
-| `FAQ.md` | Common questions and troubleshooting | After 3+ repeated questions about the same directory |
+| `TESTS.md` | Testing patterns, how to run, what's covered | Any directory with a meaningful test surface |
+
+### Conditional
+
+Add when the folder genuinely needs them:
+
+| File | Purpose | Create when |
+|------|---------|-------------|
+| `SETUP.md` | Config, install, env — non-obvious setup steps | Installation alone isn't sufficient |
+| `RUNBOOK.md` | Folder-local operational workflow | The folder has a repeatable procedure with verification or rollback |
+| `CHANGELOG.md` | Version history | Versioned service, library, or package |
+| `SECURITY.md` | Security boundaries, review notes, secrets handling | The folder has sensitive surfaces or special security rules |
+
+### Rare
+
+Use only when the domain merits them:
+
+| File | Purpose | Create when |
+|------|---------|-------------|
+| `OVERVIEW.md` | High-level concepts before diving into details | Concepts deserve their own orientation beyond README |
+| `FAQ.md` | Common questions and troubleshooting | 3+ repeated questions exist |
+| `DECISIONS.md` | Folder-local design decisions | Decisions should be kept close to the folder, not as standalone ADRs |
+| `DEPENDENCIES.md` | Dependency map, contracts, upgrade notes | Dependency behavior is non-obvious or risky |
 
 **Applies at every level:**
 - `docs/README.md` — navigation index for the docs folder
@@ -365,6 +423,12 @@ New information to document?
 │
 ├─ Is it a feature spec or API contract?
 │   └─ Spec doc in docs/specs/YYYY/MM-DD/
+│
+├─ Is it a repo-wide operating rule, execution plan, product principle, or design rule?
+│   └─ `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, or `DESIGN.md`
+│
+├─ Is it a repeatable operational workflow with verification and rollback?
+│   └─ `runbooks/<workflow>.md` or local `RUNBOOK.md`
 │
 ├─ Is it a plan or migration?
 │   └─ Plan doc in docs/plans/YYYY/MM-DD/

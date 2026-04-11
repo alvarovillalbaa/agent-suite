@@ -125,7 +125,7 @@ continual-learning (parent — orchestration only)
 
 The parent skill does **nothing** except invoke the subagent and return its result. It does not read transcripts or touch files directly. This keeps the parent skill lightweight and prevents context bloat from pulling transcript content into the main flow.
 
-See `agents/agents-memory-updater.md` for the subagent definition.
+See `references/agents/agents-memory-updater.md` for the subagent definition.
 
 ---
 

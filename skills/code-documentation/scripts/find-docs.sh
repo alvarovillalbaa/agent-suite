@@ -68,13 +68,26 @@ case "$cmd" in
         CURRENT="$PWD"
         echo "Service docs for: $CURRENT"
         echo ""
-        echo "Expected files:"
-        echo "  $CURRENT/README.md      — What it does, when to use it"
-        echo "  $CURRENT/ARCHITECTURE.md — How it works internally"
-        echo "  $CURRENT/TESTS.md       — Testing patterns"
+        echo "Core:"
+        for f in README.md ARCHITECTURE.md TESTS.md; do
+            if [[ -f "$CURRENT/$f" ]]; then
+                echo "  ✓ $f"
+            else
+                echo "  ✗ $f (missing)"
+            fi
+        done
         echo ""
-        echo "Existing:"
-        for f in README.md ARCHITECTURE.md TESTS.md SETUP.md OVERVIEW.md FAQ.md CHANGELOG.md; do
+        echo "Conditional:"
+        for f in SETUP.md RUNBOOK.md CHANGELOG.md SECURITY.md; do
+            if [[ -f "$CURRENT/$f" ]]; then
+                echo "  ✓ $f"
+            else
+                echo "  ✗ $f (missing)"
+            fi
+        done
+        echo ""
+        echo "Rare:"
+        for f in OVERVIEW.md FAQ.md DECISIONS.md DEPENDENCIES.md; do
             if [[ -f "$CURRENT/$f" ]]; then
                 echo "  ✓ $f"
             else
@@ -144,11 +157,51 @@ case "$cmd" in
         echo "   New spec: $REPO_ROOT/$DOCS_ROOT/specs/$YEAR/$MONTH_DAY/spec-name.md"
         echo ""
 
+        # Root instruction docs
+        echo "🧭 ROOT INSTRUCTION DOCS"
+        for f in AGENTS.md PLAN.md SPEC.md SOUL.md PRINCIPLES.md DESIGN.md; do
+            if [[ -f "$REPO_ROOT/$f" ]]; then
+                echo "   ✓ $REPO_ROOT/$f"
+            else
+                echo "   ✗ $REPO_ROOT/$f (missing)"
+            fi
+        done
+        echo ""
+
+        # Runbooks
+        RUNBOOKS_DIR="$REPO_ROOT/runbooks"
+        echo "📚 RUNBOOKS (runbooks/*.md)"
+        if [[ -d "$RUNBOOKS_DIR" ]]; then
+            COUNT=$(find "$RUNBOOKS_DIR" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+            echo "   Directory: $RUNBOOKS_DIR"
+            echo "   Markdown files: $COUNT"
+        else
+            echo "   Not found — create shared workflow docs here: $RUNBOOKS_DIR/"
+        fi
+        echo ""
+
         # Service docs (if in a service dir)
         if [[ "$PWD" == *"/services/"* ]]; then
             SERVICE_ROOT=$(echo "$PWD" | sed 's|\(.*services/[^/]*\).*|\1|')
             echo "🔧 SERVICE DOCS (detected: $SERVICE_ROOT)"
+            echo "   Core:"
             for f in README.md ARCHITECTURE.md TESTS.md; do
+                if [[ -f "$SERVICE_ROOT/$f" ]]; then
+                    echo "   ✓ $SERVICE_ROOT/$f"
+                else
+                    echo "   ✗ $SERVICE_ROOT/$f (missing)"
+                fi
+            done
+            echo "   Conditional:"
+            for f in SETUP.md RUNBOOK.md CHANGELOG.md SECURITY.md; do
+                if [[ -f "$SERVICE_ROOT/$f" ]]; then
+                    echo "   ✓ $SERVICE_ROOT/$f"
+                else
+                    echo "   ✗ $SERVICE_ROOT/$f (missing)"
+                fi
+            done
+            echo "   Rare:"
+            for f in OVERVIEW.md FAQ.md DECISIONS.md DEPENDENCIES.md; do
                 if [[ -f "$SERVICE_ROOT/$f" ]]; then
                     echo "   ✓ $SERVICE_ROOT/$f"
                 else

@@ -1,6 +1,6 @@
 ---
 name: agentic-development
-description: End-to-end repository execution workflow for implementing, debugging, refactoring, reviewing, instrumenting, explaining architecture, assessing refactor impact, designing system architecture, evaluating architecture patterns (monolith vs microservices, CQRS, event-driven, hexagonal), making technology decisions (database, cache, queue, auth, cloud, API style), generating architecture diagrams, analyzing dependencies, planning capacity, designing APIs and schemas, and shipping code in any software repo. Use when the assistant needs to orient in an unfamiliar codebase, choose between direct execution and supervised harness loops, keep specs, plans, and tests distinct, coordinate builder and reviewer passes, handle PR feedback, inspect observability, or land cross-cutting frontend and backend changes without leaving loose ends.
+description: End-to-end repository execution workflow for implementing, debugging, refactoring, reviewing, instrumenting, explaining architecture, assessing refactor impact, designing system architecture, evaluating architecture patterns (monolith vs microservices, CQRS, event-driven, hexagonal), making technology decisions (database, cache, queue, auth, cloud, API style), generating architecture diagrams, analyzing dependencies, planning capacity, designing APIs and schemas, and shipping code in any software repo. Use when the assistant needs to orient in an unfamiliar codebase, choose between direct execution and supervised harness loops, keep specs, plans, and tests distinct, coordinate builder and reviewer passes, handle PR feedback, inspect observability, or land cross-cutting frontend and backend changes without leaving loose ends. Also use when the user wants to break down a PRD into phases, create an implementation plan from a PRD, plan vertical slices, or mentions "tracer bullets". Also use when the user wants to plan a refactor, create a refactoring RFC, file a refactor plan as a GitHub issue, break a refactor into safe incremental steps, or mentions "tiny commits".
 ---
 
 # Agentic Development
@@ -25,6 +25,10 @@ Drive work through one loop: orient, classify the task, choose the execution mod
 - Architecture claims need evidence. Trace entrypoints, ownership, dependencies, and contracts before explaining how the system works or what a refactor will affect.
 - Separate concerns intentionally: specs define behavior, plans define execution, progress files record loop state, tests prove behavior, and instrumentation explains production behavior.
 - Treat context as scarce. Keep instruction files, prompts, and scratchpads compact; use index files and on-demand references instead of stuffing every loop with full docs.
+- Structure instruction files as logical routers, not documentation dumps. A CLAUDE.md or AGENTS.md should say "before coding, read coding-rules.md" rather than inlining those rules. Keep the always-loaded file minimal; put depth in on-demand references loaded only when the relevant scenario is active.
+- Keep rules and skills conceptually distinct. Rules encode preferences and constraints — what to always or never do. Skills encode recipes — the specific approach to accomplish a category of work. Mixing them into the same file degrades both.
+- Separate research context from implementation context. When an agent explores alternatives, do not carry those alternatives into the implementing agent's brief. The implementing agent receives only the chosen approach, with fresh context, so discarded research paths cannot compete with the implementation signal.
+- Use neutral prompts for discovery. "Trace through X and report all findings" produces honest results; "Find a bug in X" will produce a finding whether or not one exists — agents comply with requests, making biased diagnostic prompts unreliable for discovery.
 - One task per loop. If work spans multiple iterations, persist state on disk and restart with fresh context instead of dragging a swollen transcript forward.
 - Hard gates decide readiness. In harness or agent-loop mode, gates that can block or advance work must be binary pass or fail, not advisory.
 - Structured review beats narrative when another agent or loop must consume the result. Emit compact findings with severity, file, line, risk, and expected fix.
@@ -37,16 +41,37 @@ Drive work through one loop: orient, classify the task, choose the execution mod
 - Choose the right frontend artifact level before coding: primitive, composed control, domain component, page section, hook, store, or route. A bad boundary choice causes more churn than a small implementation bug.
 - Finish cleanly. Make the next integration step explicit instead of silently leaving the repo in an ambiguous state.
 - Seek clarification by default for any decision not already anchored in existing patterns. When an existing pattern is found, apply senior/principal-engineer judgement: evaluate whether it should be improved or preserved, then ask the user — prefer hybrid decisions that satisfy both evolution and backward consistency (framework choices excepted: frameworks are stable anchors).
+- Before building any non-trivial artifact (feature, document, content, system, design), run a planner step first: expand the prompt into a full spec, identify strategic decisions that would otherwise be guessed at (audience, tone, scope, architecture, success criteria, constraints), and interview the user with a recommended answer per gap. Controlling the input produces better output than fixing the output — 2 minutes of upfront spec work eliminates the entire back-and-forth editing cycle.
 - Apply senior and principal engineering standards in all work areas — frontend, backend, and beyond. Prefer the highest-quality, most maintainable implementation that fits the codebase and team conventions, not merely the minimum that compiles or passes tests.
 - The authoritative source for all project knowledge is the codebase itself and `docs/`. Discover by reading implemented code and documented decisions before making assumptions. Do not invent conventions the codebase does not already follow.
 
 ## Execution Modes
 
-- Direct execution: use for small, clear changes with a single coherent proof path.
-- Supervised harness loop: use for repeated or backlog-style work only when the spec is clear, the change surface is isolated, and the repo has trustworthy gates. Keep each iteration fresh and single-purpose.
-- Review or explanation mode: use for architecture mapping, impact analysis, code review, or debugging passes where the immediate output is understanding or findings rather than code.
+### Code Development Default: Agent Selection by Complexity
 
-Switch modes when the evidence changes. If a harness starts flailing, shrink the task, tighten the spec, or return to direct execution.
+For any code development task, choose the execution model before writing a single line:
+
+| Scope / Complexity | Default execution model |
+|--------------------|-------------------------|
+| **Small** — single file or function, clear spec, one proof path | Single agent (direct execution) |
+| **Medium** — 2–5 files, separable concerns, independent sub-tasks | Subagents-driven development — controller dispatches focused workers |
+| **Large** — cross-cutting feature, multi-service, or multi-domain | Team of agents — controller + specialized agents (implementer, reviewer, tester, architect) |
+| **Epic / multi-sprint** — full subsystem rewrite, major migration | Supervised harness loop with team of agents across iterations |
+
+When in doubt, start one level up. A single-agent task that hits unexpected complexity should be paused, re-scoped, and re-dispatched with subagents rather than piling all context into one growing transcript.
+
+Read [subagents-and-parallelism.md](./references/subagents-and-parallelism.md) for controller/worker patterns, team composition, review loops, and safe parallelization rules.
+
+### Other execution modes
+
+- **Direct execution** (single agent): use for small, clear changes with a single coherent proof path.
+- **Subagents-driven development**: use when the task has separable concerns — backend vs. frontend, independent failures, domain-specific investigation. Controller owns scope and integration; workers own focused implementation slices.
+- **Team of agents**: use for large or complex work. Typical team: architect agent (maps dependencies, designs the change), implementer agent(s) (write code per domain), reviewer agent (independent quality/risk check), and controller (integrates, verifies, resolves conflicts). Each agent gets an explicit brief, scoped files, and acceptance criteria.
+- **Supervised harness loop**: use for repeated or backlog-style work only when the spec is clear, the change surface is isolated, and the repo has trustworthy gates. Keep each iteration fresh and single-purpose.
+- **Review or explanation mode**: use for architecture mapping, impact analysis, code review, or debugging passes where the immediate output is understanding or findings rather than code.
+- **Planner/interviewer mode**: use before any non-trivial creation task. Expand the prompt into a full spec, identify decisions Claude would otherwise guess at, interview the user with one proposed answer per gap until all gaps are resolved, assemble a complete brief, then execute. Skip for trivial changes where the spec is already unambiguous. See [interviewer-pattern.md](./references/interviewer-pattern.md).
+
+Switch modes when the evidence changes. If a harness starts flailing, or a single-agent run grows beyond ~3 coherent sub-tasks, shrink the task, tighten the spec, and re-dispatch with subagents or a team.
 
 ## Architecture Bias
 
@@ -75,6 +100,10 @@ Read [repo-orientation.md](./references/repo-orientation.md) for startup discove
 
 Read [harness-loops.md](./references/harness-loops.md) when the task is large enough for repeated agent iterations, when specs or plans live on disk between runs, when builder and reviewer passes should be split, or when you need to decide whether a repo is ready for higher-autonomy execution.
 
+### Instruction file design and session hygiene
+
+Read [instruction-file-design.md](./references/instruction-file-design.md) when structuring CLAUDE.md, AGENTS.md, or project rule/skill files; when deciding how to separate rules from skills in a project's cognitive scaffolding; when scoping research-phase agents vs implementation-phase agents to avoid alternative-pollution; or when prompting for discovery and wanting results that are accurate rather than confirmatory.
+
 ### Architecture analysis and refactor impact
 
 Read [architecture-analysis.md](./references/architecture-analysis.md) when the user asks how the system works, wants dependency or data-model relationships explained, needs impact analysis before a rename, move, extraction, or schema change, or wants to create or evaluate an Architecture Decision Record (ADR) — choosing between technologies, documenting a design decision with trade-offs, reviewing a system design proposal, or designing a new component from requirements.
@@ -86,6 +115,10 @@ Read [architecture-patterns.md](./references/architecture-patterns.md) when choo
 ### System design workflows
 
 Read [system-design-workflows.md](./references/system-design-workflows.md) when the user asks to design a system from scratch, estimate capacity, design an API, design a database schema, assess scalability, or plan a migration. Contains 6 step-by-step workflows: System Design Interview Approach (requirements clarification, scale estimation, high-level design, bottleneck analysis), Capacity Planning (compute/storage/bandwidth calculations), API Design (resource identification, request/response formats, error contracts), Database Schema Design (entities, relationships, indexes, partitioning), Scalability Assessment (profiling, load testing, vertical vs horizontal scaling), and Migration Planning (strangler fig, blue-green, canary strategies with rollback procedures and checkpoints).
+
+### Interface design (Design It Twice)
+
+Read [interface-design.md](./references/interface-design.md) when designing a new module, class, or service interface; when exploring API shape options before committing; when the user says "design it twice", "explore options", or "compare approaches"; or when a component boundary is unclear and multiple valid shapes exist. Implements the parallel sub-agents pattern from Ousterhout's "A Philosophy of Software Design": spawn 3+ agents with divergent constraints (minimize methods / maximize flexibility / optimize common case), present each design with its interface signature, usage examples, and hidden internals, compare on simplicity / depth / ease-of-misuse, then synthesize. Do not implement — this is a diverge-then-converge exploration for shape decisions that are hard to reverse once callers exist.
 
 ### Technology decision frameworks
 
@@ -100,11 +133,25 @@ Use the architecture scripts in `scripts/` for automated analysis and visualizat
 
 ### Git, branches, worktrees, and PR flow
 
-Read [collaboration-and-git.md](./references/collaboration-and-git.md) when the task touches branching strategy, worktrees, PRs, merges, or cleanup. Includes bisectable commit ordering: infra → models+tests → controllers+tests → cleanup → release metadata, with rules for keeping each commit independently valid.
+Read [collaboration-and-git.md](./references/collaboration-and-git.md) when the task touches branching strategy, worktrees, PRs, merges, or cleanup. Includes bisectable commit ordering: infra → models+tests → controllers+tests → cleanup → release metadata, with rules for keeping each commit independently valid. Also contains the intent-first PR creation workflow: search session history for the problem and justification before writing the description, ask rather than fabricate if intent is missing, validate the diff for unexpected files, and apply the five anti-fabrication rules (no invented intent, no file lists, no narrated diffs, no speculative risks, no test plans).
 
 ### Spec-driven, plan-driven, and test-driven delivery
 
-Read [specs-plans-tests.md](./references/specs-plans-tests.md) when the user asks for a plan or spec, when scope is fuzzy, or when writing any implementation code. Contains the Iron Law (no production code without a failing test first), the Red-Green-Refactor cycle, the pre-completion verification checklist, common TDD rationalizations to reject, the Test Coverage Audit (ASCII diagram format, E2E Decision Matrix, coverage gate with line/branch/function targets, mandatory Regression Rule), and the Plan Completion Audit (cross-reference plan items against the diff before shipping). TDD is the default delivery mode for any behavioral change.
+Read [specs-plans-tests.md](./references/specs-plans-tests.md) when the user asks for a plan or spec, when scope is fuzzy, or when writing any implementation code. Contains the Iron Law (no production code without a failing test first), the Red-Green-Refactor cycle, the anti-pattern of horizontal slices (write all tests then all code — wrong; use one-test-one-impl vertical cycles instead), testing philosophy (tests verify behavior through public interfaces, not implementation details), mocking discipline (mock only at system boundaries, never internal collaborators), the pre-completion verification checklist, common TDD rationalizations to reject, the Test Coverage Audit (ASCII diagram format, E2E Decision Matrix, coverage gate with line/branch/function targets, mandatory Regression Rule), and the Plan Completion Audit (cross-reference plan items against the diff before shipping). TDD is the default delivery mode for any behavioral change.
+
+Also contains the **"A Sufficiently Detailed Spec Is Code"** principle: a spec precise enough to reliably generate a working implementation carries the same cognitive cost as the code itself. Use specs to capture *what* must be true (acceptance criteria, invariants, constraints), not as pseudocode substitutes for writing the code. Vague specs produce flaky implementations — precision cannot be outsourced to the agent.
+
+### PRD to implementation plan (tracer bullets)
+
+Read [prd-to-plan.md](./references/prd-to-plan.md) when the user wants to break down a PRD into phases, create a phased implementation plan, plan vertical slices, or mentions "tracer bullets". Covers the full workflow: confirming the PRD is in context, exploring the codebase, identifying durable architectural decisions, drafting vertical slices (each a thin end-to-end path through every layer), quizzing the user on granularity, and writing the plan to `./plans/<feature>.md` using the canonical template.
+
+### Refactor planning — interview, commit plan, and GitHub issue
+
+Read [refactor-planning.md](./references/refactor-planning.md) when the user wants to plan a refactor, create a refactoring RFC, file a refactor plan as a GitHub issue, break a refactor into safe incremental steps, or mentions "tiny commits". Contains an 8-step interview-driven workflow: gather the problem description, verify against the codebase, surface alternatives, deep implementation interview, nail down scope (in/out), check test coverage, break into tiny commits (one working-state commit per step per Martin Fowler), and file a structured GitHub issue with a Problem Statement / Solution / Commits / Decision Document / Testing Decisions / Out of Scope template. Distinct from `interviewer-pattern.md` (generic pre-build spec) — this workflow is specific to refactor scope negotiation, commit granularity, and coverage gate before touching existing behavior.
+
+### Pre-build specification and gap interview
+
+Read [interviewer-pattern.md](./references/interviewer-pattern.md) before building any non-trivial artifact — feature, document, content piece, design, system, or API. Implements the planner/interviewer pattern: (1) expand the short request into a full spec with every section defined and its strategic purpose stated, (2) identify decisions Claude would otherwise guess at — audience, tone, architecture, scope, success criteria, constraints, edge cases — and interview the user with a proposed answer per gap, (3) assemble a complete brief, then execute. Apply whenever the request leaves key strategic decisions unresolved. The 2-minute spec step eliminates the back-and-forth editing cycle on the back end.
 
 ### Advanced TDD techniques
 
@@ -161,9 +208,9 @@ Both scripts support `--format text` (default) or `--format json` for machine-re
 
 **Distinction from cloud-management:** `pipeline_generator.py` here generates CI YAML (lint/test/build stages) from stack signals. For cloud-specific deployment plans (rolling, blue-green, canary per provider), use the `cloud-management` skill's `scripts/deployment_manager.py` instead.
 
-### Subagents and parallel work
+### Subagents, teams, and parallel work
 
-Read [subagents-and-parallelism.md](./references/subagents-and-parallelism.md) for controller and worker patterns, review loops, and safe parallelization.
+Read [subagents-and-parallelism.md](./references/subagents-and-parallelism.md) for the complexity routing matrix, team-of-agents patterns (feature team, investigation team, review-loop team, harness team), controller responsibilities, builder/reviewer split, and safe parallelization rules. This reference is the primary guide for choosing between single-agent, subagents-driven, and team-of-agents execution.
 
 ### Agentic system architectures
 
@@ -229,6 +276,10 @@ Read [frontend-development.md](./references/frontend-development.md) for framewo
 
 Read [react-patterns.md](./references/react-patterns.md) for concrete implementations of: compound components, render props, HOCs, custom hooks (useAsync, useDebounce, useLocalStorage, useMediaQuery, usePrevious), Context+Reducer state management, Zustand, React.memo with custom comparison, useCallback/useMemo, list virtualization, error boundaries, and anti-patterns (inline objects, index keys, derived state via useEffect, direct state mutation).
 
+### No direct useEffect
+
+Read [no-use-effect.md](./references/no-use-effect.md) whenever writing or reviewing React components — especially in agentic contexts where `useEffect` gets added defensively. The rule: never call `useEffect` directly; use `useMountEffect` (an explicit empty-dep wrapper) only for genuine external-system sync. Contains the five replacement patterns with bad/good examples and smell tests: (1) derive state inline instead of syncing it via effects, (2) use a data-fetching library (React Query, SWR) instead of effect-based fetching, (3) put user-triggered work in event handlers not effects, (4) use `useMountEffect` with conditional mounting for one-time external sync, (5) reset component state with `key` instead of dependency choreography. Also covers enforcement via ESLint `no-restricted-syntax` and `AGENTS.md` guidance for agents. Backed by React's own ["You Might Not Need an Effect"](https://react.dev/learn/you-might-not-need-an-effect) guide.
+
 ### Next.js performance optimization
 
 Read [nextjs-optimization-guide.md](./references/nextjs-optimization-guide.md) for rendering strategy config (`force-static`, `force-dynamic`, `revalidate`), streaming with Suspense, image optimization patterns, dynamic imports with loading skeletons, parallel routes, `Promise.all` data fetching, fetch cache options, `unstable_cache`, bundle analysis with `@next/bundle-analyzer`, tree-shaking, and Core Web Vitals optimization (LCP priority images, CLS prevention, INP with deferred scripts, `useReportWebVitals`).
@@ -239,7 +290,7 @@ Read [frontend-best-practices.md](./references/frontend-best-practices.md) for: 
 
 ### UI constraints and patterns
 
-Read [ui-constraints.md](./references/ui-constraints.md) for hard MUST/NEVER/SHOULD rules covering stack defaults (Tailwind, motion/react, cn), accessible component primitives, interaction patterns (AlertDialog, skeletons, h-dvh, safe-area-inset), animation budget and compositor-only rules, typography helpers (text-balance, tabular-nums), layout conventions (z-index scale, size-*), performance guards, and design constraints (no unsolicited gradients, one accent color, empty-state affordances). Apply these on top of frontend-development.md whenever touching UI code.
+Read [ui-constraints.md](./references/ui-constraints.md) for hard MUST/NEVER/SHOULD rules covering stack defaults (Tailwind, motion/react, cn), accessible component primitives, interaction patterns (AlertDialog, skeletons, h-dvh, safe-area-inset), animation budget and compositor-only rules, typography helpers (text-balance, tabular-nums), layout conventions (z-index scale, size-*), performance guards, text layout & measurement (when to use `@chenglou/pretext` instead of `getBoundingClientRect` loops), and design constraints (no unsolicited gradients, one accent color, empty-state affordances). Apply these on top of frontend-development.md whenever touching UI code.
 
 ### Design engineering and animation craft
 
@@ -332,7 +383,7 @@ Read [skill-extraction.md](./references/skill-extraction.md) when a task produce
 
 ### Continual learning — maintaining CLAUDE.md / AGENTS.md memory
 
-Read [continual-learning.md](./references/continual-learning.md) when the user asks to "update memory", "mine prior sessions", "keep CLAUDE.md current", or "run continual learning"; or when the cadence gate fires (≥10 completed turns AND ≥120 min since last run AND transcript has advanced). Incrementally mines transcript deltas for durable user preferences and stable workspace facts, writes them as plain bullets to the two learned sections of `CLAUDE.md` / `AGENTS.md`, and refreshes the transcript index. Delegates mining and writing to the `agents-memory-updater` subagent (`agents/agents-memory-updater.md`).
+Read [continual-learning.md](./references/continual-learning.md) when the user asks to "update memory", "mine prior sessions", "keep CLAUDE.md current", or "run continual learning"; or when the cadence gate fires (≥10 completed turns AND ≥120 min since last run AND transcript has advanced). Incrementally mines transcript deltas for durable user preferences and stable workspace facts, writes them as plain bullets to the two learned sections of `CLAUDE.md` / `AGENTS.md`, and refreshes the transcript index. Delegates mining and writing to the `agents-memory-updater` subagent (`references/agents/agents-memory-updater.md`).
 
 ### Repo-local learning system (learning/ folder)
 
@@ -439,16 +490,17 @@ If the current environment exposes more specialized skills, route work through t
 - Use `scripts/api_scaffolder.py` to generate Express/Fastify/Koa route handlers, validation middleware, and TypeScript types from an OpenAPI spec or database schema — or to reverse-generate an OpenAPI spec from existing routes. Use `scripts/database_migration_tool.py` to analyze a PostgreSQL schema for missing indexes, N+1 risks, and optimization opportunities, and to generate or dry-run migration files. Use `scripts/api_load_tester.py` to load test API endpoints with configurable concurrency and duration, measuring P50/P95/P99 latency, throughput, and error rates — including endpoint comparison and rate-limit verification. Full usage: `python scripts/<name>.py --help`.
 - Use `scripts/prompt_optimizer.py` to analyze prompt token count, clarity score, structure score, and ambiguity issues — and generate optimized versions or extract few-shot examples. Use `scripts/rag_evaluator.py` to measure context relevance, answer faithfulness, and groundedness in RAG systems, with comparison against a baseline report. Use `scripts/agent_orchestrator.py` to validate agent YAML/JSON configs, generate ASCII or Mermaid workflow diagrams, and estimate token costs per run. Full usage: `python scripts/<name>.py --help`.
 - Use `quality-assurance` for ALL security work: threat modeling (`references/threat-modeling/`), secure architecture design (`references/security-architecture-patterns.md`), cryptography selection and implementation (`references/cryptography-implementation.md`), STRIDE automation (`scripts/threat_modeler.py`), secret scanning (`scripts/secret_scanner.py`), OWASP-aligned code review (`references/security-best-practices/`), security testing (`references/security-testing.md`), comprehensive security audits (CSO mode), and penetration testing (`references/pentesting-shannon.md`). Never implement security-sensitive code without first consulting the relevant `quality-assurance` reference.
+- Use [interface-design.md](./references/interface-design.md) when designing a new module or API and the right shape is unclear — spawns parallel sub-agents with divergent constraints to generate 3+ radically different designs, then compares and synthesizes. Invoke before implementing any interface that will be hard to change once callers exist.
 - Use `gh-address-comments` for GitHub review-thread triage and inline replies.
 - Use `gh-fix-ci` when GitHub Actions checks are failing.
 - Use [self-improvement.md](./references/self-improvement.md) at session end or after errors to extract patterns and keep reference guidance up to date. Templates live in `templates/` and accumulated patterns in `memory/semantic-patterns.json`.
 - Use [autoimprove.md](./references/autoimprove.md) for autonomous, batch optimization of a specific reference — define a binary checklist, let the agent iterate unattended, ship only after reviewing the diff and score improvement.
 - Use [skill-extraction.md](./references/skill-extraction.md) to create new `SKILL.md` files from session learnings — invoked via `/claudeception`, "save this as a skill", or after any non-obvious debugging. Use `templates/new-skill-template.md` as the scaffold.
-- Use [continual-learning.md](./references/continual-learning.md) to keep `CLAUDE.md` / `AGENTS.md` current with durable user preferences and workspace facts mined from transcript deltas. Cadence-gated (≥10 turns, ≥120 min, transcript advanced). Delegates to `agents/agents-memory-updater.md`.
+- Use [continual-learning.md](./references/continual-learning.md) to keep `CLAUDE.md` / `AGENTS.md` current with durable user preferences and workspace facts mined from transcript deltas. Cadence-gated (≥10 turns, ≥120 min, transcript advanced). Delegates to `references/agents/agents-memory-updater.md`.
 - Use [learning-system.md](./references/learning-system.md) for the repo-local `learning/` folder system — 8 artifact types (items → episodes → triples → lessons → collections → procedures → beliefs), 4-step operating loop, and promotion into identity/doc files. Scripts: `scripts/init-learning.sh`, `scripts/capture-item.py`, `scripts/scan-learning.py`, `scripts/refresh-learning.py`. When promoting to human-readable docs, write to `docs/memories/` (see `code-documentation` skill for format and placement rules).
 - Use the `code-documentation` skill whenever writing any documentation to the repo — logs, lessons, facts, procedures, fixes, audits, plans, specs, cookbook guides, or service docs. That skill owns `docs/` folder structure, naming conventions, and format templates.
 - Use [land-and-deploy.md](./references/land-and-deploy.md) when the user says "merge", "land", "deploy", "ship it to production", or similar. The reference covers the full sequence from pre-merge readiness gate through canary verification and revert strategy.
-- Use dedicated component-building, frontend-design, browser-testing, observability, analytics, or release skills when they exist. Otherwise, use the references in this skill. For design system work at the system level (auditing token coverage, naming consistency, or component completeness; documenting component variants and states; or proposing a new pattern), use [design-system.md](./references/design-system.md). For shadcn/ui component work (adding components, CLI operations, styling rules, forms, composition, theming, preset management), use [shadcn.md](./references/shadcn.md). For component complexity reduction specifically, use [component-refactoring.md](./references/component-refactoring.md). For building reusable components or libraries (API design, a11y patterns, composition, boolean-prop avoidance, state/actions/meta provider pattern, explicit variants, children over render props, React 19 APIs, styling systems, distribution), use [building-components.md](./references/building-components.md). For comprehensive UI/UX guidelines (12 priority categories: accessibility, touch, performance, style, layout, typography, animation, forms, navigation, charts, audio feedback + sound synthesis, predictive prefetching — synthesized from Apple HIG, Material Design, WCAG, and Laws of UX), use [ui-ux-guidelines.md](./references/ui-ux-guidelines.md). For UI compliance reviews, design audits, or accessibility checks against the official Web Interface Guidelines, use [web-design-guidelines.md](./references/web-design-guidelines.md). For creating a new design system from scratch (brand guidelines, DESIGN.md, aesthetic direction, typography, color, spacing, motion — six-phase conversational workflow), use [design-consultation.md](./references/design-consultation.md). For structured design critique of Figma designs, screenshots, or mockups (first impression, usability, hierarchy, consistency, accessibility, severity-graded output), use [design-critique.md](./references/design-critique.md). For live site design audits on a running URL — 10-category visual checklist, AI slop detection, dual A–F scoring, atomic CSS-first fix commits with before/after screenshots — use [design-review.md](./references/design-review.md). For React and Next.js performance review (waterfalls, bundle size, re-render churn, server-side caching), use [react-performance-rules.md](./references/react-performance-rules.md). For Next.js file conventions, RSC boundaries, async APIs, data patterns, error handling, metadata, image/font optimization, bundling, hydration errors, Suspense, and self-hosting, use [next-best-practices.md](./references/next-best-practices.md). For animation decisions, interaction polish, gesture patterns, or UI review feedback (before/after table format), use [design-engineering.md](./references/design-engineering.md). For the final pre-shipping quality pass (alignment, spacing, interaction states, copy, edge cases, checklist), use [pre-shipping-polish.md](./references/pre-shipping-polish.md).
+- Use dedicated component-building, frontend-design, browser-testing, observability, analytics, or release skills when they exist. Otherwise, use the references in this skill. For design system work at the system level (auditing token coverage, naming consistency, or component completeness; documenting component variants and states; or proposing a new pattern), use [design-system.md](./references/design-system.md). For shadcn/ui component work (adding components, CLI operations, styling rules, forms, composition, theming, preset management), use [shadcn.md](./references/shadcn.md). For component complexity reduction specifically, use [component-refactoring.md](./references/component-refactoring.md). For building reusable components or libraries (API design, a11y patterns, composition, boolean-prop avoidance, state/actions/meta provider pattern, explicit variants, children over render props, React 19 APIs, styling systems, distribution), use [building-components.md](./references/building-components.md). For comprehensive UI/UX guidelines (12 priority categories: accessibility, touch, performance, style, layout, typography, animation, forms, navigation, charts, audio feedback + sound synthesis, predictive prefetching — synthesized from Apple HIG, Material Design, WCAG, and Laws of UX), use [ui-ux-guidelines.md](./references/ui-ux-guidelines.md). For UI compliance reviews, design audits, or accessibility checks against the official Web Interface Guidelines, use [web-design-guidelines.md](./references/web-design-guidelines.md). For creating a new design system from scratch (brand guidelines, DESIGN.md, aesthetic direction, typography, color, spacing, motion — six-phase conversational workflow), use [design-consultation.md](./references/design-consultation.md). For structured design critique of Figma designs, screenshots, or mockups (first impression, usability, hierarchy, consistency, accessibility, severity-graded output), use [design-critique.md](./references/design-critique.md). For live site design audits on a running URL — 10-category visual checklist, AI slop detection, dual A–F scoring, atomic CSS-first fix commits with before/after screenshots — use [design-review.md](./references/design-review.md). For React and Next.js performance review (waterfalls, bundle size, re-render churn, server-side caching), use [react-performance-rules.md](./references/react-performance-rules.md). For the `useEffect` discipline rule (ban direct `useEffect`, five replacement patterns, `useMountEffect` wrapper, ESLint enforcement), use [no-use-effect.md](./references/no-use-effect.md). For Next.js file conventions, RSC boundaries, async APIs, data patterns, error handling, metadata, image/font optimization, bundling, hydration errors, Suspense, and self-hosting, use [next-best-practices.md](./references/next-best-practices.md). For animation decisions, interaction polish, gesture patterns, or UI review feedback (before/after table format), use [design-engineering.md](./references/design-engineering.md). For the final pre-shipping quality pass (alignment, spacing, interaction states, copy, edge cases, checklist), use [pre-shipping-polish.md](./references/pre-shipping-polish.md).
 
 ## Hooks
 
@@ -527,3 +579,56 @@ Set `AGENTIC_DEV_MAX=0` for no continuation cap, or any positive integer to limi
   }
 }
 ```
+
+## Dynamic Skill Content
+
+Skills can inject live shell output directly into the prompt at invocation time using the `!`command`` syntax embedded in `SKILL.md`:
+
+```markdown
+Current git branch: !`git branch --show-current`
+Detected stack: !`cat detected-stack.json 2>/dev/null || echo "not yet generated"`
+```
+
+Claude Code runs the command when the skill is invoked, replaces the placeholder inline, and the model only ever sees the result — not the raw placeholder.
+
+**Requirements:**
+
+- The skill's frontmatter must declare `allowed-tools` listing every tool the embedded command needs. Without it the placeholder is left unexpanded.
+- Declare the minimal surface: `allowed-tools: Bash` for general shell, or `Bash(git log)` to scope to a single command.
+
+```yaml
+---
+name: my-skill
+description: Use when ...
+allowed-tools: Bash(git log --oneline -10), Bash(cat package.json)
+---
+```
+
+**Security model — treat like postinstall scripts:**
+
+- The command runs with the same permissions as the current shell session.
+- Anything that can run in a postinstall hook can run here: network calls, file writes, credential reads.
+- Audit every `!`...`` expression before installing a skill from an external source.
+- Prefer read-only introspection commands (git, cat, jq, node -e) over commands that mutate state or download content.
+- If the skill downloads external content, verify the source the same way you would verify a dependency.
+
+**Common patterns:**
+
+| Use case | Example expression |
+|----------|--------------------|
+| Current branch | `!`git branch --show-current`` |
+| Recent commits | `!`git log --oneline -5`` |
+| Detected stack | `!`node -e "console.log(require('./package.json').dependencies ? 'node' : 'unknown')"`` |
+| Env flag | `!`echo ${CI:-local}`` |
+| File existence check | `!`test -f .env && echo ".env present" || echo ".env missing"`` |
+
+**When to use:**
+
+- Inject context that changes per repo or per session (branch name, stack, env flags, last migration state).
+- Surface file-existence checks so the model can skip or branch without a separate tool call.
+- Pre-compute expensive discovery so it runs once at skill load rather than inline during reasoning.
+
+**When not to use:**
+
+- Do not embed commands that write files, make network requests to external services, or have side effects — those belong in hooks or explicit tool calls where the user can see and approve them.
+- Do not use for content that should stay secret; command output is injected into the prompt in plaintext.

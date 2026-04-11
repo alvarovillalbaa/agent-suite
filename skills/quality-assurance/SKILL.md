@@ -543,12 +543,12 @@ Use the appropriate workflow for your task:
 
 | Workflow | When to Use | File |
 |----------|-------------|------|
-| **Setup** | Initialize E2E infrastructure (Docker, Jest config, test helpers) for a NestJS project | [workflows/typescript-e2e/setup/workflow.md](./workflows/typescript-e2e/setup/workflow.md) |
-| **Writing** | Create new E2E tests with GWT pattern | [workflows/typescript-e2e/writing/workflow.md](./workflows/typescript-e2e/writing/workflow.md) |
-| **Review** | Audit existing tests for quality, isolation, GWT compliance | [workflows/typescript-e2e/review/workflow.md](./workflows/typescript-e2e/review/workflow.md) |
-| **Running** | Execute tests, start/verify Docker infrastructure | [workflows/typescript-e2e/running/workflow.md](./workflows/typescript-e2e/running/workflow.md) |
-| **Debugging** | Fix failing or flaky tests one at a time | [workflows/typescript-e2e/debugging/workflow.md](./workflows/typescript-e2e/debugging/workflow.md) |
-| **Optimizing** | Improve test suite performance and startup time | [workflows/typescript-e2e/optimize/workflow.md](./workflows/typescript-e2e/optimize/workflow.md) |
+| **Setup** | Initialize E2E infrastructure (Docker, Jest config, test helpers) for a NestJS project | [references/workflows/typescript-e2e/setup/workflow.md](./references/workflows/typescript-e2e/setup/workflow.md) |
+| **Writing** | Create new E2E tests with GWT pattern | [references/workflows/typescript-e2e/writing/workflow.md](./references/workflows/typescript-e2e/writing/workflow.md) |
+| **Review** | Audit existing tests for quality, isolation, GWT compliance | [references/workflows/typescript-e2e/review/workflow.md](./references/workflows/typescript-e2e/review/workflow.md) |
+| **Running** | Execute tests, start/verify Docker infrastructure | [references/workflows/typescript-e2e/running/workflow.md](./references/workflows/typescript-e2e/running/workflow.md) |
+| **Debugging** | Fix failing or flaky tests one at a time | [references/workflows/typescript-e2e/debugging/workflow.md](./references/workflows/typescript-e2e/debugging/workflow.md) |
+| **Optimizing** | Improve test suite performance and startup time | [references/workflows/typescript-e2e/optimize/workflow.md](./references/workflows/typescript-e2e/optimize/workflow.md) |
 
 Knowledge base by technology (load only what the task needs):
 - **Common** — `references/typescript-e2e/common/` — GWT rules, NestJS setup, debugging, best practices, examples

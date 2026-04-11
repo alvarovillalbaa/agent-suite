@@ -1,6 +1,6 @@
 ---
 name: content-writing
-description: Use for all content creation, repurposing, quality auditing, content refresh, content gap analysis, keyword research, and support-to-content needs — blog articles from raw knowledge (including SEO-optimized content), X/Twitter Articles with editorial scoring, LinkedIn posts and long-form articles, multi-channel syndication from a canonical asset (X, LinkedIn, Substack, Medium, Dev.to, Hashnode, Reddit), humanizing AI-generated text, optimizing content for AI citation (GEO), auditing content quality with the 80-item CORE-EEAT framework, refreshing outdated content to restore rankings and traffic, identifying content gaps vs. competitors to build a prioritized editorial calendar, discovering high-value SEO keywords with search intent analysis, difficulty scoring, topic clustering, and AI citation potential, and converting support tickets into prioritized content briefs. Triggers: "write SEO content", "create a blog post", "write an article", "blog writing", "write for SEO", "SEO copywriting", "optimize for AI", "get cited by ChatGPT", "GEO optimization", "make content AI-quotable", "appear in AI answers", "Google AI Overview optimization", "audit content quality", "EEAT score", "CORE-EEAT audit", "content quality check", "how good is my content", "content improvement plan", "is my content AI-citation worthy", "update old content", "refresh content", "content is outdated", "improve declining rankings", "revive old blog posts", "content decay", "ranking dropped", "traffic is declining on this page", "rankings dropped for this article", "this post is outdated", "find content gaps", "content opportunities", "what am I missing", "topics to cover", "untapped topics", "content strategy gaps", "what topics am I missing", "where are my content blind spots", "they cover this but I don't", "what do competitors write about", "find keywords", "keyword research", "what should I write about", "identify ranking opportunities", "topic ideas", "search volume", "what are people searching for", "which keywords should I target", "give me keyword ideas", "keyword difficulty score", "long-tail keywords", "syndicate to Dev.to", "post to Hashnode", "cross-post to Reddit", "publish to dev.to", "write once publish everywhere", "distribution pack", "syndication network", "analyze support tickets", "support to content", "support-to-content", "content from tickets", "what should I document", "reduce support tickets with content", "generate help articles from tickets", "turn customer questions into content", "content from customer questions", "support ticket analysis". Routes to the appropriate mode based on user intent.
+description: Use for all content creation, repurposing, quality auditing, content refresh, content gap analysis, keyword research, support-to-content needs, and article editing — blog articles from raw knowledge (including SEO-optimized content), X/Twitter Articles with editorial scoring, LinkedIn posts and long-form articles, multi-channel syndication from a canonical asset (X, LinkedIn, Substack, Medium, Dev.to, Hashnode, Reddit), humanizing AI-generated text, optimizing content for AI citation (GEO), auditing content quality with the 80-item CORE-EEAT framework, refreshing outdated content to restore rankings and traffic, identifying content gaps vs. competitors to build a prioritized editorial calendar, discovering high-value SEO keywords with search intent analysis, difficulty scoring, topic clustering, and AI citation potential, converting support tickets into prioritized content briefs, and editing/restructuring existing article drafts for clarity, coherence, and tight prose. Triggers: "write SEO content", "create a blog post", "write an article", "blog writing", "write for SEO", "SEO copywriting", "optimize for AI", "get cited by ChatGPT", "GEO optimization", "make content AI-quotable", "appear in AI answers", "Google AI Overview optimization", "audit content quality", "EEAT score", "CORE-EEAT audit", "content quality check", "how good is my content", "content improvement plan", "is my content AI-citation worthy", "update old content", "refresh content", "content is outdated", "improve declining rankings", "revive old blog posts", "content decay", "ranking dropped", "traffic is declining on this page", "rankings dropped for this article", "this post is outdated", "find content gaps", "content opportunities", "what am I missing", "topics to cover", "untapped topics", "content strategy gaps", "what topics am I missing", "where are my content blind spots", "they cover this but I don't", "what do competitors write about", "find keywords", "keyword research", "what should I write about", "identify ranking opportunities", "topic ideas", "search volume", "what are people searching for", "which keywords should I target", "give me keyword ideas", "keyword difficulty score", "long-tail keywords", "syndicate to Dev.to", "post to Hashnode", "cross-post to Reddit", "publish to dev.to", "write once publish everywhere", "distribution pack", "syndication network", "analyze support tickets", "support to content", "support-to-content", "content from tickets", "what should I document", "reduce support tickets with content", "generate help articles from tickets", "turn customer questions into content", "content from customer questions", "support ticket analysis", "edit article", "edit this article", "revise this draft", "improve this article", "restructure article", "tighten prose", "improve clarity", "rewrite sections", "make this clearer", "fix the structure of this article", "edit my draft". Routes to the appropriate mode based on user intent.
 version: 1.1.0
 license: MIT
 compatibility: Instruction-only. Optional file read/write.
@@ -25,6 +25,7 @@ A unified content-writing skill covering the full content lifecycle:
 | **Content Gap Analysis** | "find content gaps / content opportunities / what am I missing / untapped topics" | Competitive gap analysis, keyword gap matrix, format gaps, audience journey gaps, and prioritized content calendar |
 | **Keyword Research** | "find keywords / keyword research / what should I write about / identify ranking opportunities" | Keyword discovery report with intent classification, difficulty scoring, opportunity matrix, topic clusters, GEO potential, and content calendar |
 | **Support-to-Content** | "analyze support tickets / content from customer questions / what should I document / reduce support load" | Ticket pattern analysis + prioritized content briefs for help articles and blog posts |
+| **Edit Article** | "edit / revise / improve this article / restructure these sections / tighten prose" | DAG-ordered section map confirmed with user + per-section rewrite with tight paragraphs |
 
 ### Natural Content Pipeline
 
@@ -2099,6 +2100,87 @@ After generating briefs, route to:
 
 ---
 
+## Mode 12 — Edit Article
+
+### When to Use
+
+- User pastes an existing article draft and says "edit this", "revise this", "improve clarity", "restructure this", or "rewrite sections".
+- The draft is written but feels disorganized, verbose, or hard to follow.
+- Goal is structural improvement and prose tightening — **not** SEO refresh (use Content Refresh mode) or quality scoring (use Content Audit mode).
+
+Do **not** use for writing from scratch (use Blog mode) or updating outdated stats/rankings (use Content Refresh mode).
+
+### Core Principle
+
+Treat the article's sections as a **directed acyclic graph (DAG)**: each section may depend on concepts introduced in earlier sections. The reader cannot evaluate a solution before understanding the problem; they cannot apply a framework before seeing why it is needed. Make section order respect these dependencies explicitly.
+
+### Workflow
+
+**Step 1 — Map sections.**
+
+Divide the article into sections based on its headings. For each section, write down:
+- The main point it makes.
+- What prior knowledge or context it assumes the reader already has.
+
+**Step 2 — Audit the DAG.**
+
+Draw the dependency graph (mentally or explicitly). Identify any ordering violations:
+- A section that references something not yet introduced.
+- A conclusion that appears before the evidence.
+- Background buried after the point that needs it.
+
+Reorder sections to respect all dependencies. If two sections are mutually dependent, merge them or split the shared concept into its own introductory section.
+
+**Step 3 — Confirm with user.**
+
+Present the proposed section map:
+
+```
+Proposed structure:
+1. [Section title] — [one-line summary of main point]
+2. [Section title] — [one-line summary]
+   (depends on: section 1)
+3. [Section title] — [one-line summary]
+   (depends on: sections 1, 2)
+...
+
+Changes from original: [list reordered or merged sections]
+```
+
+Wait for user confirmation or adjustments before proceeding.
+
+**Step 4 — Rewrite each section.**
+
+For each confirmed section in order:
+- Rewrite to improve clarity, coherence, and flow.
+- **Maximum 240 characters per paragraph** (~2–3 sentences). Split any paragraph that exceeds this.
+- Cut filler words ("very", "really", "in order to", "just"). One idea per paragraph.
+- Preserve the author's voice and any strong original phrasing worth keeping.
+- Start each section with a clear topic sentence that states the section's main point.
+
+### Output Format
+
+Deliver the full rewritten article with the confirmed section structure. At the end, include a brief edit summary:
+
+```
+## Edit Summary
+- Sections reordered: [list]
+- Sections merged: [list, if any]
+- Avg paragraph length: [X] chars (target: ≤240)
+- Filler cuts: [approx. count]
+- Voice changes: [minimal / moderate — describe if significant]
+```
+
+### Common Mistakes to Avoid
+
+- Reordering sections without explaining the DAG rationale to the user.
+- Skipping the confirmation step and rewriting before the user agrees on structure.
+- Merging sections without flagging it — the user may have split them intentionally.
+- Rewriting so aggressively that the author's original voice disappears.
+- Splitting paragraphs mechanically at 240 chars without checking for logical breaks.
+
+---
+
 ## Shared Standards Across All Modes
 
 ### Voice Consistency
@@ -2178,3 +2260,8 @@ In every mode:
 - Use **Support-to-Content mode** to analyze ticket patterns, cluster topics, score opportunities, and generate structured content briefs.
 - Natural pipeline: Support-to-Content → Blog mode (write the briefs) → GEO Optimize → Content Audit.
 - After generating briefs, optionally run **Keyword Research mode** to validate that discovered topics have search volume before committing to full articles.
+
+**When the user wants to edit, restructure, or tighten an existing draft:**
+- Use **Edit Article mode** to map sections as a DAG, confirm the order with the user, and rewrite each section for clarity and tight prose.
+- Natural pipeline: Blog mode → Edit Article (structural pass) → Humanize (voice pass) → Content Audit (quality gate).
+- Use Edit Article mode instead of Content Refresh mode when the goal is clarity and structure, not SEO freshness or updating outdated facts.
