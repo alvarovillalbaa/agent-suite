@@ -4,9 +4,13 @@ Use this reference when writing or debugging tests for Django models, Django RES
 serializers and views, or any pytest-based Python backend that uses Factory Boy and Faker
 for test data.
 
+For proving-layer selection, TDD-first workflow, Celery and signal testing, mock-boundary rules, and broader backend test design, also read [python-backend-tests.md](./python-backend-tests.md).
+
 ---
 
 ## Recommended Test Structure
+
+Follow repo-local conventions first. The structure below is a good default when the repo does not already define a clearer layout.
 
 ```
 tests/

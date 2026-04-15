@@ -391,7 +391,7 @@ Read [learning-system.md](./references/learning-system.md) when the user says "s
 
 ### Documentation placement
 
-When writing to `docs/` — logs, lessons, facts, procedures, fixes, audits, plans, specs, or cookbook guides — follow the `code-documentation` skill. That skill owns the `docs/` folder structure and format templates. The key structure: `docs/memories/<type>/YYYY/MM-DD/*.md` for all memory artifacts, `docs/audits/YYYY/MM-DD/` for comprehensive reports, `docs/plans/YYYY/MM-DD/` and `docs/specs/YYYY/MM-DD/` for implementation work. Do not invent new top-level `docs/` directories.
+When writing to `docs/` — logs, lessons, facts, procedures, fixes, audits, guides, references, cookbook guides, plans, or specs — follow the `code-documentation` skill. That skill owns the `docs/` folder structure and format templates. The key structure: timestamped docs use `*/YYYY/YYYY-MM-DD/*.md` for memories, audits, plans, and specs; flat docs live in `docs/guides/`, `docs/references/`, and `docs/cookbook/`. Do not invent new top-level `docs/` directories.
 
 ### Data engineering and AI/ML pipelines
 
@@ -433,7 +433,7 @@ Before touching any infra-sensitive path (IaC, CI/CD credentials, DNS, networkin
 
 ### Security work
 
-Route all security tasks to the `quality-assurance` skill. It owns the full security surface — from architecture design to testing to automated scanning:
+Route security tasks to the right skill. `quality-assurance` owns passive security engineering and `pentest` owns authorized active offensive testing:
 
 | Task | Where to go in `quality-assurance` |
 |------|-------------------------------------|
@@ -445,7 +445,7 @@ Route all security tasks to the `quality-assurance` skill. It owns the full secu
 | Write secure code (framework-specific) | `references/security-best-practices/<stack>-security.md` |
 | Extract security requirements from a threat model | `references/security-requirements.md` |
 | Add security tests (auth, IDOR, injection, headers) | `references/security-testing.md` |
-| Active penetration testing (staging only) | `references/pentesting-shannon.md` |
+| Active penetration testing (staging only) | `pentest` skill |
 | Claude Code config security scan | `Claude Code configuration security scan` section |
 
 Before touching any security-sensitive code (auth, crypto, input handling, permissions, secrets), load the relevant `quality-assurance` reference. Passive security review is always on: flag critical or high-severity issues encountered while working on any task.
@@ -489,7 +489,7 @@ If the current environment exposes more specialized skills, route work through t
 - Use `scripts/coverage_analyzer.py` to parse LCOV/JSON/XML coverage reports and identify P0/P1/P2 gaps. Use `scripts/tdd_workflow.py` to validate RED/GREEN/REFACTOR phase completion. Use `scripts/fixture_generator.py` to generate boundary-value test data and mock schemas. Full usage: `python scripts/<name>.py --help`.
 - Use `scripts/api_scaffolder.py` to generate Express/Fastify/Koa route handlers, validation middleware, and TypeScript types from an OpenAPI spec or database schema — or to reverse-generate an OpenAPI spec from existing routes. Use `scripts/database_migration_tool.py` to analyze a PostgreSQL schema for missing indexes, N+1 risks, and optimization opportunities, and to generate or dry-run migration files. Use `scripts/api_load_tester.py` to load test API endpoints with configurable concurrency and duration, measuring P50/P95/P99 latency, throughput, and error rates — including endpoint comparison and rate-limit verification. Full usage: `python scripts/<name>.py --help`.
 - Use `scripts/prompt_optimizer.py` to analyze prompt token count, clarity score, structure score, and ambiguity issues — and generate optimized versions or extract few-shot examples. Use `scripts/rag_evaluator.py` to measure context relevance, answer faithfulness, and groundedness in RAG systems, with comparison against a baseline report. Use `scripts/agent_orchestrator.py` to validate agent YAML/JSON configs, generate ASCII or Mermaid workflow diagrams, and estimate token costs per run. Full usage: `python scripts/<name>.py --help`.
-- Use `quality-assurance` for ALL security work: threat modeling (`references/threat-modeling/`), secure architecture design (`references/security-architecture-patterns.md`), cryptography selection and implementation (`references/cryptography-implementation.md`), STRIDE automation (`scripts/threat_modeler.py`), secret scanning (`scripts/secret_scanner.py`), OWASP-aligned code review (`references/security-best-practices/`), security testing (`references/security-testing.md`), comprehensive security audits (CSO mode), and penetration testing (`references/pentesting-shannon.md`). Never implement security-sensitive code without first consulting the relevant `quality-assurance` reference.
+- Use `quality-assurance` for passive security work: threat modeling (`references/threat-modeling/`), secure architecture design (`references/security-architecture-patterns.md`), cryptography selection and implementation (`references/cryptography-implementation.md`), STRIDE automation (`scripts/threat_modeler.py`), secret scanning (`scripts/secret_scanner.py`), OWASP-aligned code review (`references/security-best-practices/`), security testing (`references/security-testing.md`), and comprehensive security audits (CSO mode). Use `pentest` for authorized active penetration testing, exploit validation against staging or sandbox targets, and pentest report generation. Never implement security-sensitive code without first consulting the relevant security skill.
 - Use [interface-design.md](./references/interface-design.md) when designing a new module or API and the right shape is unclear — spawns parallel sub-agents with divergent constraints to generate 3+ radically different designs, then compares and synthesizes. Invoke before implementing any interface that will be hard to change once callers exist.
 - Use `gh-address-comments` for GitHub review-thread triage and inline replies.
 - Use `gh-fix-ci` when GitHub Actions checks are failing.

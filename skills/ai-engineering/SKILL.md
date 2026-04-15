@@ -1,19 +1,20 @@
 ---
 name: ai-engineering
-description: Use when building ML/data systems, designing data pipelines, ETL/ELT processes, data modeling, data quality frameworks, DataOps, or working with Spark, Airflow, dbt, Kafka, Flink, Snowflake, BigQuery, or Delta Lake. Also use for streaming architecture decisions, data contract design, pipeline orchestration, and troubleshooting data infrastructure issues. Also use when optimizing prompts, designing prompt templates, evaluating LLM outputs, building agentic systems, implementing RAG, creating few-shot examples, analyzing token usage, or designing AI workflows. Also use when designing or analysing controlled experiments (A/B testing, sample sizing, Bonferroni correction), performing causal inference (difference-in-differences), building feature engineering pipelines (Scikit-learn, XGBoost), evaluating classification/regression models (AUC-ROC, AUC-PR, SHAP, MLflow), or translating statistical findings into data-driven business decisions. Also use when building computer vision systems — object detection (YOLO, Faster R-CNN, DETR), image segmentation (Mask R-CNN, SAM, SegFormer), image classification (ResNet, EfficientNet, ViT), video analysis, 3D vision, model optimization (ONNX, TensorRT, OpenVINO), dataset preparation and annotation pipelines, or deploying vision models to production with PyTorch, Ultralytics, Detectron2, or MMDetection.
+description: Use when building ML/data systems, designing data pipelines, ETL/ELT processes, data modeling, data quality frameworks, DataOps, or working with Spark, Airflow, dbt, Kafka, Flink, Snowflake, BigQuery, or Delta Lake. Also use for streaming architecture decisions, data contract design, pipeline orchestration, and troubleshooting data infrastructure issues. Also use when optimizing prompts, designing prompt templates, evaluating LLM outputs, building agentic systems, implementing RAG, creating few-shot examples, analyzing token usage, designing AI workflows, or implementing constrained generation with regex, grammars, or Microsoft Guidance-style structured output controls. Also use when designing or analysing controlled experiments (A/B testing, sample sizing, Bonferroni correction), performing causal inference (difference-in-differences), building feature engineering pipelines (Scikit-learn, XGBoost), evaluating classification/regression models (AUC-ROC, AUC-PR, SHAP, MLflow), or translating statistical findings into data-driven business decisions. Also use when building computer vision systems — object detection (YOLO, Faster R-CNN, DETR), image segmentation (Mask R-CNN, SAM, SegFormer), image classification (ResNet, EfficientNet, ViT), video analysis, 3D vision, model optimization (ONNX, TensorRT, OpenVINO), dataset preparation and annotation pipelines, or deploying vision models to production with PyTorch, Ultralytics, Detectron2, or MMDetection.
 ---
 
 # AI & Data Engineering
 
-Production-grade guidance for data pipelines, ML infrastructure, modern data stack engineering, prompt engineering, and LLM evaluation.
+Production-grade guidance for data pipelines, ML infrastructure, modern data stack engineering, prompt engineering, constrained generation, and LLM evaluation.
 
 ## Start Here
 
 1. Load only the reference files relevant to the current task (see Workflow Router below).
 2. For data engineering: choose the processing model first — batch vs. streaming, Lambda vs. Kappa, warehouse vs. lakehouse.
 3. For prompt/LLM work: choose the right pattern first — see Prompt Engineering Quick Reference below.
-4. Use the scripts in `scripts/` for common operations — don't write boilerplate from scratch.
-5. Apply DataOps practices by default: data contracts, quality checks, CI/CD gates, and observability.
+4. For strict output guarantees: prefer hard constraints over prompt-only compliance — use regex, finite selections, or grammar-backed generation when the output must validate deterministically.
+5. Use the scripts in `scripts/` for common operations — don't write boilerplate from scratch.
+6. Apply DataOps practices by default: data contracts, quality checks, CI/CD gates, and observability.
 
 ## Core Rules
 
@@ -26,6 +27,7 @@ Production-grade guidance for data pipelines, ML infrastructure, modern data sta
 - Dead Letter Queues (DLQs) are mandatory for streaming pipelines. Never silently drop records.
 - Observable pipelines emit metrics, lineage events, and freshness signals by default.
 - Cost optimization is an engineering concern, not a finance concern. Track and attribute compute spend per pipeline.
+- If a response must parse, validate, or match a fixed syntax, prefer constrained generation over plain "return valid JSON" prompting.
 
 ## Architecture Decision Framework
 
@@ -162,6 +164,7 @@ python scripts/model_evaluation_suite.py --input features.parquet --config eval_
 | **Chain-of-Thought** | Reasoning, math, multi-step logic | "Think step by step..." |
 | **Role Prompting** | Expertise needed, specific perspective | "You are an expert tax accountant..." |
 | **Structured Output** | Need parseable JSON/XML | Include schema + "Respond ONLY with valid JSON" |
+| **Constrained Generation** | Output must match exact syntax or enumerated choices | Guidance with `regex`, `select`, or grammar-backed fields |
 | **Self-Consistency** | High-stakes decisions | Run N times at temp > 0, majority-vote the answer |
 | **ReAct** | Tool use required | Thought → Action → Observation loop |
 | **Tree of Thoughts** | Complex problem solving | Generate 3 approaches, evaluate, pick best |
@@ -235,6 +238,10 @@ Read [data-troubleshooting.md](./references/data-troubleshooting.md) for diagnos
 ### Prompt engineering (patterns, few-shot, chain-of-thought, role prompting, structured output)
 
 Read [prompt-engineering-patterns.md](./references/prompt-engineering-patterns.md) when writing or improving prompts — choosing between zero-shot, few-shot, chain-of-thought, role prompting, structured output, self-consistency, ReAct, tree-of-thoughts, RAG, or meta-prompting patterns. Includes input/output examples for each pattern and a pattern selection guide.
+
+### Constrained generation with Guidance (regex, select, grammar-backed output)
+
+Read [guidance-constrained-generation.md](./references/guidance-constrained-generation.md) when prompt-only formatting is too weak — implementing regex-constrained fields, finite-choice routing with `select`, grammar-backed JSON/code generation, Guidance functions with `@guidance`, token-healing-aware output control, backend setup for OpenAI/Anthropic/local models, or multi-step constrained workflows.
 
 ### LLM evaluation (metrics, A/B testing, RAG evaluation, benchmarks)
 

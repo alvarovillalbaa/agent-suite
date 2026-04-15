@@ -7,7 +7,7 @@ Use learning artifacts to improve the right source of truth. Do not promote ever
 Promote in this order:
 
 1. `learning/` artifacts
-2. Identity files: `AGENTS.md`, `SOUL.md`, `PRINCIPLES.md`
+2. Root instruction docs: `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`
 3. Human-facing markdown docs that should persist for collaborators
 
 If the knowledge is useful only as session memory, stop at `learning/`.
@@ -16,14 +16,19 @@ If the knowledge is useful only as session memory, stop at `learning/`.
 
 | File | What belongs there | Update bar |
 |---|---|---|
-| `AGENTS.md` | Stable operating rules, repo facts, agent workflow constraints | Repeated or explicitly stated, actionable, durable |
+| `AGENTS.md` | Stable operating rules, repo facts, and general customization to the user's/codebase's ways of working | Repeated or explicitly stated, actionable, durable |
+| `PLAN.md` | Repo-wide planning protocol and how plans should look | Durable planning guidance, not one feature's transient plan |
+| `SPEC.md` | Repo-wide spec protocol and what specs must contain | Durable spec-writing rules, not one feature's transient content |
 | `SOUL.md` | Persistent style, tone, or collaboration stance | Rare, identity-level signal |
-| `PRINCIPLES.md` | Decision heuristics and trade-off rules | Rare, heuristic clearly needed |
+| `PRINCIPLES.md` | Decision heuristics, constraints, and trade-off rules | Rare, heuristic clearly needed |
+| `DESIGN.md` | Design-system and frontend interaction rules | Durable design language or interface-system guidance |
 | `README.md` | Human-facing overview or usage facts | When a teammate would need it |
 | `ARCHITECTURE.md` | Structural decisions, ownership, boundaries | When architecture changed or was clarified |
 | `TESTS.md` / `TESTING.md` | Durable test workflows and pitfalls | When test strategy or gotchas changed |
 | `SETUP.md` | Environment, setup, bootstrap behavior | When operational steps changed |
-| `docs/cookbook/*` | Reusable technical guidance | When a pattern needs broader documentation |
+| `docs/guides/*` | General technical how-to guidance | When the method is reusable beyond this repo's implementation |
+| `docs/references/*` | Stable lookup/reference material | When teammates need a factual reference surface |
+| `docs/cookbook/*` | Repo-specific technical guidance | When a pattern needs broader documentation in this codebase |
 | `docs/memories/logs/` | Development log entries | After any meaningful code change |
 | `docs/memories/lessons/` | Verified reusable insights | When a discovery should change future behavior |
 | `docs/memories/facts/` | Stable project/team facts | When teammates would make wrong assumptions without it |
@@ -81,6 +86,16 @@ Examples:
 
 Write concise heuristics that help future decision making.
 
+## `PLAN.md` / `SPEC.md` / `DESIGN.md`
+
+Update these when the learning changes the repo-wide documentation contract:
+
+- `PLAN.md` — how planning should be done and how plans should be shaped
+- `SPEC.md` — how specs should be written and what they must define
+- `DESIGN.md` — the design system and frontend interaction language for the repo
+
+Do not use these files for one feature's local content when a timestamped doc in `docs/plans/` or `docs/specs/` is the narrower source of truth.
+
 ## Other markdown docs
 
 Promote there when the knowledge is for humans first, not just agents.
@@ -105,9 +120,19 @@ Promote there when the knowledge is for humans first, not just agents.
 
 - install, bootstrap, credentials flow, or local runtime setup changed
 
+### Promote to `docs/guides/` when
+
+- the knowledge is a general technical how-to
+- it should not depend on how this repo implements the pattern
+
+### Promote to `docs/references/` when
+
+- the knowledge is mostly lookup material, mappings, or reference data
+- readers will use it to check facts rather than follow a workflow
+
 ### Promote to `docs/cookbook/` when
 
-- the knowledge is a reusable technical recipe
+- the knowledge is a reusable technical recipe for this codebase
 - it spans multiple modules or teams
 
 ### Promote to `docs/memories/` when
@@ -119,7 +144,7 @@ The `docs/memories/` folder (owned by the `code-documentation` skill) is the hum
 - **`procedures/`** — repeatable workflow that would require rediscovery without documentation
 - **`fixes/`** — non-obvious error solution that is reproducible and likely to recur
 
-All paths follow `docs/memories/<type>/YYYY/MM-DD/*.md`. See `skills/code-documentation/references/continuous-docs.md` for format templates.
+All paths follow `docs/memories/<type>/YYYY/YYYY-MM-DD/*.md`. See `skills/code-documentation/references/continuous-docs.md` for format templates.
 
 ## Conflict handling
 

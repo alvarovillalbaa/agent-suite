@@ -1,7 +1,7 @@
 ---
 name: code-documentation
 description: This skill should be used when the user asks to write, update, review, scaffold, or reorganize documentation for code, folders, services, repos, workflows, architectural decisions, or operational processes. Trigger for `README.md`, `ARCHITECTURE.md`, `TESTS.md`, `SETUP.md`, `RUNBOOK.md`, `CHANGELOG.md`, `SECURITY.md`, `OVERVIEW.md`, `FAQ.md`, `DECISIONS.md`, `DEPENDENCIES.md`, `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`, `runbooks/**/*.md`, `docs/**/*.md`, MDX docs, JSDoc/TSDoc, docstrings, ADRs, post-mortems, migration guides, and PR documentation-impact reviews.
-version: 1.2.0
+version: 1.3.0
 ---
 
 # Code Documentation
@@ -16,7 +16,7 @@ Documentation in this repo falls into five surfaces:
 2. **In-folder docs** — `README.md`, `ARCHITECTURE.md`, `TESTS.md`, and related files that explain one directory
 3. **Root instruction docs** — `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`
 4. **Operational runbooks** — workflow-specific procedures in `runbooks/` or a local `RUNBOOK.md`
-5. **Project docs** — `docs/` for references, audits, guides, memories, specs, and longer-form artifacts
+5. **Project docs** — `docs/` for memories, audits, guides, references, cookbook entries, plans, specs, and longer-form artifacts
 
 Default rule: put the doc in the narrowest place that future readers will naturally look first.
 
@@ -30,17 +30,44 @@ Default rule: put the doc in the narrowest place that future readers will natura
 | Explain how to test one directory or service | `TESTS.md` in that directory |
 | Document setup or bootstrap steps for one area | `SETUP.md` in that directory |
 | Document a repeatable operational workflow | `runbooks/<name>.md` or local `RUNBOOK.md` |
-| Record repo-wide operating rules for humans and agents | `AGENTS.md` |
-| Record planned execution steps | `PLAN.md` |
-| Record required behavior or scope | `SPEC.md` |
-| Record product intent, voice, or core spirit | `SOUL.md` |
-| Record non-negotiable engineering or product rules | `PRINCIPLES.md` |
-| Record design-system, architecture, or UX rules | `DESIGN.md` |
-| Record audits, ADRs, post-mortems, reports, migrations, or references | `docs/` |
+| Record repo-wide customization for agents, contributors, and the user's ways of working | `AGENTS.md` |
+| Record how planning should be done and what plans should look like | `PLAN.md` |
+| Record how specs should be written and what they must define | `SPEC.md` |
+| Record the agents' personality and collaboration stance | `SOUL.md` |
+| Record principles, constraints, and max/min rules that always apply | `PRINCIPLES.md` |
+| Record the design system or frontend interaction language | `DESIGN.md` |
+| Record a repo-level implementation plan and verification shape | `docs/plans/YYYY/YYYY-MM-DD/` |
+| Record a repo-level behavior contract or requirements spec | `docs/specs/YYYY/YYYY-MM-DD/` |
+| Record a general technical how-to that is not implementation-specific to this repo | `docs/guides/` |
+| Record stable code or system references | `docs/references/` |
+| Record how something is actually done in this codebase | `docs/cookbook/` |
+| Record audits, ADRs, post-mortems, reports, or migrations | `docs/audits/YYYY/YYYY-MM-DD/` |
+
+## `docs/` taxonomy
+
+Use these locations consistently:
+
+- `docs/memories/logs/` — brief logs (2 lines max, append to the latest date file) about every change made in the code
+- `docs/memories/lessons/` — lessons learned from experience, related to the code
+- `docs/memories/facts/` — facts about the user, company, or project that are not derivable from code
+- `docs/memories/procedures/` — how things ought to be done after discovering the right workflow
+- `docs/memories/fixes/` — non-obvious error solutions and fixes
+- `docs/audits/` — comprehensive reports and analytical audits
+- `docs/guides/` — technical guides for how to do something; not about how this repo implements it
+- `docs/references/` — code and system reference docs
+- `docs/cookbook/` — technical guides for how something is done in this codebase
+- `docs/plans/` — implementation plans: how something should be built, tested, and behaviorally verified
+- `docs/specs/` — specifications: how something should behave
+
+Timestamped doc families use one layout only:
+
+- `*/YYYY/YYYY-MM-DD/*.md`
+
+That applies to memories, audits, plans, and specs. `guides/`, `references/`, and `cookbook/` stay flat with no timestamp subfolders.
 
 ## In-folder documentation contract
 
-Every meaningful folder can carry its own documentation. Unless repo-local rules say otherwise, use this default set.
+Outside `docs/`, every meaningful folder can carry its own documentation. Unless repo-local rules say otherwise, use this default set.
 
 ### Core
 
@@ -88,12 +115,12 @@ Use the smallest set that makes the folder legible. Do not create files just to 
 
 Treat these as first-class documentation, not miscellaneous meta files:
 
-- `AGENTS.md` — repo operating instructions for agents and contributors
-- `PLAN.md` — current execution strategy and ordering
-- `SPEC.md` — contract, scope, acceptance criteria
-- `SOUL.md` — product intent, voice, or qualitative direction
-- `PRINCIPLES.md` — invariants and non-negotiable rules
-- `DESIGN.md` — design system, architecture, UX, or interaction rules
+- `AGENTS.md` — general customization to the user's needs, codebase, and ways of working
+- `PLAN.md` — how planning should be done and what plans should look like
+- `SPEC.md` — how specs should be written and what they must contain
+- `SOUL.md` — personality and collaboration stance for AI agents
+- `PRINCIPLES.md` — principles, constraints, and max/min rules that should always be followed
+- `DESIGN.md` — the design system and frontend interaction language when the repo has one
 
 When a change affects how the repo is operated, designed, or extended, review these files the same way you would review a README or architecture doc.
 
@@ -143,9 +170,11 @@ Borrow the quality bar from mature operational runbooks:
 
 When documentation work reveals repeated gaps, stale instruction files, or recurring workflow confusion:
 
-- treat `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`, `runbooks/**/*.md`, and the in-folder docs above as valid documentation targets
+- treat `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`, `runbooks/**/*.md`, the in-folder docs above, and the `docs/` taxonomy here as valid documentation targets
 - prefer fixing the upstream doc rather than patching the same explanation into many places
 - keep the same surface model between skills: `code-documentation` defines the doc taxonomy, and `auto-improve` should harden that same taxonomy automatically
+- make `auto-improve` treat the root instruction docs as first-class documentation, not special-case meta files
+- keep timestamped docs on `*/YYYY/YYYY-MM-DD/*.md` and flat docs on `docs/guides/`, `docs/references/`, and `docs/cookbook/`
 - if the issue is systemic rather than one-off, route follow-up hardening through `skills/auto-improve/`
 
 ## Workflow
@@ -154,9 +183,10 @@ When documentation work reveals repeated gaps, stale instruction files, or recur
 2. Decide the surface: inline, folder, root instruction doc, runbook, or `docs/`.
 3. Update the closest existing document before creating a new one.
 4. If creating folder docs, start with the Core set and add Conditional or Rare files only when justified.
-5. Link neighboring docs so readers can move from overview to procedure to deeper design.
-6. Keep code examples real and commands executable.
-7. If the task is a documentation impact review, inspect the diff and map changed code to the docs above.
+5. If the destination is timestamped, use `*/YYYY/YYYY-MM-DD/*.md`; do not invent alternative date layouts.
+6. Link neighboring docs so readers can move from overview to procedure to deeper design.
+7. Keep code examples real and commands executable.
+8. If the task is a documentation impact review, inspect the diff and map changed code to the docs above.
 
 ## Quality bar
 

@@ -1,6 +1,6 @@
 ---
 name: quality-assurance
-description: "End-to-end quality assurance and secure coding for any software repo: code review, test strategy, bug triage, debugging, flaky-test repair, coverage improvement, coverage assessment, coverage regression, identify low-coverage files, coverage artifacts, make coverage, pnpm test:coverage, coverage thresholds failing, propose high-impact tests, coverage gaps, confirm before writing tests, suite architecture, CI/CD quality gates, security best practices, security audits, and AppSec threat modeling for frontend, backend, or full-stack systems. Use when reviewing PRs, receiving review feedback, writing or repairing tests, debugging failing or flaky suites, proving browser behavior, hardening frontend or backend CI, improving release confidence with reliable verification, defining a testing strategy for a new project, security review, security audit, security scan, security report, write a security report, security vulnerability, secure by default, secure coding, write secure code, audit codebase for vulnerabilities, security best practices review, find vulnerabilities, passive security review, active security audit, threat model, threat modeling, AppSec threat model, security threat model, threat model a codebase, threat model a repository, enumerate threats, abuse paths, trust boundaries, attacker model, attack surface analysis, threat enumeration, STRIDE threat model, PASTA threat model, STRIDE PASTA, security guidance for React, security guidance for Django, security guidance for FastAPI, security guidance for Flask, security guidance for Express, security guidance for Next.js, security guidance for Vue, security guidance for jQuery, security guidance for Go, python web security, javascript web security, typescript web security, golang backend security, XSS prevention, SQL injection prevention, CSRF protection, CSP Content Security Policy, secure token storage, avoid prototype pollution, safe HTML rendering, OWASP, cloud security, infrastructure security, IAM security, AWS security, cloud infrastructure security, cloud deployment security, CI/CD security, pipeline security, secrets rotation, secrets management, VPC security, network security, CloudWatch logging, cloud secrets manager, Cloudflare WAF, CDN security, DDoS protection, backup disaster recovery, OIDC federation CI, supply chain security, cloud misconfiguration, S3 bucket security, RDS security, Terraform security, rate limiting, dependency security, npm audit, file upload validation, input validation schema, blockchain security, Solana security, Web3 security, wallet signature verification, wallet ownership verification, transaction verification, Solana wallet, on-chain security, crypto security, NFT security, DeFi security, smart contract interaction security, scan Claude Code configuration, agent configuration security scan, AgentShield, ecc-agentshield, agentshield scan, scan .claude directory, CLAUDE.md security audit, settings.json security, MCP server security scan, hooks security audit, agent definition security, claude code config vulnerability, prompt injection CLAUDE.md, hook command injection, MCP supply chain risk, overly permissive allow list, bash wildcard permission, hardcoded secrets in config, claude code security, agent config hardening, secure claude code setup, initialize secure config, agentshield init, agentshield fix, agentshield opus deep analysis, agentshield github action, claude code settings audit, designing a test pyramid, applying test pyramid ratio 70 20 10, defining unit integration E2E test distribution, AI testing pyramid, AI application test pyramid, LLM testing pyramid, AI test strategy, AI eval pyramid, offline AI evaluations, LLM evals, AI evals, agent workflow testing, red team AI testing, human QA AI, LLM-as-judge, PromptFoo evals, Ragas evals, DeepEval evals, RAG testing pyramid, AI agent test layers, deterministic unit tests AI, AI contracts testing, AI integration testing, test pyramid for LLM apps, test pyramid for agent systems, eval framework selection, AI quality assurance, before refactoring to build a safety net, setting up CI CD automated tests, quality issues bugs happen frequently, how should we test, test strategy for, write tests for, test plan, what tests do we need, testing approach, test strategy document output, coverage goals and tools selection, fixing lint errors or formatting issues, running pre-commit checks, using yarn prettier or yarn linc, adding new React error messages, seeing 'unknown error code' warnings, writing Django or DRF tests, generating Factory Boy fixtures, debugging pytest failures in a Django project, testing Django models, serializers, or API views, working with React feature flags, understanding @gate pragmas, debugging channel-specific test failures, adding new flags to ReactFeatureFlags, generating test planning documentation from PRDs or implementation plans, applying ISTQB test design techniques, applying ISO 25010 quality characteristics, creating GitHub test issue templates, defining quality gates and entry/exit criteria, estimating test tasks, structuring test strategies for GitHub project management, writing TypeScript Playwright E2E tests, implementing page object model, reusing auth state across tests, managing test data with API helpers, configuring Playwright for CI, writing smoke tests or critical-path regression tests, debugging flaky E2E tests, cross-browser E2E testing with Chromium Firefox or WebKit, writing Cypress E2E tests, Cypress custom commands, cy.intercept network mocking, Cypress session auth reuse, visual regression testing with toHaveScreenshot, parallel test sharding, accessibility testing with axe-core, Playwright network interception with page.route, test.step structured reporting, E2E-first testing philosophy, preferring E2E tests over unit tests, avoiding React component tests in isolation, minimizing mocking, 3-mock rule, MSW integration tests, Vitest unit tests for pure functions, co-located test files, createTestingAccount utility, addAccountBalance utility, role-based selectors, accessible selectors in Playwright, test ID selectors, avoid CSS selectors in E2E tests, Playwright installation npm init playwright, Playwright configuration webServer, beforeEach afterEach beforeAll afterAll test hooks, serial test mode test.describe.configure, Playwright form interactions fill check uncheck selectOption setInputFiles, Playwright keyboard interactions press type dblclick dragAndDrop, Playwright assertions toBeVisible toBeHidden toHaveText toHaveCount toHaveCSS, soft assertions expect.soft, toPass poll assertion, custom fixtures test.extend, multiple user roles fixture adminPage userPage, test tags filtering tag @smoke @regression grep, video recording retain-on-failure, browser console capture page.on console pageerror, popup handling context waitForEvent, conditional optional elements count isVisible, data-driven tests for loop parametrized, Playwright Docker mcr.microsoft.com playwright, generating Playwright tests from a scenario, Playwright MCP test generation, generate test with Playwright MCP, walk scenario live before writing code, emit test after MCP steps, save and execute generated Playwright test, iterate until Playwright test passes, pytest fixtures, pytest parametrize, pytest markers, pytest-mock mocker, pytest-asyncio async tests, pytest-cov coverage, pytest-xdist parallel pytest, FastAPI testing TestClient AsyncClient httpx, pytest conftest, fixture scope function class module session, autouse fixture, arrange act assert, pytest.raises, pytest.approx, pytest.mark.skip pytest.mark.xfail, pytest.ini addopts testpaths, writing Python unit tests, writing Python integration tests, testing FastAPI endpoints, async Python testing, SQLAlchemy test database override, dependency override FastAPI test, aiosqlite test database, pytest best practices, pytest anti-patterns, pytest common pitfalls, pytest coverage annotate, cov_annotate, coverage annotate report, lines missing coverage, increase coverage to 100%, exclamation mark uncovered lines, iterative coverage improvement, TDD test-driven development, red green refactor, write failing test first, TDD iron laws, no production code without failing test, observe the red, unittest.mock patch Mock mock_open autospec PropertyMock, testing file operations tmp_path tmpdir tempfile, mocking async functions assert_awaited_once, coverage target 80 percent critical path 100 percent coverage, quick reference pytest cheatsheet, monkeypatch setenv delenv setattr, MagicMock magic methods, freezegun freeze_time time travel time freezing, property-based testing hypothesis given strategies, SQLAlchemy in-memory test database db_session, testing retry behavior side_effect sequence, concurrent async asyncio.gather, CI CD GitHub Actions Python pytest workflow, pyproject.toml coverage omit exclude_lines, test naming convention test unit scenario expected outcome, testing error paths failure cases, parametrized fixture fixture params request.param fixture parametrization backend variant environment parametrize fixture, test organization directory structure tests unit integration e2e conftest shared fixtures, python testing patterns, Mastra smoke test, create-mastra, Mastra Studio, Mastra Studio smoke test, smoke test Mastra, create mastra project, mastra dev server, mastra agents page, mastra tools page, mastra workflows page, mastra scorers page, mastra observability, mastra network mode, mastra agent network, plannerNetwork, mastra localhost 4111, mastra LLM provider, mastra openai anthropic groq google cerebras mistral, mastra environment variables, mastra browser testing, mastra studio routes, smoke testing a web app, smoke test checklist browser automation, Jest unit tests, Vitest unit tests, describe beforeEach afterEach jest.fn mockResolvedValue, Supertest API testing integration tests, API endpoint testing Node.js, k6 load testing, k6 stress test, k6 spike test, k6 thresholds, Artillery performance testing, load test ramp up ramp down, p95 response time SLA, performance testing stages, security requirement extraction, threat model to requirements, STRIDE requirements, security user stories, security acceptance criteria, compliance requirement mapping, security traceability matrix, threat to requirement mapping, STRIDE PASTA security requirements, PCI-DSS requirements, HIPAA requirements, GDPR requirements, OWASP ASVS requirements, security requirements from threat model, derive security requirements, security requirement priority, security testing, authentication security tests, authorization IDOR privilege escalation, input validation SQL injection XSS, security headers CSP HSTS X-Frame-Options, rate limiting brute force, OWASP security test checklist, test report template, defect report, severity CRITICAL HIGH MEDIUM LOW, coverage analysis gaps recommendations, QA methodology, exploratory testing charter, usability testing, accessibility testing WCAG 2.1 AA, localization testing RTL UTF-8, compatibility matrix browser OS, pairwise testing, risk-based testing, defect management 5 whys root cause analysis, quality metrics DRE defect leakage MTTR, quality dashboard, continuous testing shift-left, feedback cycle targets, quality gates production release, automation framework, Screenplay pattern Actor Task, keyword-driven testing, model-based testing state machine, self-healing locators multi-strategy finder, error recovery smart retry exponential backoff, parallel distributed execution Playwright sharding, test data factories Faker UserFactory, team enablement training code review checklist, automation ROI calculation break-even, custom reporter metrics, prefer integration tests over unit tests, mock external services use real fixtures, minimize edge case testing, always add regression tests for bugs, cover every user entry point, tests validate before manual QA, testing philosophy testing principles, pnpm test pnpm test:run, co-locate test files star.test.ts, test isolation temp directory cleanup afterEach, pure function tests no setup, sanitized fixtures PII scrubbing, happy path integration test entry point coverage, regression test for bug fail before fix pass after, public interface not internal methods, real world fixtures not mocks for data, test submission checklist, boundary conditions, boundary value analysis, edge case testing, limit values, integer overflow underflow, MIN_VALUE MAX_VALUE, null empty whitespace string testing, collection empty single many, floating point precision tolerance, NaN Infinity special values, array index out of bounds, date time leap year boundaries, parameterized boundary tests, JUnit 5 boundary testing, ParameterizedTest ValueSource CsvSource, Math.addExact Math.subtractExact, isCloseTo within tolerance, pytest.approx sys.maxsize, toBeCloseTo Number.MAX_SAFE_INTEGER, it.each boundary cases, vitest vitest.config.ts vite testing framework, vi.fn vi.mock vi.spyOn vitest mocks, vi.useFakeTimers vi.setSystemTime vitest timers, vitest globals jsdom happy-dom environment, vitest coverage v8 istanbul thresholds, vitest sharding shard CI parallel, expectTypeOf type testing test-d.ts, vitest browser mode playwright chromium, vitest fixtures test.extend custom fixtures, vitest snapshots toMatchSnapshot toMatchInlineSnapshot, vitest workspace projects monorepo, vitest benchmarks bench describe, vitest watch mode HMR, vitest run coverage, vitest concurrent sequential test.concurrent, defineConfig mergeConfig vitest config, vitest setup files setupFiles globalSetup, vitest pool threads forks vmThreads, vitest aroundEach aroundAll around hooks, vi.hoisted hoisted variables vitest, vi.stubGlobal vi.stubEnv vitest globals env, vi.mockObject mock object vitest, vitest soft assertions expect.soft, vitest poll assertion expect.poll, vitest filter tags testNamePattern changed, vitest related files imports, vitest typecheck type check, NestJS E2E testing, NestJS jest e2e, nestjs test e2e, jest-e2e.config.ts, e2e-spec.ts, test/e2e directory, GWT pattern, Given-When-Then test, real infrastructure testing, Docker E2E testing, docker-compose E2E, docker-compose testing infrastructure, Kafka E2E testing, Kafka Jest testing, KafkaTestHelper, Redpanda testing, Kafka consumer E2E, Kafka producer E2E, kafka fromBeginning pre-subscription, waitForMessages smart polling, consumer group isolation, PostgreSQL E2E testing, PostgresTestHelper, MongoDB E2E testing, MongoDbTestHelper, Redis E2E testing, RedisTestHelper, MSW external API mock E2E, Nock API mock, supertest NestJS, NestJS test helper, NestJS app bootstrap test, connectMicroservice test, inheritAppConfig, runInBand sequential jest, jest maxWorkers 1, jest forceExit detectOpenHandles, E2E session temp file, E2E_SESSION log file redirect, fix one test at a time E2E, debug E2E test, review E2E test, setup E2E test, write E2E test, run E2E test, optimize E2E test, e2e test flaky NestJS, e2e connection error database Kafka Redis, e2e timeout async, e2e race condition, e2e state leakage, e2e test isolation beforeEach cleanup, release readiness review, release candidate review, release gate, ship or block, green light to ship, blocked release, release diff review, release diff audit, release review checklist, breaking changes detection, regression detection, release risk assessment, find latest release tag, BASE_TAG TARGET diff, git diff release, version bump check, changelog audit, migration path audit, release blocking triggers, release polish, release notes audit, release readiness checklist, pre-release review, pre-release audit, validate release, release review workflow, release call, release gate policy, deterministic gate, ship block call, openai-agents-python release, release candidate diff, release sign-off, release readiness gate, make format make lint make typecheck make tests, makefile verification stack, parallel make steps, pre-commit make workflow, code-change-verification, run verification stack, make sync uv dev requirements, fail-fast parallel make, heartbeat make steps, make verify run, autonomous penetration testing, pentest web application, shannon keygraph, npx shannon, run a pentest, active security testing, DAST dynamic application security testing, proof of concept exploit, PoC exploit, vulnerability confirmation, confirmed exploit, exploitable vulnerability, security assessment report, JWT algorithm confusion, JWT none algorithm, RS256 HS256 confusion, KID header injection, NoSQL injection MongoDB, mass assignment vulnerability, SSRF cloud metadata, SSRF auth header forwarding, command injection OS, horizontal privilege escalation, vertical privilege escalation, 41 checkpoint security test, pentest staging environment, autonomous pentest, automated pentest, AI pentesting, security assessment, penetration testing report, vulnerability exploitation, exploit validation, pentest framework, authorized testing, QA a web app, test this site, find bugs and fix, test and fix bugs, live web app QA, browser QA testing, QA report, health score, issue taxonomy, QA health score, quick QA, standard QA, exhaustive QA, diff-aware QA, QA tier, QA mode, QA phases, fix loop QA, before after screenshot, ship readiness, does this work, feature ready for testing, QA this branch, QA this PR, QA this feature, visual bug, functional bug, UX bug, console error QA, broken link QA, accessibility bug, content bug, performance bug, per-page exploration, QA checklist, framework detection QA, Next.js QA, Rails QA, WordPress QA, SPA QA, QA regression, WTF likelihood, verified best-effort reverted deferred, commit per fix, minimal fix QA, regression test QA, qa-report-template, issue-taxonomy, systematic debugging, root cause investigation, investigate this error, root cause analysis, debug report, hypothesis testing, scope lock, pattern analysis bug, investigate broken functionality, debug this, fix this bug, why is this broken, phase investigation, race condition debug, null propagation debug, state corruption debug, integration failure debug, configuration drift debug, stale cache debug, 3-strike debugging, blast radius fix, fix root cause not symptom, no fixes without root cause, iron law debugging, reproduce before repair, bug investigation phases, structured debug report, DONE DONE_WITH_CONCERNS BLOCKED status, CSO review, chief security officer audit, comprehensive security audit, infrastructure-first security audit, secrets archaeology, git history credential scan, find leaked credentials in git history, CI/CD pipeline security audit, LLM AI security audit, skill supply chain security scan, attack surface census, webhook signature verification audit, infrastructure shadow surface, false positive confidence gate, security posture report, 15-phase security audit, secrets in git history, dependency supply chain audit, OWASP Top 10 assessment, STRIDE per component threat model, data classification security, active verification security findings, SOC 2 compliance, SOC 2 Type II, PCI-DSS compliance, HIPAA compliance, GDPR compliance, compliance checker, compliance scan, compliance audit, compliance report, compliance framework, compliance validation, compliance score, compliance gap, run compliance check, check compliance, verify compliance, compliance controls, SOC 2 controls, HIPAA safeguards, GDPR principles, PCI cardholder data, CVE triage, CVSS scoring, CVSS score, CVSS v3.1, vulnerability management, vulnerability lifecycle, vulnerability assessment, vulnerability report, vulnerability remediation, dependency CVE, npm vulnerability, Python vulnerability, go vulnerability, vulnerability scanner, vulnerability assessor, scan for vulnerabilities, automated vulnerability scan, risk score dependency, emergency patch, patch priority, vulnerability SLA, security scanner script, scan codebase security, automated code security scan, detect hardcoded secrets, detect injection vulnerabilities, path traversal detection, security scan exit code, zero trust architecture, defense in depth, design secure architecture, secure architecture design, security incident response, handle security incident, incident response plan, incident response playbook, P1 P2 P3 P4 incident severity, breach containment, eradication recovery post-mortem, FIDO2 WebAuthn hardware keys, mTLS mutual TLS, OAuth 2.0 PKCE, JWT short expiry refresh token, authentication pattern selection, AES-256-GCM encryption, Argon2id password hashing, bcrypt hashing, HMAC-SHA256, key management key rotation, envelope encryption DEK KEK, vulnerability severity matrix impact exploitability, security code review checklist, secure vs insecure patterns, SQL injection parameterized query, Ed25519 digital signature, X25519 key exchange, PBKDF2 scrypt KDF."
+description: "End-to-end quality assurance and secure engineering for any software repo: code review, test strategy, bug triage, debugging, flaky-test repair, coverage analysis and improvement, suite architecture, CI quality gates, secure coding reviews, security audits, threat modeling, compliance validation, and dependency or vulnerability management for frontend, backend, full-stack, and AI systems. Use when reviewing PRs, writing or repairing tests, debugging failing suites, improving release confidence, creating test plans, running passive security reviews, or translating threats into requirements. For authorized active penetration testing, exploit validation against a running target, or pentest reporting, use `pentest`."
 ---
 
 # Quality Assurance
@@ -38,8 +38,8 @@ Apply the same structure for pytest (`def test_…`, `assert result == expected`
 - Assert specific outcomes (`expect(result).toBe(90)`), not just truthiness
 - Run tests in CI/CD; document and remediate coverage gaps
 - **Minimize tests** — iterate and expand existing tests before writing new ones; prefer one parameterized test over many similar tests
-- **Keep tests alive** — update existing tests when code changes rather than letting them go stale or adding new ones; dead tests are dead code, remove them
-- **Match the database strategy to the test layer**: unit tests use mocks/in-memory; integration and contract tests use a dedicated test database (never production); E2E tests use real infrastructure (Docker)
+- **Keep tests alive** — update existing tests when code changes, preserve their intent, and consolidate overlap before adding new files; do not remove existing tests without explicit approval or repo policy support
+- **Match the database strategy to the test layer**: unit tests use no DB or in-memory fakes; integration and contract tests use a dedicated test database (never production); E2E and smoke tests use a production-like harness only when lower layers cannot prove the behavior
 - Include **contract tests** for service boundaries (API schemas, message formats, inter-service interfaces)
 - Include **component tests** for stateful UI components and non-trivial frontend logic (distinct from unit tests for pure functions)
 - For systems with LLMs, agents, or RAG: include **AI evals** alongside traditional tests (see AI evals section below)
@@ -50,7 +50,7 @@ Apply the same structure for pytest (`def test_…`, `assert result == expected`
 - Create order-dependent tests — each test must be independently runnable
 - Ignore flaky tests — quarantine and fix them; don't just re-run until green
 - Test implementation details (internal method calls) — test observable behaviour
-- Leave **dead test code** — tests that never run, always skip, or test code that no longer exists must be deleted
+- Delete, weaken, or silently skip existing tests without explicit approval; if a test is stale, rewrite or consolidate it while preserving the behavior it was supposed to prove
 
 ## Start Here
 
@@ -77,7 +77,7 @@ Apply the same structure for pytest (`def test_…`, `assert result == expected`
 - At scale, speed comes from suite architecture, hermetic setup, sharding, disciplined test selection, and high-signal artifacts.
 - **Prefer fewer, stronger tests.** A single well-scoped test that covers a real user path beats three micro-tests of internal plumbing.
 - **When code changes, update its tests in the same commit.** Never leave tests silently asserting stale behavior.
-- **Remove dead tests immediately.** A test that always passes without ever having been observed to fail, or that covers deleted code, is dead code — delete it.
+- **Preserve test intent.** If a test is obsolete or redundant, replace it with a smaller proof or consolidate it into stronger coverage, but do not remove or weaken it without explicit sign-off.
 
 ## QA Router
 
@@ -143,14 +143,14 @@ Read [references/ai-evals.md](./references/ai-evals.md) for:
 
 ### Coverage assessment and improvement
 
-Use this workflow when coverage drops below targets, coverage thresholds fail in CI, or the user requests stronger test coverage.
+Use this workflow when coverage drops below targets, coverage thresholds fail in CI, coverage artifacts look stale or incomplete, or the user requests stronger test coverage.
 
 **Workflow (always confirm with the user before writing any code):**
 
 1. **Run coverage** — execute `make coverage` (Python) or `pnpm test:coverage` / `npm run test:coverage` (Node.js) at the repo root. Avoid watch flags. Keep prior artifacts only when comparing trends.
 2. **Parse summaries efficiently:**
    - Prefer console output from `coverage report -m` for file-level totals.
-   - Fallback to `coverage.xml` for tooling or spreadsheets.
+   - Collect `.coverage` and `coverage.xml` when available; use them for tooling, comparisons, or spreadsheets.
    - Run `uv run coverage html` (Python) or equivalent to generate `htmlcov/index.html` for interactive drill-down.
 3. **Summarize coverage** — report total percentages, lowest-coverage files, and uncovered lines/paths.
 4. **Prioritize targets:**
@@ -159,14 +159,19 @@ Use this workflow when coverage drops below targets, coverage thresholds fail in
    - Recent bug fixes or risky paths (error handling, retries, timeouts, concurrency).
 5. **Draft test ideas** — for each target file: scenario, behavior under test, expected outcome, and estimated coverage gain.
 6. **Ask the user for approval** — present a numbered, concise list of proposed test additions and expected gains. **Pause and wait for explicit confirmation before editing any code or fixtures.**
-7. **Implement and verify** — after approval, write tests, rerun coverage, report the updated summary, and note any remaining low-coverage areas.
+7. **Implement and verify** — after approval, write tests in `tests/` or the repo's established test directory, rerun coverage, run `$code-change-verification`, report the updated summary, and note any remaining low-coverage areas.
 
 **Design principles for high-impact tests:**
 - Hit uncovered paths: error cases, boundary inputs, optional flags, cancellation/timeouts.
 - Cover combinational logic rather than trivial happy paths already tested elsewhere.
+- Place tests with the existing suite structure instead of inventing a new location.
 - Avoid flaky async timing — use proper async fixtures or mocking instead.
 
 > For pytest coverage tooling (`--cov`, `--cov-report`, annotate workflow for reaching 100%) see `references/pytest.md`. For coverage targets by area and the coverage lagging-indicator rule see `references/test-strategy.md`.
+
+**Execution notes:**
+- Keep added comments, test names, and code in English unless the repo already uses another language convention.
+- If coverage artifacts are missing or obviously stale, rerun the coverage command instead of inferring gaps from old files.
 
 ### Backend-heavy QA
 
@@ -174,6 +179,8 @@ Read [references/backend-testing.md](./references/backend-testing.md) for:
 - APIs, services, jobs, queues, migrations, and contracts
 - common backend stack patterns
 - database and concurrency concerns
+
+For Python-specific backend test design around proving-layer selection, TDD-first bug fixing, service vs transport coverage, Celery tasks, signals, serializers, and mock-boundary rules, also read [references/python-backend-tests.md](./references/python-backend-tests.md).
 
 **Database strategy by test layer:**
 
@@ -205,6 +212,7 @@ Read [references/pytest.md](./references/pytest.md) when writing Python tests wi
 - common pitfalls: execution-order dependencies, resource leaks, testing implementation details
 
 For **Django/DRF** tests (Factory Boy, model/serializer/view tests) see the section below.
+For broader **Python backend testing workflow** guidance, read [references/python-backend-tests.md](./references/python-backend-tests.md).
 
 ### Django / DRF backend testing
 
@@ -217,6 +225,8 @@ Read [references/django-drf-testing.md](./references/django-drf-testing.md) for:
 - generating realistic test data with Faker
 - debugging common Django/DRF failure patterns: missing migration, new required field, permission added, stale mock
 - ready-to-use test class templates for models, serializers, and API endpoints
+
+For cross-cutting guidance on proving-layer selection, Celery and signal testing, external auth flows, anti-patterns, and outcome-focused assertions, also read [references/python-backend-tests.md](./references/python-backend-tests.md).
 
 ### Test planning and documentation
 
@@ -980,73 +990,22 @@ Read [references/security-testing.md](./references/security-testing.md) when add
 - Security test checklist by category (Auth, Input, Access, Rate Limit, Headers, Data)
 - Vulnerability quick reference: SQL injection, NoSQL injection, XSS, CSRF, auth bypass, JWT confusion, SSRF, command injection
 
-### Autonomous penetration testing (Shannon)
+### Pentest handoff
 
-Use when the user wants to run an active pentest against a staging or sandbox web application, confirm that identified vulnerabilities are actually exploitable with proof-of-concept evidence, or generate a security assessment report from confirmed exploits. Do not use against production systems or targets without explicit written authorization.
+Active offensive testing moved to [skills/pentest/SKILL.md](../pentest/SKILL.md).
 
-Read [references/pentesting-shannon.md](./references/pentesting-shannon.md) for:
-- What Shannon is and when it's appropriate to use (authorization requirements, staging only)
-- Quick-start commands (`npx @keygraph/shannon setup`, `start`, `logs`, `workspaces`, `stop`)
-- The **five-phase methodology**: Pre-Reconnaissance → Reconnaissance → Parallel Analysis → Exploitation → Reporting
-- **41 vulnerability checkpoints** organized by class:
-  - Broken Authentication & Authorization (9): default creds, JWT algorithm confusion, mass assignment, privilege escalation
-  - SQL Injection: UNION-based, boolean/time blind, NoSQL operators, auth bypass
-  - Command Injection: OS command execution, semicolon injection
-  - XSS (8): reflected, stored, DOM-based, Angular sanitization bypass
-  - SSRF: cloud metadata endpoints, auth header forwarding
-  - Session Management (6): fixation, CSRF, logout flaws, token storage
-  - Input Validation (7): SSTI, code injection, path traversal, file upload bypass, XXE
-  - Information Gathering (5): fingerprinting, error disclosure, subdomain takeover
-- Real proof-of-concept patterns from confirmed exploits (JWT confusion, SSRF with auth forwarding, NoSQL injection, mass assignment)
-- **Security assessment report structure** with PoC evidence, CVSS scores, and remediation guidance
-- Workspace resumption — continue interrupted scans without repeating completed phases
-- Shannon vs. manual testing comparison — when to use each
-- Integration point in the full QA security workflow: after threat modeling and before security requirement extraction
+Use `pentest` when the user wants:
+- Authorized penetration testing against a staging or sandbox target
+- Exploit validation with proof-of-concept evidence
+- Shannon-based autonomous pentesting
+- Manual pentest payload guidance, OWASP offensive checklists, or disclosure templates
+- Pentest report generation
 
-### Manual penetration testing
-
-Use when performing authorized, hands-on offensive security testing without automated tooling, designing a pentest engagement, or reviewing an existing security assessment report. Requires **written authorization** from the system owner — unauthorized testing is illegal under the CFAA and equivalent laws.
-
-Read [references/attack-patterns.md](./references/attack-patterns.md) for safe, non-destructive test payloads organized by vulnerability class:
-- **XSS**: Reflected (basic, filter bypass, URL-encoded, context-specific), Stored, and DOM-based payloads with source/sink mapping
-- **SQL Injection**: Error-based, union-based, time-based blind, and boolean-based blind; database-specific syntax table (MySQL, PostgreSQL, MSSQL, SQLite)
-- **SSRF**: Internal IP payloads, cloud metadata endpoints (AWS IMDSv1/v2, GCP, Azure, DigitalOcean), IP encoding bypass tricks, URL parsing inconsistency exploits
-- **JWT Manipulation**: Decode-without-verification, none-algorithm attack, RS256→HS256 confusion, claim manipulation, weak secret brute force, JWKS injection
-- **API Authorization (IDOR/BOLA)**: Two-account testing methodology, ID manipulation (sequential, UUID, base64, hash), BFLA testing, mass assignment
-- **GraphQL**: Introspection query, depth/complexity/batch/alias attacks, field suggestion exploitation, authorization bypass via fragments
-- **Rate Limiting Bypass**: IP header spoofing, case/path/method/encoding variations
-- **Static Analysis Configs**: CodeQL custom query (SQL injection), Semgrep rules (hardcoded JWT secret, unsafe yaml.load, missing Helmet), ESLint security plugin configuration
-
-Read [references/owasp-top-10-checklist.md](./references/owasp-top-10-checklist.md) for per-category OWASP Top 10 (2021) coverage including test procedures, bad/good code examples, remediation steps, and CVSS scoring guidance across all 10 categories (A01–A10).
-
-For automated OWASP checklist generation and regex-based source code scanning (13 built-in rules: SQL injection, XSS, command injection, hardcoded secrets, unsafe deserialization, SSRF, path traversal, JWT with hardcoded secret), run:
-```bash
-python <skill-dir>/scripts/vulnerability_scanner.py --target web --scope full [--code /path/to/repo]
-```
-
-For multi-ecosystem dependency auditing (npm, pip, Go, Ruby) against a built-in CVE database with risky pattern detection:
-```bash
-python <skill-dir>/scripts/dependency_auditor.py --file package.json [--severity high] [--json]
-```
-
-To generate a structured pentest report from a JSON findings file:
-```bash
-python <skill-dir>/scripts/pentest_report_generator.py findings.json [--format markdown]
-# Use --sample to generate a template findings JSON
-```
-
-Read [references/responsible-disclosure.md](./references/responsible-disclosure.md) for:
-- **Timeline templates**: Standard 90-day (day-by-day actions), Accelerated 30-day (CVSS 9.0+), Extended 120-day (complex architectural changes)
-- **Communication templates**: Initial report, 7-day follow-up, 30-day status request, Day-80 pre-disclosure notice, public disclosure statement
-- **Legal considerations**: CFAA/CMA compliance, authorization requirements, scope boundaries, data handling during testing
-- **Bug bounty integration**: Finding the right program, best practices, process when no program exists
-- **CVE request process**: When to request, how to submit (vendor CNA, MITRE, platform CNAs), required information
-
-**Anti-patterns for manual pentesting:**
-- Never test production systems without explicit authorization
-- Do not rely exclusively on automated tools — automation misses business logic flaws
-- Do not skip remediation guidance in the final report
-- Security testing is not a one-time event — integrate it into the release cycle
+Keep using `quality-assurance` for:
+- Passive code and architecture review
+- Secure coding guidance and security test design
+- Threat modeling, requirement extraction, and compliance mapping
+- Dependency and vulnerability management as part of engineering hygiene
 
 ### Claude Code configuration security scan
 

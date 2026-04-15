@@ -1,6 +1,6 @@
 # Daily Log Template
 
-Development logs go in `docs/memories/logs/YYYY/MM-DD/*.md` — always append to the latest existing file, never create new files unless today's date directory doesn't exist yet.
+Development logs go in `docs/memories/logs/YYYY/YYYY-MM-DD/*.md` — always append to the latest existing file, never create new files unless today's date directory doesn't exist yet.
 
 ---
 
@@ -79,11 +79,11 @@ These are not useful to anyone — they contain no searchable information.
 ```bash
 # Find the latest year/day directory
 YEAR=$(ls docs/memories/logs/ | sort | tail -1)
-DAY=$(ls docs/memories/logs/$YEAR/ | sort | tail -1)
-FILE=$(ls docs/memories/logs/$YEAR/$DAY/ | sort | tail -1)
+DATE_DIR=$(ls docs/memories/logs/$YEAR/ | sort | tail -1)
+FILE=$(ls docs/memories/logs/$YEAR/$DATE_DIR/ | sort | tail -1)
 
 # Append to it
-echo "- Your log entry here" >> docs/memories/logs/$YEAR/$DAY/$FILE
+echo "- Your log entry here" >> docs/memories/logs/$YEAR/$DATE_DIR/$FILE
 ```
 
 Or use: `skills/code-documentation/scripts/find-docs.sh log`

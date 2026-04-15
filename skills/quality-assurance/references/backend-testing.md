@@ -4,11 +4,23 @@
 
 Use this reference for backend or service-heavy systems: APIs, domain services, databases, queues, schedulers, external integrations, and migrations.
 
+For Python-specific backend test design with pytest, Django/DRF, Celery, signals, and serializer/view patterns, also read [python-backend-tests.md](./python-backend-tests.md).
+
+## Purpose and philosophy
+
+Backend QA should bias toward the cheapest proof that still exercises the behavior users depend on.
+
+- prefer workflow-level or class-level tests when the bug risk lives at boundaries between routing, validation, persistence, and async handoff
+- keep pure transformations and policy decisions in fast unit tests
+- treat heavy operational scripts, migration checks, and production-like harnesses as supplements to automated tests, not replacements
+- preserve existing test intent; consolidate overlap instead of deleting coverage casually
+
 ## Policy First
 
 - Read repo-local rules before deciding whether tests may be run, which suites are mandatory, where tests live, and what evidence format is expected.
 - If the repo or user does not want tests run proactively, still choose the right proof path and state what should be run later.
 - Choose the lowest environment that can prove the claim: in-memory, test DB, containerized stack, or production-like harness.
+- Align new tests to the repo's current layout. If the repo already has `unit`, `integration`, `e2e`, `smoke`, `contract`, or `scripts` directories, reuse them rather than inventing new top-level buckets.
 
 ## Test shape by layer
 
@@ -64,6 +76,11 @@ Test migration and rollout risk when schemas change:
 - backfills on realistic data volume if the change is risky
 - enqueue-after-commit or equivalent transaction handoff when async work follows writes
 
+Default environment choices:
+- **No database** for pure logic, deterministic transformations, and policy functions
+- **Dedicated test database** for ORM behavior, serializers, handlers, service objects, and most async integration tests
+- **Production-like harness** for engine-specific behavior, queue semantics, network topology, or rollout validation that lower-fidelity environments cannot prove
+
 ## Jobs, queues, and async workers
 
 For background work:
@@ -80,6 +97,17 @@ Common bugs to catch:
 - handlers that do too much instead of delegating to an owning service
 
 If the repo uses signals, webhooks, or schedulers, prefer at least one test path that triggers the real entrypoint when the handoff itself matters.
+
+## Operational verification scripts
+
+Some backend risks are too expensive or environment-specific for the normal PR suite. Put those checks in repo-local validation scripts or dedicated ops workflows when needed:
+
+- schema or migration validation on realistic data
+- infra-bound connectivity checks
+- queue, scheduler, or cron verification
+- auth flow verification against sanctioned test environments
+
+These scripts should produce repeatable evidence and complement the main automated suite.
 
 ## External integrations
 

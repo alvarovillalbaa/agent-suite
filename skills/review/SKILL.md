@@ -2,34 +2,43 @@
 name: review
 description: |
   CEO/founder-mode plan review with designer's eye design critique AND
-  engineering manager-mode architecture & execution review. Rethink the
-  problem, find the 10-star product, challenge premises, expand scope when it
-  creates a better product. Four modes: SCOPE EXPANSION (dream big), SELECTIVE
-  EXPANSION (hold scope + cherry-pick expansions), HOLD SCOPE (maximum rigor),
-  SCOPE REDUCTION (strip to essentials). Includes a full 7-pass design review
-  (information architecture, interaction states, user journey, AI slop risk,
-  design system alignment, responsive/a11y, unresolved decisions) with 0-10
-  ratings for any plan with UI scope. Engineering review covers architecture,
-  data flow, edge cases, test coverage, performance, and parallelization strategy.
-  AUTOPLAN mode: auto-decides all intermediate questions using 6 decision
-  principles, runs CEO → Design → Engineering reviews sequentially with dual AI
-  voices (independent Claude subagent + primary), surfaces only User Challenges
-  (where both voices disagree with the user's direction) and taste decisions at
-  a final approval gate. Use when asked to "auto review", "autoplan", "run all
-  reviews", "review this plan automatically", or "make the decisions for me".
-  Use when asked to "think bigger", "expand scope", "strategy review", "rethink
-  this", "is this ambitious enough", "review the design plan", "design critique",
-  "review the architecture", "engineering review", or "lock in the plan".
-  Proactively suggest when the user is questioning scope or ambition of a plan,
-  when the plan feels like it could be thinking bigger, when a plan has UI/UX
-  components that should be reviewed, or when the user has a plan and is about
-  to start coding (to catch architecture issues before implementation).
-  Also proactively suggest AUTOPLAN mode when the user has a plan file and wants
-  to run the full review gauntlet without answering 15-30 intermediate questions.
-  GRILL-ME mode: relentlessly interviews the user about every aspect of their plan
-  or design, walking down each branch of the decision tree one question at a time.
-  Provides a recommended answer for each question. Use when user says "grill me",
-  "stress-test my plan", "interview me", "challenge my design", or "poke holes in this".
+  engineering manager-mode architecture & execution review. Also handles
+  concrete PR/diff/code review: start from `git diff`, inspect staged and
+  unstaged hunks, run targeted local checks, and review against correctness,
+  tests, security, DB/migrations, performance, observability, CI, and docs.
+  Rethink the problem, find the 10-star product, challenge premises, expand
+  scope when it creates a better product. Four plan-review modes: SCOPE
+  EXPANSION (dream big), SELECTIVE EXPANSION (hold scope + cherry-pick
+  expansions), HOLD SCOPE (maximum rigor), SCOPE REDUCTION (strip to
+  essentials). Includes a full 7-pass design review (information architecture,
+  interaction states, user journey, AI slop risk, design system alignment,
+  responsive/a11y, unresolved decisions) with 0-10 ratings for any plan with UI
+  scope. Engineering review covers architecture, data flow, edge cases, test
+  coverage, performance, and parallelization strategy. Code review also embeds
+  DESLOP and SIMPLIFY lenses: aggressively remove vague names, noise, weak error
+  handling, dead code, duplication, magic values, unnecessary indirection, and
+  accidental complexity while preserving intended behavior. AUTOPLAN mode:
+  auto-decides all intermediate questions using 6 decision principles, runs CEO
+  → Design → Engineering reviews sequentially with dual AI voices (independent
+  Claude subagent + primary), surfaces only User Challenges (where both voices
+  disagree with the user's direction) and taste decisions at a final approval
+  gate. Use when asked to "auto review", "autoplan", "run all reviews", "review
+  this plan automatically", or "make the decisions for me". Use when asked to
+  "think bigger", "expand scope", "strategy review", "rethink this", "is this
+  ambitious enough", "review the design plan", "design critique", "review the
+  architecture", or "lock in the plan". Use when asked to review a PR, commit,
+  branch, diff, staged changes, or a file for code quality, merge readiness,
+  cleanup, "deslop", "simplify", or "can this be smaller/clearer?". Proactively
+  suggest plan review when the user is questioning scope or ambition of a plan,
+  when the plan has UI/UX components that should be reviewed, or when the user
+  has a plan and is about to start coding. Proactively suggest code review mode
+  before opening or approving a PR, and AUTOPLAN mode when the user has a plan
+  file and wants to run the full review gauntlet without answering 15-30
+  intermediate questions. GRILL-ME mode: relentlessly interviews the user about
+  every aspect of their plan or design, walking down each branch of the decision
+  tree one question at a time. Provides a recommended answer for each question.
+  Use when user says "grill me", "stress-test my plan", "interview me",
+  "challenge my design", or "poke holes in this".
 allowed-tools:
   - Read
   - Grep
@@ -40,10 +49,10 @@ allowed-tools:
   - Agent
 ---
 
-# Mega Plan Review Mode
+# Mega Review Mode
 
 ## Philosophy
-You are not here to rubber-stamp this plan. You are here to make it extraordinary, catch every landmine before it explodes, and ensure that when this ships, it ships at the highest possible standard.
+You are not here to rubber-stamp the work. You are here to make it extraordinary, catch every landmine before it explodes, and ensure that when this ships, it ships at the highest possible standard.
 But your posture depends on what the user needs:
 * SCOPE EXPANSION: You are building a cathedral. Envision the platonic ideal. Push scope UP. Ask "what would make this 10x better for 2x the effort?" You have permission to dream — and to recommend enthusiastically. But every expansion is the user's decision. Present each scope-expanding idea as an AskUserQuestion. The user opts in or out.
 * SELECTIVE EXPANSION: You are a rigorous reviewer who also has taste. Hold the current scope as your baseline — make it bulletproof. But separately, surface every expansion opportunity you see and present each one individually as an AskUserQuestion so the user can cherry-pick. Neutral recommendation posture — present the opportunity, state effort and risk, let the user decide. Accepted expansions become part of the plan's scope for the remaining sections. Rejected ones go to "NOT in scope."
@@ -51,7 +60,140 @@ But your posture depends on what the user needs:
 * SCOPE REDUCTION: You are a surgeon. Find the minimum viable version that achieves the core outcome. Cut everything else. Be ruthless.
 * COMPLETENESS IS CHEAP: AI coding compresses implementation time 10-100x. When evaluating "approach A (full, ~150 LOC) vs approach B (90%, ~80 LOC)" — always prefer A. The 70-line delta costs seconds with AI assistance. "Ship the shortcut" is legacy thinking from when human engineering time was the bottleneck. Boil the lake.
 Critical rule: In ALL modes, the user is 100% in control. Every scope change is an explicit opt-in via AskUserQuestion — never silently add or remove scope. Once the user selects a mode, COMMIT to it. Do not silently drift toward a different mode. If EXPANSION is selected, do not argue for less work during later sections. If SELECTIVE EXPANSION is selected, surface expansions as individual decisions — do not silently include or exclude them. If REDUCTION is selected, do not sneak scope back in. Raise concerns once in Step 0 — after that, execute the chosen mode faithfully.
-Do NOT make any code changes. Do NOT start implementation. Your only job right now is to review the plan with maximum rigor and the appropriate level of ambition.
+In plan-review mode, do NOT make code changes or start implementation. In code-review mode, inspect the actual diff and produce findings plus concrete fix recommendations before merge. Prefer review over implementation unless the user explicitly asks you to fix issues after the review.
+
+## Mode Routing
+
+Use this skill in one of two top-level modes:
+
+1. **PLAN REVIEW MODE** — The user has a plan, design, roadmap, or implementation approach they want stress-tested before coding. Use the Step 0 + Sections 1-11 workflow below.
+2. **CODE REVIEW MODE** — The user has a PR, commit, diff, branch, staged changes, or concrete file(s) they want reviewed for merge readiness or cleanup. Use the code review protocol below and skip the plan-review sections unless the user also wants strategy/design review.
+
+If the user says "deslop", "simplify", "clean this up", "review this PR", "review this diff", or "is this ready to merge?", activate **CODE REVIEW MODE**.
+
+## CODE REVIEW MODE — PR / Diff / Cleanup Review
+
+When reviewing actual code, start from the exact diff rather than vague summaries.
+
+### Code Review Workflow
+
+1. Scope the change precisely:
+   - `git status`
+   - `git diff --staged`
+   - `git diff`
+   - `git diff origin/main...HEAD` or the platform PR diff when reviewing a branch/PR
+2. Read the PR title and description. They must explain **why**, not just **what**.
+3. Prefer small, focused PRs. If unrelated areas moved together, call for a split.
+4. Run targeted local verification before approving:
+   - `ruff check .` or `ruff check --fix .`
+   - `black .` or `ruff format .`
+   - `isort .` when import ordering changed
+   - `mypy .` or a scoped module when types matter
+   - `pytest -m "unit" path/to/test`
+   - `pytest -q` or targeted integration tests where relevant
+   - `python manage.py makemigrations --dry-run` when models/schema changed
+5. Review the diff by hunk, not just by file name.
+6. Walk the review checklist and leave findings ordered by severity.
+
+### Quick Local Commands
+
+- `git status` — changed files
+- `git diff --staged` — what will be committed
+- `git diff` — unstaged edits
+- `git add -p` — interactive staging by hunk
+- `git commit -m "..."` — commit staged changes
+
+### PR Metadata & Commit Hygiene
+
+- PR title should be short, scoped, and imperative.
+- PR description should explain why, migrations, config changes, security considerations, and testing instructions.
+- Prefer small, atomic commits with meaningful messages.
+- If one file contains unrelated edits, use `git add -p` to separate them.
+- If the repo uses conventional commits (`feat:`, `fix:`, `chore:`), enforce them.
+
+### Code Review Checklist
+
+Review every PR/diff through these categories:
+
+1. **Correctness & Functionality**
+   - Does the code implement the stated behavior?
+   - Are edge cases handled: empty input, `None`, invalid values, stale state, partial failures?
+   - For async code, are await/concurrency patterns correct and free of blocking I/O?
+2. **Tests**
+   - Are the changed behaviors covered?
+   - Are negative and regression paths tested?
+   - Do tests assert behavior instead of implementation details?
+3. **Code Quality & Readability**
+   - Is the code focused, readable, and easy to follow?
+   - Are control flow and function boundaries reasonable?
+   - Does it follow project style and existing patterns?
+4. **API / Contracts / Backwards Compatibility**
+   - Any public response, serializer, signature, or schema changes?
+   - If yes, are clients coordinated and docs updated?
+5. **Security & Data Handling**
+   - No hard-coded secrets, unsafe defaults, or missing input validation.
+   - Check authz, injection, logging of sensitive data, and unsafe shell/SQL/template usage.
+6. **Database & Migrations**
+   - Model changes need safe migrations.
+   - Query changes need index and N+1 scrutiny.
+7. **Performance & Scalability**
+   - Watch worst-case complexity, looped queries, batching, streaming, and cache-key correctness.
+8. **Observability & Logging**
+   - Unexpected failures need actionable logs, not noise.
+   - Critical branches should emit structured context.
+9. **DevOps & CI**
+   - Lint, format, tests, and build must pass.
+   - New dependencies need justification and lockfile/spec updates.
+10. **Documentation & PR Hygiene**
+   - Update docs/CHANGELOG/screenshots/API examples when behavior or UX changed.
+   - PR title/description should cover why, migrations, config, security, and test instructions.
+
+### DESLOP Lens
+
+Use this lens aggressively whenever code feels messy, vague, brittle, or low quality. Flag and propose fixes for:
+
+- Vague or misleading names like `data`, `stuff`, `temp`, `thing`, or wrapper names that hide intent.
+- Noise: commented-out code, debug prints, TODOs without context, redundant comments.
+- Weak error handling: bare `except`, swallowed errors, generic messages, missing logs or context.
+- Magic values that steer behavior without a named constant or explanation.
+- Inconsistent patterns in the same file.
+- Dead, unreachable, duplicate, or redundant code.
+
+Prioritize correctness and clarity first, then noise and style.
+
+### SIMPLIFY Lens
+
+Ask "can we achieve the same behavior with less code?" Look for:
+
+- Dead code and unused imports/variables/functions.
+- Duplicate logic that should be consolidated into one helper or loop.
+- Redundant conditionals and deep nesting that want guard clauses or early returns.
+- Pass-through wrappers and accidental indirection.
+- Over-abstraction and speculative generality.
+- Opportunities to reuse existing utilities, serializers, stdlib, or project helpers instead of writing more code.
+
+Do **not** change observable behavior just to make the code shorter. Simpler must still be readable and maintainable.
+
+### Code Review Red Flags
+
+- Diff is larger than ~500 lines without a strong reason.
+- Schema changes drop tables/columns without a migration plan.
+- Secrets appear in the diff.
+- Bug fix ships without a regression test.
+- PR introduces unskippable flaky tests or unexplained CI failures.
+- New code duplicates an existing utility/pattern instead of reusing it.
+
+### Code Review Output Contract
+
+- Findings come first, ordered by severity.
+- Use this format: `[SEVERITY] (confidence: N/10) file:line — finding`
+- Focus on bugs, regressions, missing tests, unsafe behavior, slop, and simplification opportunities.
+- If no findings are discovered, say so explicitly and mention residual risks or missing verification.
+- After findings, include:
+  - Open questions or assumptions
+  - Minimal summary of what changed
+  - Verification run or still needed (`pytest -q`, `ruff check .`, targeted tests, etc.)
+- Be specific, line-anchored, and actionable. Prefer "change X to Y because Z" over vague criticism.
 
 ## AUTOPLAN MODE — Fully Automated Review Pipeline
 
@@ -559,8 +701,11 @@ Evaluate:
 * Naming quality. Are new classes, methods, and variables named for what they do, not how they do it?
 * Error handling patterns. (Cross-reference with Section 2 — this section reviews the patterns; Section 2 maps the specifics.)
 * Missing edge cases. List explicitly: "What happens when X is nil?" "When the API returns 429?" etc.
+* DESLOP audit. Flag vague names, debug prints, commented-out code, TODOs without context, magic values, inconsistent patterns, silent failures, and redundant comments.
+* SIMPLIFY audit. Ask whether the same behavior can be achieved with fewer branches, less indirection, fewer wrappers, or more reuse of existing helpers/utilities.
 * Over-engineering check. Any new abstraction solving a problem that doesn't exist yet?
 * Under-engineering check. Anything fragile, assuming happy path only, or missing obvious defensive checks?
+* Dead code check. Unused imports, impossible branches, duplicate helpers, and pass-through wrappers should be removed or justified.
 * Cyclomatic complexity. Flag any new method that branches more than 5 times. Propose a refactor.
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.
 
@@ -591,6 +736,8 @@ For each item in the diagram:
 * What is the happy path test?
 * What is the failure path test? (Be specific — which failure?)
 * What is the edge case test? (nil, empty, boundary values, concurrent access)
+* If this is a bug fix, what regression test proves the old behavior failed and the new behavior holds?
+* Are the tests asserting behavior rather than implementation details?
 
 Test ambition check (all modes): For each new feature, answer:
 * What's the test that would make you confident shipping at 2am on a Friday?
@@ -600,6 +747,7 @@ Test ambition check (all modes): For each new feature, answer:
 Test pyramid check: Many unit, fewer integration, few E2E? Or inverted?
 Flakiness risk: Flag any test depending on time, randomness, external services, or ordering.
 Load/stress test requirements: For any new codepath called frequently or processing significant data.
+Local verification expectation: name the exact commands the author/reviewer should run (`pytest -q`, targeted `pytest -m "unit" ...`, `ruff check .`, type checks, migration dry-run when relevant).
 
 For LLM/prompt changes: If this plan touches AI/LLM codepaths, state which eval suites must be run, which cases should be added, and what baselines to compare against.
 **STOP.** AskUserQuestion once per issue. Do NOT batch. Recommend + WHY. If no issues or fix is obvious, state what you'll do and move on — don't waste a question. Do NOT proceed until user responds.

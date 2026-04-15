@@ -50,10 +50,10 @@ After the learning artifacts are written, check whether the knowledge should als
 - `PRINCIPLES.md` for decision heuristics.
 - Service docs such as `README.md`, `ARCHITECTURE.md`, `TESTS.md`, `SETUP.md` when teammates benefit.
 - **`docs/memories/`** for human-readable documentation of discoveries — the shared team knowledge base:
-  - `docs/memories/lessons/YYYY/MM-DD/` — verified insights that should change future behavior
-  - `docs/memories/facts/YYYY/MM-DD/` — stable facts about team/company/project context
-  - `docs/memories/procedures/YYYY/MM-DD/` — repeatable workflows discovered during work
-  - `docs/memories/fixes/YYYY/MM-DD/` — solutions to non-obvious errors
+  - `docs/memories/lessons/YYYY/YYYY-MM-DD/` — verified insights that should change future behavior
+  - `docs/memories/facts/YYYY/YYYY-MM-DD/` — stable facts about team/company/project context
+  - `docs/memories/procedures/YYYY/YYYY-MM-DD/` — repeatable workflows discovered during work
+  - `docs/memories/fixes/YYYY/YYYY-MM-DD/` — solutions to non-obvious errors
 
 **Documentation placement rules** (what goes where in `docs/`) are owned by the `code-documentation` skill. Read `skills/code-documentation/SKILL.md` before writing to `docs/` to ensure placement is correct.
 

@@ -296,6 +296,8 @@ type Output = { name: string; age: number; active: boolean }"
 "Do NOT include markdown code blocks. Do NOT add explanations."
 ```
 
+If the response must satisfy deterministic field-level syntax or an enumerated action space, move from prompt-only structured output to constrained generation. See [guidance-constrained-generation.md](./guidance-constrained-generation.md).
+
 ---
 
 ## 6. Self-Consistency

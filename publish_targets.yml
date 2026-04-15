@@ -2,15 +2,15 @@
 skills:
   code-slides:
     repo: alvarovillalbaa/code-slides
-  quality-assurance:
-    repo: alvarovillalbaa/quality-assurance
-  cloud-management:
-    repo: alvarovillalbaa/cloud-management
-  code-documentation:
-    repo: alvarovillalbaa/code-documentation
-  seo-and-geo:
-    repo: alvarovillalbaa/seo-and-geo
+  # quality-assurance:
+  #   repo: alvarovillalbaa/quality-assurance
+  # cloud-management:
+  #   repo: alvarovillalbaa/cloud-management
+  # code-documentation:
+  #   repo: alvarovillalbaa/code-documentation
+  # seo-and-geo:
+  #   repo: alvarovillalbaa/seo-and-geo
   agentic-development:
     repo: alvarovillalbaa/agentic-driven-development
-  video-generation:
-    repo: alvarovillalbaa/video-generation
+  # video-generation:
+  #   repo: alvarovillalbaa/video-generation

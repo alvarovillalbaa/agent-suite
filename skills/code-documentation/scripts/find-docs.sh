@@ -11,7 +11,7 @@ set -euo pipefail
 
 TODAY=$(date +%Y-%m-%d)
 YEAR=$(date +%Y)
-MONTH_DAY=$(date +%m-%d)
+DATE_DIR=$(date +%Y-%m-%d)
 DOCS_ROOT="docs"
 
 # Find repo root (walk up until we find a docs/ directory or .git)
@@ -49,13 +49,13 @@ case "$cmd" in
             echo "  echo '- Your log entry here' >> $LOG_DIR/$LATEST_YEAR/$LATEST_DAY/$LATEST_FILE"
         else
             echo "No docs/memories/logs/ directory found in repo root: $REPO_ROOT"
-            echo "Create it with: mkdir -p $REPO_ROOT/$DOCS_ROOT/memories/logs/$YEAR/$MONTH_DAY"
-            echo "Then create:    touch $REPO_ROOT/$DOCS_ROOT/memories/logs/$YEAR/$MONTH_DAY/dev.md"
+            echo "Create it with: mkdir -p $REPO_ROOT/$DOCS_ROOT/memories/logs/$YEAR/$DATE_DIR"
+            echo "Then create:    touch $REPO_ROOT/$DOCS_ROOT/memories/logs/$YEAR/$DATE_DIR/dev.md"
         fi
         ;;
 
     audit)
-        AUDIT_DIR="$REPO_ROOT/$DOCS_ROOT/audits/$YEAR/$MONTH_DAY"
+        AUDIT_DIR="$REPO_ROOT/$DOCS_ROOT/audits/$YEAR/$DATE_DIR"
         echo "New audit location: $AUDIT_DIR/"
         echo ""
         echo "Create with:"
@@ -104,7 +104,7 @@ case "$cmd" in
 
         # Memory logs
         LOG_DIR="$REPO_ROOT/$DOCS_ROOT/memories/logs"
-        echo "📓 MEMORY LOGS (docs/memories/logs/YYYY/MM-DD/)"
+        echo "📓 MEMORY LOGS (docs/memories/logs/YYYY/YYYY-MM-DD/)"
         if [[ -d "$LOG_DIR" ]]; then
             LATEST_YEAR=$(ls "$LOG_DIR" 2>/dev/null | sort | tail -1)
             if [[ -n "$LATEST_YEAR" ]]; then
@@ -116,25 +116,25 @@ case "$cmd" in
             fi
         else
             echo "   Not found — expected: $LOG_DIR/"
-            echo "   New log: $LOG_DIR/$YEAR/$MONTH_DAY/dev.md"
+            echo "   New log: $LOG_DIR/$YEAR/$DATE_DIR/dev.md"
         fi
         echo ""
 
         # Memory lessons/facts/procedures/fixes
-        echo "🧠 MEMORY ARTIFACTS (docs/memories/<type>/YYYY/MM-DD/)"
+        echo "🧠 MEMORY ARTIFACTS (docs/memories/<type>/YYYY/YYYY-MM-DD/)"
         for TYPE in lessons facts procedures fixes; do
             MEM_DIR="$REPO_ROOT/$DOCS_ROOT/memories/$TYPE"
             if [[ -d "$MEM_DIR" ]]; then
                 COUNT=$(find "$MEM_DIR" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
                 echo "   $TYPE: $COUNT file(s)"
             else
-                echo "   $TYPE: not found — new: $MEM_DIR/$YEAR/$MONTH_DAY/"
+                echo "   $TYPE: not found — new: $MEM_DIR/$YEAR/$DATE_DIR/"
             fi
         done
         echo ""
 
         # Audits
-        echo "📊 AUDITS (docs/audits/YYYY/MM-DD/)"
+        echo "📊 AUDITS (docs/audits/YYYY/YYYY-MM-DD/)"
         AUDIT_BASE="$REPO_ROOT/$DOCS_ROOT/audits"
         if [[ -d "$AUDIT_BASE" ]]; then
             RECENT=$(find "$AUDIT_BASE" -name "*.md" 2>/dev/null | sort | tail -3)
@@ -147,14 +147,21 @@ case "$cmd" in
                 echo "   Directory exists but is empty"
             fi
         else
-            echo "   Not found — new audit: $AUDIT_BASE/$YEAR/$MONTH_DAY/report-name.md"
+            echo "   Not found — new audit: $AUDIT_BASE/$YEAR/$DATE_DIR/report-name.md"
         fi
         echo ""
 
         # Plans and Specs
         echo "📋 PLANS / SPECS"
-        echo "   New plan: $REPO_ROOT/$DOCS_ROOT/plans/$YEAR/$MONTH_DAY/plan-name.md"
-        echo "   New spec: $REPO_ROOT/$DOCS_ROOT/specs/$YEAR/$MONTH_DAY/spec-name.md"
+        echo "   New plan: $REPO_ROOT/$DOCS_ROOT/plans/$YEAR/$DATE_DIR/plan-name.md"
+        echo "   New spec: $REPO_ROOT/$DOCS_ROOT/specs/$YEAR/$DATE_DIR/spec-name.md"
+        echo ""
+
+        # Flat project docs
+        echo "📚 GUIDES / REFERENCES / COOKBOOK"
+        echo "   Guides: $REPO_ROOT/$DOCS_ROOT/guides/"
+        echo "   References: $REPO_ROOT/$DOCS_ROOT/references/"
+        echo "   Cookbook: $REPO_ROOT/$DOCS_ROOT/cookbook/"
         echo ""
 
         # Root instruction docs

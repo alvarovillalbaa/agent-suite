@@ -14,19 +14,19 @@ The development log is the engineering team's shared memory. It answers: "what c
 
 **Rule: Always append to the latest existing date file. Never create new files unless today's date doesn't exist yet.**
 
-File path convention: `docs/memories/logs/YYYY/MM-DD/<filename>.md`
+File path convention: `docs/memories/logs/YYYY/YYYY-MM-DD/<filename>.md`
 
 ```bash
 # Find the latest log directory
 YEAR=$(ls docs/memories/logs/ | sort | tail -1)
-DAY=$(ls docs/memories/logs/$YEAR/ | sort | tail -1)
-# → docs/memories/logs/2026/03-21/
+DATE_DIR=$(ls docs/memories/logs/$YEAR/ | sort | tail -1)
+# → docs/memories/logs/2026/2026-03-21/
 
 # Append a log entry to the latest file in that directory
-echo "- Fixed failing OAuth tests by mocking token exchange properly" >> docs/memories/logs/$YEAR/$DAY/dev.md
+echo "- Fixed failing OAuth tests by mocking token exchange properly" >> docs/memories/logs/$YEAR/$DATE_DIR/dev.md
 ```
 
-If today's date directory doesn't exist, create `docs/memories/logs/YYYY/MM-DD/dev.md`.
+If today's date directory doesn't exist, create `docs/memories/logs/YYYY/YYYY-MM-DD/dev.md`.
 
 ### Format
 
@@ -82,7 +82,7 @@ Two distinct changelog types serve different audiences. Never mix them — they 
 
 **Customer-facing (`CHANGELOG.md` at service or package root):** What changed in the product — for users and stakeholders. Plain language, no technical jargon, no internal class names.
 
-**Internal engineering (`docs/audits/YYYY/MM-DD/release-notes.md` or PR description):** Technical changes, refactors, infrastructure details — for engineers.
+**Internal engineering (`docs/audits/YYYY/YYYY-MM-DD/release-notes.md` or PR description):** Technical changes, refactors, infrastructure details — for engineers.
 
 ### Customer-Facing Changelog
 
@@ -125,7 +125,7 @@ Two distinct changelog types serve different audiences. Never mix them — they 
 ### Semantic Versioning in Changelogs
 
 When the repo uses semver:
-- **MAJOR** (1.0.0 → 2.0.0): Breaking changes — document migration path in `docs/plans/`
+- **MAJOR** (1.0.0 → 2.0.0): Breaking changes — document migration path in `docs/plans/YYYY/YYYY-MM-DD/`
 - **MINOR** (1.0.0 → 1.1.0): New features — document what's new
 - **PATCH** (1.0.0 → 1.0.1): Bug fixes — document what was fixed
 
@@ -320,7 +320,7 @@ components/CandidateCard/
 
 ## Memory Artifacts (`docs/memories/`)
 
-Memory artifacts are the team's collective knowledge base — the human-readable output of continuous learning. All types use date-based subdirectories: `docs/memories/<type>/YYYY/MM-DD/*.md`.
+Memory artifacts are the team's collective knowledge base — the human-readable output of continuous learning. All types use date-based subdirectories: `docs/memories/<type>/YYYY/YYYY-MM-DD/*.md`.
 
 ---
 

@@ -185,12 +185,12 @@ They are valid targets for ongoing hardening by `auto-improve`, just like README
 
 | File | Purpose |
 |---|---|
-| `AGENTS.md` | Repo operating instructions for agents and contributors |
-| `PLAN.md` | Current execution plan and ordering |
-| `SPEC.md` | Scope, requirements, constraints, acceptance criteria |
-| `SOUL.md` | Product intent, voice, and qualitative direction |
-| `PRINCIPLES.md` | Invariants and non-negotiable rules |
-| `DESIGN.md` | Design-system, architecture, UX, or interaction guidance |
+| `AGENTS.md` | General customization to the user's needs, the codebase, and preferred ways of working |
+| `PLAN.md` | How planning should be done and what plans should look like |
+| `SPEC.md` | How specs should be structured and what they must define |
+| `SOUL.md` | Personality and collaboration stance for AI agents |
+| `PRINCIPLES.md` | Invariants, constraints, and max/min rules that should always hold |
+| `DESIGN.md` | Design-system and frontend interaction guidance when the repo has one |
 
 ### Runbooks
 
@@ -219,7 +219,7 @@ Prefer `runbooks/` for shared workflows that span multiple folders. Keep `docs/`
 
 Project docs are repo-wide and live in the `docs/` directory.
 
-### Memory Logs (`docs/memories/logs/YYYY/MM-DD/`)
+### Memory Logs (`docs/memories/logs/YYYY/YYYY-MM-DD/`)
 
 **Purpose:** Chronological log of what changed and why — the engineering team's shared memory.
 
@@ -231,7 +231,7 @@ Project docs are repo-wide and live in the `docs/` directory.
 
 See: `references/continuous-docs.md` for full format guide.
 
-### Memory Lessons (`docs/memories/lessons/YYYY/MM-DD/`)
+### Memory Lessons (`docs/memories/lessons/YYYY/YYYY-MM-DD/`)
 
 **Purpose:** Reusable insights that should change future behavior — verified discoveries from real work.
 
@@ -241,7 +241,7 @@ See: `references/continuous-docs.md` for full format guide.
 
 See: `references/continuous-docs.md` for format guide.
 
-### Memory Facts (`docs/memories/facts/YYYY/MM-DD/`)
+### Memory Facts (`docs/memories/facts/YYYY/YYYY-MM-DD/`)
 
 **Purpose:** Stable facts about the team, company, or project not derivable from code.
 
@@ -249,7 +249,7 @@ See: `references/continuous-docs.md` for format guide.
 
 **Freshness:** Updated when the fact changes. Removed when no longer true.
 
-### Memory Procedures (`docs/memories/procedures/YYYY/MM-DD/`)
+### Memory Procedures (`docs/memories/procedures/YYYY/YYYY-MM-DD/`)
 
 **Purpose:** Repeatable workflows — the right way to do something after discovery.
 
@@ -257,7 +257,7 @@ See: `references/continuous-docs.md` for format guide.
 
 **Freshness:** Update the "last verified" date each time the procedure is successfully followed.
 
-### Memory Fixes (`docs/memories/fixes/YYYY/MM-DD/`)
+### Memory Fixes (`docs/memories/fixes/YYYY/YYYY-MM-DD/`)
 
 **Purpose:** Solutions to non-obvious errors or bugs likely to recur.
 
@@ -265,7 +265,7 @@ See: `references/continuous-docs.md` for format guide.
 
 **Freshness:** Written once. Update if the fix stops working or a better solution is found.
 
-### Audits (`docs/audits/YYYY/MM-DD/`)
+### Audits (`docs/audits/YYYY/YYYY-MM-DD/`)
 
 **Purpose:** Structured investigation or analysis artifacts — audits, ADRs, post-mortems, findings, performance analyses.
 
@@ -275,31 +275,45 @@ See: `references/continuous-docs.md` for format guide.
 
 See: `references/one-off-docs.md` for structure guide.
 
-### Plans (`docs/plans/YYYY/MM-DD/`)
+### Guides (`docs/guides/`)
 
-**Purpose:** Source of truth for planned features, migrations, or architectural changes.
+**Purpose:** General technical how-to guides for doing something, independent of how this repo happens to implement it.
+
+**Audience:** Engineers who need the general method or approach.
+
+**Freshness:** Updated when the recommended approach changes. Flat structure, no timestamps.
+
+### References (`docs/references/`)
+
+**Purpose:** Stable code, system, API, or domain reference material.
+
+**Audience:** Engineers who need definitions, mappings, or lookup-style reference docs.
+
+**Freshness:** Updated when the referenced system changes. Flat structure, no timestamps.
+
+### Cookbook (`docs/cookbook/`)
+
+**Purpose:** Technical guides for how something is done in this codebase.
+
+**Audience:** Engineers implementing a pattern in this repo and needing the local way of doing it.
+
+**Freshness:** Updated when the repo's implementation pattern changes. Flat structure, no timestamps.
+
+### Plans (`docs/plans/YYYY/YYYY-MM-DD/`)
+
+**Purpose:** Source of truth for how something should be implemented, tested, and behaviorally verified.
 
 **Audience:** The team executing the plan, reviewers, future engineers understanding why something was built a certain way.
 
 **Freshness:** Updated as the plan evolves during execution. Archived after completion.
 
-### Specs (`docs/specs/YYYY/MM-DD/`)
+### Specs (`docs/specs/YYYY/YYYY-MM-DD/`)
 
-**Purpose:** Feature requirements, API contracts, and behavior specifications before implementation.
+**Purpose:** Source of truth for how something should behave — requirements, contracts, and acceptance criteria before or during implementation.
 
 **Audience:** Implementors, reviewers, QA.
 
 **Freshness:** Written before implementation begins. Updated if requirements change.
-
-### Cookbook (`docs/cookbook/`)
-
-**Purpose:** How-to guides for common engineering patterns and tasks within this repo.
-
-**Audience:** Engineers new to a pattern, or engineers implementing something they haven't done here before.
-
-**Freshness:** Updated when the pattern changes. Flat structure, no timestamps.
-
----
 
 ## Tier 3b: In-Folder Documentation
 
@@ -346,7 +360,7 @@ Use only when the domain merits them:
 - `services/auth/handlers/README.md` — handlers sub-module
 - `src/components/README.md` — component library overview
 
-**`README.md` is always the highest priority.** It's the entry point for any directory. Leaf directories (date-stamped day folders like `2026/03-21/`) do not need in-folder docs.
+**`README.md` is always the highest priority.** It's the entry point for any directory. Leaf directories inside timestamped trees (date folders like `2026/2026-03-21/`) do not need in-folder docs.
 
 ---
 
@@ -398,31 +412,31 @@ New information to document?
 │   └─ Internal design → ARCHITECTURE.md
 │
 ├─ Is it what changed today?
-│   └─ Memory log (docs/memories/logs/YYYY/MM-DD/)
+│   └─ Memory log (docs/memories/logs/YYYY/YYYY-MM-DD/)
 │
 ├─ Is it a lesson learned from real work?
-│   └─ Memory lesson (docs/memories/lessons/YYYY/MM-DD/)
+│   └─ Memory lesson (docs/memories/lessons/YYYY/YYYY-MM-DD/)
 │
 ├─ Is it a stable fact about the team/project/company?
-│   └─ Memory fact (docs/memories/facts/YYYY/MM-DD/)
+│   └─ Memory fact (docs/memories/facts/YYYY/YYYY-MM-DD/)
 │
 ├─ Is it the right way to do something?
-│   └─ Memory procedure (docs/memories/procedures/YYYY/MM-DD/)
+│   └─ Memory procedure (docs/memories/procedures/YYYY/YYYY-MM-DD/)
 │
 ├─ Is it a non-obvious error solution?
-│   └─ Memory fix (docs/memories/fixes/YYYY/MM-DD/)
+│   └─ Memory fix (docs/memories/fixes/YYYY/YYYY-MM-DD/)
 │
 ├─ Is it a decision with non-obvious trade-offs?
-│   └─ ADR in docs/audits/YYYY/MM-DD/
+│   └─ ADR in docs/audits/YYYY/YYYY-MM-DD/
 │
 ├─ Is it a structured investigation or analysis?
-│   └─ Technical report in docs/audits/YYYY/MM-DD/
+│   └─ Technical report in docs/audits/YYYY/YYYY-MM-DD/
 │
 ├─ Is it a production incident?
-│   └─ Post-mortem in docs/audits/YYYY/MM-DD/
+│   └─ Post-mortem in docs/audits/YYYY/YYYY-MM-DD/
 │
 ├─ Is it a feature spec or API contract?
-│   └─ Spec doc in docs/specs/YYYY/MM-DD/
+│   └─ Spec doc in docs/specs/YYYY/YYYY-MM-DD/
 │
 ├─ Is it a repo-wide operating rule, execution plan, product principle, or design rule?
 │   └─ `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, or `DESIGN.md`
@@ -431,7 +445,7 @@ New information to document?
 │   └─ `runbooks/<workflow>.md` or local `RUNBOOK.md`
 │
 ├─ Is it a plan or migration?
-│   └─ Plan doc in docs/plans/YYYY/MM-DD/
+│   └─ Plan doc in docs/plans/YYYY/YYYY-MM-DD/
 │
 ├─ Is it a versioned release history?
 │   └─ CHANGELOG.md at the service or package root (not in docs/)
@@ -439,6 +453,12 @@ New information to document?
 ├─ Is it navigation/orientation for a directory?
 │   └─ README.md (or ARCHITECTURE.md / OVERVIEW.md) in that directory
 │
-└─ Is it a reusable how-to?
+├─ Is it a general reusable how-to?
+│   └─ Guide in docs/guides/
+│
+├─ Is it lookup-style reference material?
+│   └─ Reference in docs/references/
+│
+└─ Is it a reusable how-to for this repo's implementation?
     └─ Cookbook entry in docs/cookbook/
 ```

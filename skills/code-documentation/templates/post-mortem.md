@@ -1,6 +1,6 @@
 # Post-Mortem Template
 
-File location: `docs/audits/YYYY/MM-DD/post-mortem-[incident-name].md`
+File location: `docs/audits/YYYY/YYYY-MM-DD/post-mortem-[incident-name].md`
 
 Write within 48 hours of incident resolution. Review with team within 1 week. Link from the incident ticket.
 

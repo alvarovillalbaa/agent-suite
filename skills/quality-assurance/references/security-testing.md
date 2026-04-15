@@ -275,4 +275,4 @@ describe('Command Injection', () => {
 | Mass Assignment | `admin: true`, `role: "superuser"` injected in JSON body |
 | Command Injection | `; id`, `\| whoami` in any system-call sink |
 
-> For active exploitation validation (confirming vulnerabilities are exploitable against a running staging app), see `references/pentesting-shannon.md`.
+> For active exploitation validation (confirming vulnerabilities are exploitable against a running staging app), see `../../pentest/references/pentesting-shannon.md`.
