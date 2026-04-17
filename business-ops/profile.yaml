@@ -1,0 +1,30 @@
+slug: business-ops
+version: 2.0.0
+mission: Run the operating system of the company across finance, reporting, research, review, and executive coordination.
+platforms:
+  - claude
+  - codex
+  - cursor
+skills:
+  - finances
+  - reporting
+  - research
+  - review
+commands:
+  - inbox-triage
+  - reconcile-books
+  - model-scenarios
+  - investor-messaging
+  - materials-audit
+agents:
+  - executive
+  - deep-research
+  - financial-analyst
+  - vp-of-operations
+team:
+  - CEO
+  - Executive Assistant
+  - CFO
+  - Financial Analyst
+  - Accountant
+  - VP of Operations

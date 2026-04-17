@@ -1,0 +1,29 @@
+slug: engineering
+version: 2.0.0
+mission: Own architecture, delivery, quality, documentation, cloud operations, and technical risk.
+platforms:
+  - claude
+  - codex
+  - cursor
+skills:
+  - agentic-development
+  - ai-engineering
+  - backend
+  - frontend
+  - cloud-management
+  - pentest
+  - pr-management
+  - quality-assurance
+  - code-documentation
+commands:
+  - repo-review
+  - docs-pass
+agents:
+  - principal-engineer
+team:
+  - CTO
+  - Cloud Architect
+  - Software Engineer
+  - Product Manager
+  - Designer
+  - AI Engineer

@@ -1,10 +1,10 @@
-# Agent Suite
+# Agent Company
 
-Portable business and productivity workflows for AI agents: content, finance, sales, research, social, slides, and video.
+This repository is a company package with department-level plugins for Claude, Codex, and Cursor.
 
 This repo is structured so people can use it in multiple ways:
 
-- As a Claude Code plugin
+- As a Claude Code plugin system through the root marketplace plus department plugins
 - As a skill collection via Vercel's `npx skills`
 - In Codex
 - In OpenClaw
@@ -12,74 +12,24 @@ This repo is structured so people can use it in multiple ways:
 - By copying only the folders you want with shell scripts
 - By installing only individual skills, agents, or commands
 
-## What is in this repo
+The active departments are:
 
-### Skills
+- `learning-system`
+- `marketing`
+- `sales`
+- `engineering`
+- `product`
+- `business-ops`
 
-| Skill | Purpose |
-|-------|---------|
-| `accounting-reconciliation` | Match books, statements, and ledgers; flag discrepancies |
-| `agentic-development` | General repository execution workflow |
-| `blog-articles` | Draft and structure blog posts |
-| `cloud-management` | Cross-cloud CLI-first operations |
-| `code-documentation` | Technical docs and reports |
-| `code-slides` | Code-based slide decks, HTML presentations, PPT-to-web conversion |
-| `competitors` | Competitive intel and positioning |
-| `content-syndication` | Repurpose and distribute content across channels |
-| `continuous-learning` | Capture lessons and reusable knowledge |
-| `email-inbox-management` | Email triage, replies, and inbox workflows |
-| `financial-modeling` | Build and review financial models |
-| `fundraising` | Investor messaging, materials upgrade, process diagnostics |
-| `linkedin-articles` | LinkedIn long-form articles |
-| `linkedin-engagement` | LinkedIn comments, DMs, and engagement |
-| `message-outreach` | Outreach and sales messaging |
-| `prospect-research` | Prospect and account research |
-| `quality-assurance` | QA and testing workflows |
-| `seo-and-geo` | SEO, GEO, and AEO optimization |
-| `suite-router` | Route intent to the right agent or skill |
-| `video-generation` | Programmatic video workflows |
-| `visualizer` | Visual explainers, reviews, dashboards, and slide-mode HTML |
-| `x-articles` | X long-form articles |
-| `x-engagement` | X replies, quote posts, DMs, and engagement |
+The active agents are:
 
-### Agents
-
-| Agent | Scope |
-|-------|-------|
-| `content-manager` | Content planning, drafting, and distribution |
-| `financial-manager` | Reconciliation, modeling, and fundraising |
-| `sales-manager` | Prospect research, outreach, and competitor analysis |
-| `social-media-manager` | LinkedIn and X content plus engagement |
-| `visual-manager` | Visual explainers, decks, and video outputs |
-| `swe` | Software engineering orchestration |
-
-### Commands
-
-These are repo-provided command entry points, primarily useful in Claude-style plugin environments:
-
-| Command | Purpose |
-|---------|---------|
-| `content-brief` | Build a reusable content brief |
-| `blog-draft` | Draft a canonical blog article |
-| `social-pack` | Repurpose a canonical piece across social channels |
-| `account-brief` | Build a focused account or prospect brief |
-| `outreach` | Research and draft outreach messages |
-| `competitor-scan` | Scan competitor or market moves |
-| `linkedin-engage` | Draft LinkedIn comments or DMs |
-| `x-engage` | Draft X replies, quote posts, or DMs |
-| `inbox-triage` | Triage inbound email threads and draft replies |
-| `reconcile-books` | Reconcile statements, receipts, and ledgers |
-| `model-scenarios` | Build or review a financial model with scenarios |
-| `investor-messaging` | Draft the fundraising narrative and investor hooks |
-| `materials-audit` | Audit deck, model, or data room quality |
-| `pipeline-diagnostics` | Diagnose fundraising funnel health and next steps |
-| `visualize` | Turn source material into a visual HTML artifact |
-| `repo-review` | Run a findings-first engineering review |
-| `docs-pass` | Update technical documentation close to the code |
-| `learning-sync` | Capture durable engineering lessons |
-| `help` | List suite capabilities |
-| `slides` | Slides workflow entry point |
-| `video` | Video workflow entry point |
+- `sales-prospecting`
+- `executive`
+- `deep-research`
+- `financial-analyst`
+- `growth-lead`
+- `principal-engineer`
+- `vp-of-operations`
 
 ## Install
 
@@ -87,7 +37,7 @@ These are repo-provided command entry points, primarily useful in Claude-style p
 
 | Method | Best for | Installs |
 |--------|----------|----------|
-| Claude Code plugin | Full repo with commands, hooks, agents, and skills | Full plugin |
+| Claude Code marketplace + department plugin | Full repo with department plugins, teams, and shared references | Marketplace plus department plugin |
 | `npx skills` | Cross-agent skill install | Skills only |
 | Codex manual install | One skill or a small set of skills | Skills only |
 | Codex `$skill-installer` | Direct GitHub skill install inside Codex | Individual skills |
@@ -96,284 +46,338 @@ These are repo-provided command entry points, primarily useful in Claude-style p
 | Symlink / shell copy | Selective local installs | Individual folders |
 | Sparse checkout | Pull only specific folders from Git | Individual folders |
 
-## 1. Claude Code Plugin
+### 1. Claude Code plugin
 
-Use this when you want the full repo: plugin metadata, commands, hooks, agents, and skills.
+Use this when you want the full repo: root marketplace, department plugins, teams, references, commands, hooks, agents, and skills.
 
-### Local development
+Claude now installs departments through the root marketplace at [`.claude-plugin/marketplace.json`](/Users/alvipe/Desktop/plugins/.claude-plugin/marketplace.json).
+
+#### Local development
+
+Run Claude against the department you want to work with:
 
 ```bash
-claude --plugin-dir /absolute/path/to/agent-suite
+claude --plugin-dir /absolute/path/to/repo/engineering
+claude --plugin-dir /absolute/path/to/repo/marketing
+claude --plugin-dir /absolute/path/to/repo/business-ops
 ```
 
-### Persistent install
+#### Persistent install
+
+Clone the repo once, then add the marketplace and install the department plugin you want:
 
 ```bash
 mkdir -p ~/.claude/plugins
-git clone https://github.com/alvarovillalbaa/agent-suite.git ~/.claude/plugins/agent-suite
+git clone https://github.com/alvarovillalbaa/plugins.git ~/.claude/plugins/agent-company
 ```
 
-### Update
+Inside Claude:
+
+```text
+/plugin marketplace add /absolute/path/to/repo
+/plugin install engineering@agent-company
+/plugin install sales@agent-company
+```
+
+If the repo is hosted on GitHub, the flow is:
+
+```text
+/plugin marketplace add alvarovillalbaa/plugins
+/plugin install engineering@agent-company
+/plugin install sales@agent-company
+```
+
+#### Update
 
 ```bash
-cd ~/.claude/plugins/agent-suite && git pull
+cd ~/.claude/plugins/agent-company && git pull
 ```
 
-## 2. Vercel `npx skills`
+### 2. Vercel `npx skills`
 
 Use this when you want portable skill installation across supported agents.
 
-### Install all skills
+Because the repo is now department-scoped, install from a department path or from a published skill repo that mirrors one skill.
+
+#### Install from a local department path
 
 ```bash
-npx -y skills add alvarovillalbaa/agent-suite
+npx -y skills add ./engineering
+npx -y skills add ./marketing
 ```
 
-### Install all skills globally
+#### Install all skills from selected departments globally
 
 ```bash
-npx -y skills add -g alvarovillalbaa/agent-suite
+npx -y skills add -g ./engineering
+npx -y skills add -g ./business-ops
 ```
 
-### Install for a specific agent
+#### Install for a specific agent
 
 ```bash
-npx -y skills add -a codex alvarovillalbaa/agent-suite
-npx -y skills add -a claude-code alvarovillalbaa/agent-suite
+npx -y skills add -a codex ./engineering
+npx -y skills add -a claude-code ./marketing
 ```
 
-### Install only selected skills
+#### Install only selected skills
+
+If your `npx skills` workflow accepts direct folder targets, point it at the skill folder:
 
 ```bash
-npx -y skills add alvarovillalbaa/agent-suite --skill fundraising
-npx -y skills add alvarovillalbaa/agent-suite --skill blog-articles --skill seo-and-geo
+npx -y skills add ./marketing/skills/seo-and-geo
+npx -y skills add ./sales/skills/prospect-research
 ```
 
-### Install from local path
+#### Install from a cloned local path
 
 ```bash
-npx -y skills add ./agent-suite
+git clone https://github.com/alvarovillalbaa/plugins.git
+cd plugins
+npx -y skills add ./engineering
 ```
 
-## 3. Codex
+### 3. Codex
 
-You have two practical options: install through `npx skills` targeting Codex, or install an individual skill directly.
+You still have the same three practical options: install via `npx skills`, install an individual skill manually, or use Codex `$skill-installer`.
 
-### Option A: install through `npx skills`
+#### Option A: install through `npx skills`
 
 ```bash
-npx -y skills add -a codex alvarovillalbaa/agent-suite
+npx -y skills add -a codex ./engineering
+npx -y skills add -a codex ./marketing
 ```
 
-### Option B: install a single skill manually
+#### Option B: install a single skill manually
 
 Copy a skill folder into your local Codex skills directory.
 
 ```bash
 mkdir -p ~/.codex/skills
-cp -R skills/fundraising ~/.codex/skills/
+cp -R marketing/skills/seo-and-geo ~/.codex/skills/
+cp -R engineering/skills/agentic-development ~/.codex/skills/
+cp -R business-ops/skills/finances ~/.codex/skills/
 ```
 
-### Option C: install a single skill with Codex's skill installer
+#### Option C: install a single skill with Codex's skill installer
 
-Inside Codex, use `$skill-installer` for built-in or repository-backed installs.
+Inside Codex, use `$skill-installer` for repository-backed installs.
 
 ```text
 $skill-installer
 ```
 
-If you want a skill from this repo, prompt the installer to fetch the skill from:
+If you want a skill from this repo, prompt the installer to fetch the skill from its new department path:
 
 ```text
-https://github.com/alvarovillalbaa/agent-suite/tree/main/skills/<skill-name>
+https://github.com/alvarovillalbaa/plugins/tree/main/engineering/skills/agentic-development
+https://github.com/alvarovillalbaa/plugins/tree/main/marketing/skills/seo-and-geo
+https://github.com/alvarovillalbaa/plugins/tree/main/business-ops/skills/finances
 ```
 
-## 4. OpenClaw
+### 4. OpenClaw
 
-OpenClaw users can clone the repo and point the runtime at the `skills/` directory, or copy individual folders.
+OpenClaw users can still clone the repo and point the runtime at the specific department `skills/` directory, or copy individual skill folders.
 
-### Full clone
+#### Full clone
 
 ```bash
 mkdir -p ~/.openclaw/skills
-git clone https://github.com/alvarovillalbaa/agent-suite.git ~/.openclaw/skills/agent-suite
+git clone https://github.com/alvarovillalbaa/plugins.git ~/.openclaw/skills/agent-company
 ```
 
-### Individual skill copy
+From there, point OpenClaw at one or more department skill roots:
+
+```text
+~/.openclaw/skills/agent-company/engineering/skills
+~/.openclaw/skills/agent-company/marketing/skills
+```
+
+#### Individual skill copy
 
 ```bash
 mkdir -p ~/.openclaw/skills
-cp -R skills/code-slides ~/.openclaw/skills/
+cp -R marketing/skills/code-slides ~/.openclaw/skills/
+cp -R sales/skills/prospect-research ~/.openclaw/skills/
 ```
 
 Reload the runtime after install.
 
-## 5. Git clone
+### 5. Git clone
 
 Use this when you want the repo locally for development, inspection, or manual loading in any AI OS.
 
 ```bash
-git clone https://github.com/alvarovillalbaa/agent-suite.git
-cd agent-suite
+git clone https://github.com/alvarovillalbaa/plugins.git
+cd plugins
 ```
 
 From there you can:
 
-- Load the full repo as a plugin if your runtime supports plugins
-- Point your runtime at `skills/`
-- Copy only `agents/`, `commands/`, or selected skills
+- Load one department as a plugin if your runtime supports plugins
+- Point your runtime at one or more `<department>/skills/` directories
+- Copy only selected `agents/`, `commands/`, or skills
 - Symlink folders into a local skill registry
 
-## 6. Install with shell scripts
+### 6. Install with shell scripts
 
 Use plain `sh` commands if you want repeatable installs without a marketplace.
 
-### Copy one skill
+#### Copy one skill
+
+```bash
+mkdir -p "$HOME/.codex/skills"
+cp -R marketing/skills/seo-and-geo "$HOME/.codex/skills/"
+```
+
+#### Copy several skills
+
+```sh
+mkdir -p ~/.codex/skills
+cp -R marketing/skills/seo-and-geo ~/.codex/skills/
+cp -R sales/skills/prospect-research ~/.codex/skills/
+cp -R business-ops/skills/research ~/.codex/skills/
+```
+
+#### Symlink for local development
 
 ```sh
 mkdir -p "$HOME/.codex/skills"
-cp -R skills/seo-and-geo "$HOME/.codex/skills/"
+ln -s "$(pwd)/engineering/skills/agentic-development" "$HOME/.codex/skills/agentic-development"
 ```
 
-### Copy several skills
+### 7. Install only individual skills
 
-```sh
-mkdir -p "$HOME/.codex/skills"
-for skill in blog-articles seo-and-geo content-syndication; do
-  cp -R "skills/$skill" "$HOME/.codex/skills/"
-done
-```
-
-### Symlink for local development
-
-```sh
-mkdir -p "$HOME/.codex/skills"
-ln -s "$(pwd)/skills/fundraising" "$HOME/.codex/skills/fundraising"
-```
-
-## 7. Install only individual skills
-
-Every folder under `skills/` is installable on its own.
+Every folder under `<department>/skills/` is installable on its own.
 
 Examples:
 
 ```bash
-cp -R skills/fundraising ~/.codex/skills/
-cp -R skills/code-slides ~/.openclaw/skills/
-npx -y skills add alvarovillalbaa/agent-suite --skill x-articles
+cp -R business-ops/skills/finances ~/.codex/skills/
+cp -R marketing/skills/code-slides ~/.openclaw/skills/
+npx -y skills add ./sales/skills/message-outreach
 ```
 
-## 8. Install only individual agents
+### 8. Install only individual agents
 
-If your runtime supports agent files, copy only the agent you want from `agents/`.
+If your runtime supports agent files, copy only the agent you want from the owning department.
 
 Examples:
 
 ```bash
-cp agents/content-manager.md /path/to/your/agents/
-cp agents/sales-manager.md /path/to/your/agents/
+cp sales/agents/sales-prospecting.md /path/to/your/agents/
+cp engineering/agents/principal-engineer.md /path/to/your/agents/
+cp business-ops/agents/executive.md /path/to/your/agents/
 ```
 
-The agent files reference skills by logical name, so the corresponding skills should also be available in that runtime.
+The agent files reference skills by logical name, so the corresponding department skills should also be available in that runtime.
 
-## 9. Install only individual commands
+### 9. Install only individual commands
 
-If your runtime supports command markdown files, copy only the files you need from `commands/`.
+If your runtime supports command markdown files, copy only the files you need from the owning department.
 
 Examples:
 
 ```bash
-cp commands/investor-messaging.md /path/to/your/commands/
-cp commands/slides.md /path/to/your/commands/
+cp business-ops/commands/investor-messaging.md /path/to/your/commands/
+cp marketing/commands/slides.md /path/to/your/commands/
+cp engineering/commands/repo-review.md /path/to/your/commands/
 ```
 
 Command support is runtime-specific. In some environments, commands are ignored while skills still work.
 
-## 10. Sparse checkout for partial clone
+### 10. Sparse checkout for partial clone
 
 Use sparse checkout if you want only one part of the repo without pulling everything.
 
-### One skill
+#### One skill
 
 ```bash
-git clone --filter=blob:none --no-checkout https://github.com/alvarovillalbaa/agent-suite.git
-cd agent-suite
+git clone --filter=blob:none --no-checkout https://github.com/alvarovillalbaa/plugins.git
+cd plugins
 git sparse-checkout init --cone
-git sparse-checkout set skills/fundraising
+git sparse-checkout set marketing/skills/seo-and-geo
 git checkout main
 ```
 
-### Only agents and commands
+#### Only agents and commands
 
 ```bash
-git clone --filter=blob:none --no-checkout https://github.com/alvarovillalbaa/agent-suite.git
-cd agent-suite
+git clone --filter=blob:none --no-checkout https://github.com/alvarovillalbaa/plugins.git
+cd plugins
 git sparse-checkout init --cone
-git sparse-checkout set agents commands
+git sparse-checkout set sales/agents engineering/agents marketing/commands business-ops/commands
 git checkout main
 ```
 
-## 11. Other compatible approaches
+### 11. Other compatible approaches
 
 Depending on the runtime, these also work:
 
 - Install from a local path after cloning the repo
 - Use symlinks instead of copies for local development
 - Fork the repo and install from your own GitHub namespace
-- Vendor specific `skills/<name>` folders into another repo
-- Use the repo as a template for your own internal skill pack
+- Vendor specific `<department>/skills/<name>` folders into another repo
+- Use the repo as a template for your own internal company package
 
-## Quick start
+### 12. Cursor
 
-### If you installed the full plugin
+Cursor should target a department directory because each department contains its own [`.cursor-plugin/plugin.json`](/Users/alvipe/Desktop/plugins/engineering/.cursor-plugin/plugin.json).
 
-- Try `content-manager` for multi-channel content work
-- Try `financial-manager` for modeling or fundraising
-- Try `sales-manager` for research and outreach
-- Try `social-media-manager` for LinkedIn and X workflows
-- Try `visual-manager` for explainers, decks, and video
+Examples:
 
-### If you installed individual skills
+- `engineering/`
+- `marketing/`
+- `sales/`
 
-Good entry points:
-
-- `suite-router`
-- `visualize`
-- `fundraising`
-- `repo-review`
-- `code-slides`
-- `blog-articles`
-- `prospect-research`
-- `seo-and-geo`
-
-## Repository layout
+## Structure
 
 ```text
-agent-suite/
-├── .claude-plugin/
-│   └── plugin.json
+agent-company/
+├── .claude-plugin/marketplace.json
+├── COMPANY.md
+├── assets/
+├── scripts/
+├── references/
+├── learning-system/
+├── marketing/
+├── sales/
+├── engineering/
+├── product/
+└── business-ops/
+```
+
+Each department follows the same contract:
+
+```text
+department/
+├── .claude-plugin/plugin.json
+├── .codex-plugin/plugin.json
+├── .cursor-plugin/plugin.json
+├── TEAM.md
+├── profile.yaml
+├── skills/
 ├── agents/
 ├── commands/
-├── docs/
 ├── hooks/
-├── scripts/
-├── skills/
-│   └── <skill-name>/
-│       ├── SKILL.md
-│       ├── references/
-│       ├── examples/
-│       ├── templates/
-│       └── scripts/
-└── templates/
+└── scripts/
 ```
+
+## Department map
+
+- `learning-system`: `auto-improve`, `memory-management`, `second-brain`
+- `marketing`: content, SEO/GEO, social, slides, video, visual content
+- `sales`: GTM, pipeline, prospect research, outreach
+- `engineering`: implementation, QA, docs, security, cloud, AI engineering
+- `product`: product development and product strategy support
+- `business-ops`: finance, reporting, research, review, executive operating cadence
 
 ## Notes
 
-- Skills are the most portable unit in this repo.
-- Agents are portable when the target runtime supports agent files.
-- Commands and hooks are the least portable because support varies by runtime.
-- Repo-specific integration notes live in [docs/agent-suite-integration.md](docs/agent-suite-integration.md).
+- The repo root is no longer the Codex or Cursor plugin root.
+- The repo root is the Claude marketplace root and the company package root.
+- Legacy root-level manifests, hooks, agents, and commands were moved under [`references/legacy`](/Users/alvipe/Desktop/plugins/references/legacy).
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](/Users/alvipe/Desktop/plugins/LICENSE).

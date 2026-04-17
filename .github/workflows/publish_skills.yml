@@ -4,7 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - "skills/**"
+      - "learning-system/skills/**"
+      - "marketing/skills/**"
+      - "sales/skills/**"
+      - "engineering/skills/**"
+      - "product/skills/**"
+      - "business-ops/skills/**"
       - "public/**"
       - "publish_targets.yml"
       - ".github/workflows/publish_skills.yml"
@@ -25,6 +30,9 @@ jobs:
         run: |
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
+
+      - name: Validate skill metadata
+        run: python3 scripts/validate_skills.py
 
       - name: Publish skills that differ from targets
         env:
@@ -59,10 +67,17 @@ jobs:
             # wipe destination (keep .git)
             find /tmp/mirror -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 
+            SKILL_SOURCE=$(find "${ROOT}" -path "*/skills/${SKILL}" -type d | head -n 1)
+
+            if [ -z "${SKILL_SOURCE:-}" ]; then
+              echo "Could not resolve skill directory for ${SKILL}. Skipping."
+              continue
+            fi
+
             # copy skill contents to repo root (--exclude .git: rsync --delete would
             # otherwise remove the clone metadata; find already kept .git, but rsync
             # still prunes paths not present in the source tree)
-            rsync -av --delete --exclude='.git/' "${ROOT}/skills/${SKILL}/" /tmp/mirror/
+            rsync -av --delete --exclude='.git/' "${SKILL_SOURCE}/" /tmp/mirror/
 
             # add shared public files if you want
             if [ -f "${ROOT}/public/LICENSE" ]; then cp "${ROOT}/public/LICENSE" /tmp/mirror/LICENSE; fi

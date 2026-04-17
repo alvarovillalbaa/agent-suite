@@ -1,0 +1,6 @@
+{
+  "name": "marketing",
+  "version": "2.0.0",
+  "description": "Content, SEO/GEO, social, slides, and video workflows for Codex.",
+  "skills": "./skills/"
+}

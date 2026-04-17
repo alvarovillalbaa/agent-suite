@@ -1,0 +1,30 @@
+slug: marketing
+version: 2.0.0
+mission: Create, adapt, and distribute growth content across search, social, presentations, and motion formats.
+platforms:
+  - claude
+  - codex
+  - cursor
+skills:
+  - content-writing
+  - seo-and-geo
+  - social-media-management
+  - video-generation
+  - code-as-images
+  - code-slides
+  - html-visualization
+commands:
+  - blog-draft
+  - content-brief
+  - social-pack
+  - linkedin-engage
+  - x-engage
+  - slides
+  - video
+agents:
+  - growth-lead
+team:
+  - Growth Lead
+  - Product Manager
+  - Designer
+  - GTM Engineers

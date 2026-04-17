@@ -1,0 +1,24 @@
+slug: sales
+version: 2.0.0
+mission: Find qualified demand, turn research into outreach, and keep pipeline work tightly connected to GTM execution.
+platforms:
+  - claude
+  - codex
+  - cursor
+skills:
+  - go-to-market
+  - sales-pipeline
+  - prospect-research
+  - message-outreach
+commands:
+  - account-brief
+  - outreach
+  - competitor-scan
+  - pipeline-diagnostics
+agents:
+  - sales-prospecting
+team:
+  - CSO
+  - GTM Engineer
+  - SDR
+  - Account Executive

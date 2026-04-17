@@ -1,0 +1,15 @@
+slug: product
+version: 2.0.0
+mission: Shape product direction, clarify user needs, and translate strategy into prioritized execution.
+platforms:
+  - claude
+  - codex
+  - cursor
+skills:
+  - product-development
+commands:
+  - grill-me
+agents: []
+team:
+  - Product Manager
+  - Designer
