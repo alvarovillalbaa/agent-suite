@@ -1,7 +1,7 @@
 # publish_targets.yml
 skills:
-  code-slides:
-    repo: alvarovillalbaa/code-slides
+  # code-slides:
+  #   repo: alvarovillalbaa/code-slides
   # quality-assurance:
   #   repo: alvarovillalbaa/quality-assurance
   # cloud-management:
@@ -10,7 +10,7 @@ skills:
   #   repo: alvarovillalbaa/code-documentation
   # seo-and-geo:
   #   repo: alvarovillalbaa/seo-and-geo
-  agentic-development:
-    repo: alvarovillalbaa/agentic-driven-development
+  # agentic-development:
+  #   repo: alvarovillalbaa/agentic-driven-development
   # video-generation:
   #   repo: alvarovillalbaa/video-generation
