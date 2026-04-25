@@ -1,7 +1,7 @@
 {
   "name": "product",
-  "description": "Product development and product strategy support plugin for the agent company.",
-  "version": "2.0.0",
+  "description": "Product strategy, product management, and product marketing support plugin for the agent company.",
+  "version": "2.1.0",
   "author": {
     "name": "Agent Company"
   },
@@ -12,6 +12,7 @@
     "product",
     "roadmap",
     "discovery",
-    "development"
+    "development",
+    "marketing"
   ]
 }

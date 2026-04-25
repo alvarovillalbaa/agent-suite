@@ -87,6 +87,30 @@ Sequence content by Priority Score within each pillar. Deprioritize high-effort,
 
 ---
 
+## Survey-Driven Lead Magnets
+
+When survey responses are available, treat them as a segmentation input, not just a quote source.
+
+Use survey data to:
+- cluster recurring pain points
+- identify which pain is both common and commercially relevant
+- choose the best lead magnet format for that segment
+- create an acquisition offer that mirrors real audience language
+
+Best-fit lead magnet formats:
+
+| Pain type | Best format |
+|---|---|
+| Multi-step operational problem | Checklist |
+| Strategic or nuanced problem | Guide |
+| Repeated task or workflow gap | Template |
+| ROI, pricing, or efficiency tradeoff | Calculator |
+| Creative or copy problem | Swipe file |
+
+If the request is primarily about turning raw survey data into ranked lead magnet opportunities, load `survey-to-lead-magnet.md` directly instead of staying at the general content-strategy layer.
+
+---
+
 ## Content Strategy Output Contract
 
 When producing a content strategy, always deliver:

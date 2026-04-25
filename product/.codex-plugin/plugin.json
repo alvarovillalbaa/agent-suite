@@ -1,6 +1,6 @@
 {
   "name": "product",
-  "version": "2.0.0",
-  "description": "Product development and product strategy support workflows for Codex.",
+  "version": "2.1.0",
+  "description": "Product strategy, product management, and product marketing workflows for Codex.",
   "skills": "./skills/"
 }

@@ -2,7 +2,7 @@
 
 Use this reference when the user wants the second brain to behave like an actively maintained wiki compiler rather than a passive note store.
 
-This playbook is storage-agnostic. It assumes a durable raw-source layer and a canonical wiki layer, but it does not require Obsidian, plugin metadata, or any specific frontend. Adapt filenames, link styles, and helper files to the user's existing system.
+This playbook is storage-agnostic. It assumes a raw/source-intake layer and a canonical knowledge layer, but it does not require Obsidian, plugin metadata, or any specific frontend. Adapt filenames, link styles, and helper files to the user's existing system.
 
 ## Stance
 
@@ -137,9 +137,9 @@ Goal: refresh machine-friendly navigation artifacts.
 
 Examples:
 
-- `wiki/INDEX.md`
-- `wiki/BACKLINKS.json`
-- `wiki/ABSORB_LOG.json`
+- `knowledge/INDEX.md`
+- `knowledge/BACKLINKS.json`
+- `knowledge/ABSORB_LOG.json`
 
 Use the user's actual filenames if they already have equivalents. These are helpers, not architecture requirements.
 

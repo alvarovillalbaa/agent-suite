@@ -1,8 +1,8 @@
 {
   "name": "product",
   "displayName": "Product",
-  "version": "2.0.0",
-  "description": "Product development and product strategy support workflows.",
+  "version": "2.1.0",
+  "description": "Product strategy, product management, and product marketing support workflows.",
   "author": {
     "name": "Agent Company",
     "email": "alvarovillalbaa@icloud.com"
@@ -11,6 +11,7 @@
   "keywords": [
     "product",
     "roadmap",
-    "research"
+    "research",
+    "marketing"
   ]
 }

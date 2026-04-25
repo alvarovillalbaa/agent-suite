@@ -6,6 +6,8 @@ Frontend engineering skill for browser-facing implementation, UI systems, and de
 
 - components, hooks, routes, state ownership, and client-side architecture
 - accessibility, responsiveness, interaction quality, and frontend performance
+- signup, auth, verification, and onboarding-flow implementation details
+- implementation of page-level CRO fixes such as CTA prominence, form friction reduction, trust placement, and speed-sensitive surfaces
 - design systems, shadcn/ui, animation craft, UI critique, and visual polish
 - Next.js and React-specific rules, patterns, and helper scripts
 

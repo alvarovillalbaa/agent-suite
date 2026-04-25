@@ -8,6 +8,8 @@ These modes are storage-agnostic. They describe the workflow contract, not a req
 
 Apply these rules across all modes:
 
+- count `BRAIN.md` files first when the scope might contain more than one second brain
+- work inside the nearest relevant `BRAIN.md` boundary
 - read the operating manual first when it exists
 - use `INDEX.md`, hub pages, or the user's equivalent before broad searching
 - search before creating so the system does not grow duplicate pages
@@ -21,13 +23,14 @@ Use when the user wants to initialize, bootstrap, or align an existing corpus.
 
 Default flow:
 
-1. Map the current structure.
-2. Inspect representative notes, templates, dashboards, boards, or instruction files.
-3. Create or refresh the operating manual, `INDEX.md`, and `LOG.md` or their equivalents.
-4. Preserve existing naming, metadata, and folder conventions when they already work.
-5. If an operating manual already exists, diff mentally and avoid overwriting it without approval.
+1. Count `BRAIN.md` files and identify the target brain root.
+2. Map the current structure.
+3. Inspect representative notes, templates, dashboards, boards, or instruction files.
+4. Create or refresh `BRAIN.md`, `knowledge/INDEX.md`, and the current dated log file in `logs/` or their equivalents.
+5. Preserve existing naming, metadata, and folder conventions when they already work.
+6. If an operating manual already exists, diff mentally and avoid overwriting it without approval.
 
-Goal: produce a usable navigation and maintenance layer without forcing a migration.
+Goal: produce a usable navigation and maintenance layer without forcing a migration and without collapsing multiple brains into one.
 
 ## Save or session-capture mode
 

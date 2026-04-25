@@ -1,12 +1,13 @@
 slug: product
-version: 2.0.0
-mission: Shape product direction, clarify user needs, and translate strategy into prioritized execution.
+version: 2.1.0
+mission: Shape product direction, clarify user needs, and turn product and market insight into prioritized execution.
 platforms:
   - claude
   - codex
   - cursor
 skills:
   - product-development
+  - product-marketing
 commands:
   - grill-me
 agents: []

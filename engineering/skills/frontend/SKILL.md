@@ -26,6 +26,8 @@ This skill owns browser-facing implementation depth. Use it together with [`../a
 - Keep business logic and async orchestration out of leaf UI where possible.
 - Treat loading, empty, error, success, keyboard, and mobile states as part of the implementation.
 - Performance and accessibility are part of correctness, not post-hoc polish.
+- Signup, auth, and onboarding flows must treat validation, recovery, instrumentation, and mobile behavior as part of correctness.
+- Landing pages and trial-entry surfaces must treat CTA visibility, trust placement, form friction, mobile responsiveness, and page speed as explicit acceptance criteria.
 - For cross-domain features, keep this skill focused on the browser-facing slice and use [`../backend/SKILL.md`](../backend/SKILL.md) for server-side changes.
 
 ## Workflow Router
@@ -57,6 +59,10 @@ Read [component-refactoring.md](./references/component-refactoring.md) when redu
 Read [design-system.md](./references/design-system.md) when auditing or extending a design system itself.
 
 Read [shadcn.md](./references/shadcn.md) and [`references/shadcn/`](./references/shadcn/) for shadcn/ui component work, theming, registry usage, and update workflows.
+
+### Signup and onboarding implementation
+
+Read [signup-onboarding-flows.md](./references/signup-onboarding-flows.md) when implementing signup forms, auth selection, verification states, onboarding checklists, empty states, guided tours, or activation instrumentation.
 
 ### UI constraints, design quality, and polish
 

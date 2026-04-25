@@ -1,13 +1,18 @@
 ---
 name: pr-management
-description: "Pull request management skill for teams from 1 to 1000+ engineers. Use when the user needs to design or improve PR workflow, review queues, merge policy, ownership rules, branch strategy, review SLAs, CI gating, metrics, or operating rituals for getting code reviewed and merged safely at scale."
+description: "Pull request management skill for teams from 1 to 1000+ engineers. Use when the user needs to design or improve PR workflow, review queues, merge policy, ownership rules, branch strategy, review SLAs, CI gating, triage lanes, merge-conflict handling, or operating rituals for getting code reviewed and merged safely at scale."
 metadata:
-  short-description: Manage PR flow, review queues, and merge policy
+  short-description: Manage PR flow, review queues, merge policy, and conflict handling
 ---
 
 # PR Management
 
 Use this skill for pull request operations and process design across an engineering team.
+
+This skill covers both:
+
+- **system design**: how a team should run PR review, routing, CI, and merge policy
+- **operational execution**: how to triage active PRs, resolve straightforward conflicts, and decide when human judgment is required
 
 ## Use this skill for
 
@@ -18,6 +23,8 @@ Use this skill for pull request operations and process design across an engineer
 - designing branch strategy and release interaction with PR flow
 - building PR metrics, dashboards, and operating reviews
 - diagnosing why reviews stall, churn, or pile up
+- triaging large PR queues for teams of 50-200+ engineers
+- resolving straightforward merge conflicts non-interactively
 
 ## Core model
 
@@ -29,6 +36,15 @@ Manage pull requests at four levels:
 - **System level**: policy, CI gates, branching, release cadence, accountability
 
 If the user only wants one level, still check whether the adjacent level is causing the problem.
+
+For active PR operations, reason in this order:
+
+- what is the PR trying to do for a human
+- whether the implementation actually solves that problem
+- whether it can keep moving autonomously
+- what operating action is needed next
+
+Do not confuse "diff exists" with "progress exists." A PR that compiles but does not solve the underlying problem is still a flow failure.
 
 ## Standard output structure
 
@@ -88,6 +104,7 @@ Prefer a small set of operationally useful metrics:
 - review queue age
 - CI failure rate
 - merge-blocked count
+- merge-conflict rate
 
 Do not stop at reporting. Pair every metric with an action threshold.
 
@@ -102,6 +119,144 @@ When the user asks for a PR process and does not supply one, cover these default
 - stale PRs need explicit nudges or escalation
 - CI gates should block merge on correctness, not on noise
 - emergency paths should exist but be auditable
+- straightforward merge conflicts may be resolved autonomously; judgment-heavy conflicts must escalate
+
+## Triage lane for active PRs
+
+Use this lane when the user is managing an active queue, reviewing many PRs, or asking how to operationalize landing flow for a large engineering team.
+
+### Step 1. Process each item independently
+
+- do not let one PR's framing leak into another
+- if triaging a queue, treat each PR, issue, or raw problem statement as its own decision
+
+### Step 2. Recover the plain-language intent
+
+Before judging a PR, restate what it is actually trying to do for a human.
+
+- do not blindly repeat technical wording from the PR description
+- translate technical changes into user or operator impact
+- if the intent is unclear, treat that as a real quality problem
+
+### Step 3. Judge the solution, not just the diff
+
+Ask:
+
+- does this implementation solve the underlying problem
+- is it a durable fix or a local patch
+- is extra behavior or special-case logic being introduced unnecessarily
+
+Classify the result:
+
+- **continue**: good enough to keep moving autonomously
+- **close**: wrong-shaped, too local, or too unclear to continue
+- **escalate**: needs a real product, architectural, or policy judgment from a human
+
+### Step 4. Distinguish bug, feature, and maintenance paths
+
+Choose the validation lane deliberately:
+
+- **bug**: reproduce the failure and prove the fix changes the outcome
+- **feature**: test the changed behavior directly
+- **maintenance**: run the smallest credible local validation plus normal review and CI
+
+If the claimed change cannot actually be validated, escalate instead of pretending it is merge-ready.
+
+### Step 5. Handle superficial cleanup before review
+
+If the PR is directionally correct but still messy:
+
+- remove unnecessary local complexity
+- tighten names or ownership signals
+- reduce special cases that are not essential
+- keep changes minimal and readable
+
+If the PR needs a fundamental reframe, escalate instead of polishing around the edges.
+
+### Step 6. Review and CI in a fixed order
+
+For PRs that stay on the autonomous lane:
+
+- address existing valid review feedback first
+- run fresh review against the current base, not stale assumptions
+- treat blocking review findings as merge blockers
+- fix related CI failures before handoff
+- do not keep looping on non-blocking polish if the PR is otherwise sound
+
+### Step 7. Re-check base drift before final handoff
+
+Before landing or final escalation:
+
+- confirm the branch still applies cleanly to current base
+- if new conflicts are straightforward, resolve and re-run the final validation path
+- if new conflicts are judgment-heavy, escalate
+
+## Merge conflict lane
+
+Use this lane when the user needs merge-conflict handling itself, or when merge friction is materially affecting throughput.
+
+### Requirements and constraints
+
+- operate from the repository root; if not in a Git repo, stop and report
+- do not ask the user for input when the conflict is straightforward
+- choose sensible defaults and explain them briefly
+- prefer minimal, correct changes that preserve both sides' intent when possible
+- use non-interactive flags for any tools invoked
+- do not push or tag as part of the resolution procedure
+
+### Resolution workflow
+
+#### 1. Detect conflicts
+
+- run `git status --porcelain`
+- collect files with unmerged statuses
+- also check for conflict markers such as `<<<<<<<`, `=======`, and `>>>>>>>`
+
+#### 2. Resolve per file
+
+Open each conflicting file and remove conflict markers.
+
+Merge both sides logically when feasible. If the versions are mutually exclusive, prefer the variant that:
+
+- compiles and passes type checks
+- preserves public APIs and expected behavior
+- keeps module boundaries and imports consistent
+
+#### 3. Apply language-aware strategy
+
+- `package.json`, `pnpm-lock.yaml`, `yarn.lock`, `package-lock.json`: merge conservatively and prefer regenerating lockfiles instead of hand-editing them
+- config files: preserve the union of safe settings; avoid dropping required fields
+- generated files and build artifacts: prefer keeping them out of version control where possible; otherwise prefer the current branch unless project guidance says otherwise
+- text and markdown: include both unique content and deduplicate headings or repeated prose
+- binary files: prefer current branch unless repo policy says otherwise
+
+#### 4. Validate
+
+After resolving conflicts:
+
+- install dependencies if manifests changed
+- run the narrowest credible lint, typecheck, build, and test sequence for the affected stack
+- if other ecosystems are present, run their normal verification path when available
+
+If ambiguity remains and one option blocks the build while another compiles and tests cleanly, prefer the variant that keeps the repo green.
+
+#### 5. Finalize
+
+- re-scan for conflict markers to confirm none remain
+- stage resolved files and regenerated lockfiles
+- summarize which files were touched and the notable resolution choices
+
+### Merge-conflict operating guidance
+
+When merge conflicts are a recurring team problem, inspect:
+
+- branch age before merge
+- PR size and overlap
+- ownership hot spots
+- lockfile churn
+- release-branch coupling
+
+Do not treat conflict count as a purely local author problem if the real cause is system-level overlap or branch policy.
 
 ## Team-scale guidance
 
@@ -109,8 +264,8 @@ Adjust the workflow by scale:
 
 - **1-10 engineers**: favor lightweight rules, high trust, fast merge, minimal ceremony
 - **10-50 engineers**: add reviewer routing, SLA expectations, and better queue visibility
-- **50-200 engineers**: formalize ownership, exceptions, merge policy, and reporting
-- **200-1000+ engineers**: treat PR management as an operational system with dashboards, automation, and explicit governance
+- **50-200 engineers**: formalize ownership, exceptions, merge policy, triage lanes, and reporting
+- **200-1000+ engineers**: treat PR management as an operational system with dashboards, automation, explicit governance, and human-judgment checkpoints
 
 Do not recommend enterprise-heavy policy for a tiny team unless the user explicitly wants it.
 
@@ -122,6 +277,7 @@ If PRs are slow:
 - then reviewer load
 - then CI duration and flakiness
 - then ownership ambiguity
+- then merge-conflict frequency or stale branch hygiene
 
 If review quality is weak:
 
@@ -134,6 +290,25 @@ If merge risk is high:
 - inspect test gates
 - inspect branch age and merge frequency
 - inspect release coupling and hotfix paths
+- inspect how the team handles merge conflicts today
+
+If many PRs should not keep moving:
+
+- inspect whether the queue lacks a clear close-versus-escalate decision
+- inspect whether reviewers are commenting on code that should have been rejected earlier
+- inspect whether unclear PR intent is clogging the lane
+
+## Suggested thresholds
+
+If the user does not provide thresholds, propose defaults such as:
+
+- `time to first review > 24h`: rebalance review routing or backup reviewer coverage
+- `time to merge > 3 business days` for normal PRs: inspect queue load, CI time, and PR sizing
+- `PR size > 500 lines changed`: challenge reviewability unless justified
+- `conflict rate rising for 2+ consecutive periods`: inspect branch freshness and ownership overlap
+- `related CI failure rate > 10%`: stabilize the pipeline before optimizing throughput
+
+Every threshold should map to a concrete action, not just a dashboard color.
 
 ## Failure modes to avoid
 
@@ -143,6 +318,9 @@ If merge risk is high:
 - measuring throughput without measuring merge quality
 - forcing tiny-team process onto large organizations or vice versa
 - treating CI pain as a people problem
+- resolving judgment-heavy conflicts autonomously when the final shape is unclear
+- spending review effort on PRs that should have been closed or escalated earlier
+- using merge-conflict counts without diagnosing why overlap is happening
 
 ## Quality bar
 
@@ -150,3 +328,5 @@ If merge risk is high:
 - The metrics are tied to decisions, not vanity.
 - Tradeoffs are named clearly.
 - The recommendation fits the team size and repo reality.
+- The triage lane distinguishes continue, close, and escalate clearly.
+- The merge-conflict lane is concrete enough to execute non-interactively on straightforward cases.

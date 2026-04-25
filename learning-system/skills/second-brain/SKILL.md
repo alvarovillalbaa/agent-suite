@@ -11,7 +11,7 @@ Turn scattered raw material into a living knowledge system that is easy to retri
 
 This skill is storage-agnostic. Prefer plain folders and markdown or text files unless the user already has an existing tool, database, or knowledge system. Do not assume Obsidian, a plugin ecosystem, or any specific app. If the user already has a workable system, map the workflow onto it instead of forcing a migration.
 
-When the user already works in an Obsidian vault or wants compatibility with one, keep the storage contract portable and load [references/obsidian_adapter.md](/Users/alvipe/Desktop/agent-suite/skills/second-brain/references/obsidian_adapter.md). That reference adapts the second-brain model to Obsidian-style markdown, views, canvas files, CLI helpers, and clean web capture without making any of them required.
+When the user already works in an Obsidian vault or wants compatibility with one, keep the storage contract portable and load [references/obsidian_adapter.md](./references/obsidian_adapter.md). That reference adapts the second-brain model to Obsidian-style markdown, views, canvas files, CLI helpers, and clean web capture without making any of them required.
 
 One useful mental model is:
 
@@ -35,6 +35,36 @@ Another useful mental model from larger personal-brain systems is:
 - the interface can change, but the knowledge contract should stay stable
 - the harness can stay thin, while the workflow intelligence lives in the operating manual and skill
 - canonical pages should separate current understanding from historical evidence instead of mixing both into one undifferentiated note
+
+## AFS compatibility modes
+
+This skill is AFS-first. AFS means Agentic File System, with a standard layout for memory, operational work, and source-of-truth content.
+
+Support these modes:
+
+- **Strict AFS**: if the user has no meaningful second-brain structure yet, create one and follow AFS directory names directly.
+- **Partial adaptation**: if the user or company already has conventions that mostly work, keep them, but map them explicitly onto AFS in `BRAIN.md`.
+- **Full adaptation**: if the user or company already has a mature structure, leave it in place and use `BRAIN.md` only to explain how it maps to AFS roles and how the assistant should behave inside it.
+
+Rules:
+
+- default to **Strict AFS** only when the target area has no existing second-brain contract
+- prefer **Partial adaptation** over migration when the existing system is workable but inconsistent
+- use **Full adaptation** only when the user's own standard is already the real source of truth
+- every second brain should still have a discoverable `BRAIN.md` file, even in partial or full adaptation mode
+
+## Brain boundaries and discovery
+
+Treat each `BRAIN.md` as the root marker for one second brain.
+
+Rules:
+
+- a single repo, codebase, workspace, or database can contain more than one second brain
+- detect this by counting `BRAIN.md` files before doing broad setup, migration, or cleanup work
+- scope work to the nearest relevant `BRAIN.md` instead of assuming the entire repo is one brain
+- if several `BRAIN.md` files exist, do not merge structures across them unless the user explicitly asks
+- if no `BRAIN.md` exists for the target area, create one before large-scale second-brain work
+- if the user already has `AGENTS.md`, `CLAUDE.md`, `README.md`, or another instruction file, reference it from `BRAIN.md` rather than replacing it blindly
 
 ## Use this skill for
 
@@ -78,114 +108,161 @@ Use the following mental model:
 
 Do not make the user carry the maintenance burden when the assistant can touch multiple files, propagate changes, and keep the wiki consistent in one pass.
 
-## Three-layer architecture
+## AFS-first architecture
 
-There is a default architecture, but it is only a fallback. If the user already has an architecture, storage layout, naming scheme, or folder structure, always adapt to it instead of imposing a new one.
+There is still a logical architecture, but the physical default should be AFS.
 
-The preferred model has three logical layers:
+The logical layers are:
 
-- **Raw sources**: immutable source material such as notes, transcripts, articles, PDFs, exports, screenshots, and bookmarks
-- **Wiki**: canonical, assistant-maintained knowledge pages that synthesize, compare, and cross-link what the sources mean
-- **Schema**: one lightweight operating-manual file that tells the assistant how the knowledge base is structured and how ingest, query, maintenance, and publishing should work
+- **Memory**: compact retained context such as logs, lessons, durable facts, and fixes
+- **Operational**: active work areas such as audits, raw intake, plans, specs, and domain-specific operating folders
+- **Source of truth**: canonical knowledge, references, guides, documentation, research, and monitored sources
+- **Schema**: one `BRAIN.md` file per brain root that tells the assistant how this specific brain maps onto AFS
 
 When the user has no existing structure, default to these top-level areas:
 
-- `raw/` — immutable source material such as notes, transcripts, excerpts, screenshots, bookmarks, exports, and research.
-- `wiki/` — assistant-maintained canonical knowledge pages, source summaries, topic pages, entity pages, concept pages, decision logs, identity/context files, and cross-links.
-- `outputs/` — generated answers, reports, briefings, comparisons, analyses, exports, and recurring output registries created from the knowledge base.
-- `videos/` — optional working area for video briefs, render payloads, transcripts, thumbnails, or local media assets when the user wants recurring media output.
-- `boards/` — optional task or work-tracking views when the user wants kanban- or queue-style planning.
-- `templates/` — optional note or page templates when repeated structures are useful.
+- `BRAIN.md`
+- `logs/`
+- `lessons/`
+- `items/`
+- `fixes/`
+- `audits/`
+- `raw/`
+- `plans/`
+- `specs/`
+- `references/`
+- `cookbook/`
+- `knowledge/`
+- `runbooks/`
+- `research/`
+- `official-documentation/`
+- `sources/`
 
-This is a logical model, not a product requirement. If the user already uses a different layout, map it to:
+This is the default contract:
 
-- raw-source layer
-- canonical wiki layer
-- schema or operating-manual layer
-- generated outputs layer
-- optional execution layer
+- `logs/` holds terse dated logs. Append to the latest `YYYY-MM-DD.md` file and keep each entry to two lines max.
+- `lessons/` stores lessons learned from experience, especially engineering lessons that should change future behavior.
+- `items/` stores durable facts about the user, team, company, customers, environments, and other factual context.
+- `fixes/` stores reusable error solutions and debugging resolutions.
+- `audits/` stores comprehensive reports and analytical audits, usually under timestamped folders such as `audits/YYYY-MM-DD/`.
+- `raw/` is the intake queue for unprocessed material to be compiled into the brain.
+- `plans/` stores implementation plans and plan-driven-development artifacts.
+- `specs/` stores desired-state documents and spec-driven-development artifacts.
+- `references/` stores code, API, and URL references in a flat non-timestamped layout.
+- `cookbook/` stores "how we actually do this here" guides in a flat non-timestamped layout.
+- `knowledge/` stores maintained timeless knowledge in a structured non-timestamped layout.
+- `runbooks/` stores operational procedures in a flat non-timestamped layout.
+- `research/` stores continuous research work in a flat non-timestamped layout.
+- `official-documentation/` stores external official documentation in a flat non-timestamped layout.
+- `sources/` stores URL-based source registries worth monitoring over time in a flat non-timestamped layout.
+
+Use top-level domain folders only when the user already has them or when a domain genuinely needs its own operational surface, such as `health/` or `investing/`. Do not use them as a substitute for canonical knowledge when `knowledge/` is the better home.
 
 Do not require a database. Prefer folders plus markdown or text files unless the user explicitly wants another storage mechanism.
 
-Do not assume the wiki must live in Obsidian. A plain folder of markdown files is enough. If the user already uses Obsidian or another tool, treat it as the editor or interface around the files, not as a required architectural dependency.
+Do not assume the knowledge base must live in Obsidian. A plain folder of markdown files is enough. If the user already uses Obsidian or another tool, treat it as the editor or interface around the files, not as a required architectural dependency.
 
 Treat the interface layer separately from storage:
 
-- storage is where `raw/`, `wiki/`, `outputs/`, and related files live
+- storage is where the AFS folders and their files live
 - frontend or IDE is whatever the user uses to browse, search, read, and render those files
 - automation or helper CLIs are optional tools that operate on the stored knowledge but do not define the architecture
 
-If the user already has an opinionated frontend, support it as an adapter around the portable knowledge base:
-
-- Obsidian-style markdown and wikilinks can be the editing format when the user already uses them
-- database-like views such as `.base` files can sit on top of notes as derived dashboards, queues, or reviews
-- canvas-style maps can visualize relationships, plans, or research clusters without becoming the only place the knowledge lives
-- CLI helpers can speed up capture, indexing, or vault operations without changing the underlying knowledge contract
-
 Architecture precedence:
 
-- existing user architecture always wins
+- existing user or company architecture always wins
 - existing repo or workspace conventions come next
-- the default `raw/`, `wiki/`, `outputs/` model is used only when no better structure already exists
+- strict AFS is the default only when no workable second-brain standard already exists
 
 Storage backends are interchangeable as long as the knowledge contract survives:
 
 - plain markdown files are still the default because they are portable and easy to inspect
 - a local database, structured store, or custom app is acceptable if the user already has one
-- any richer backend should still be able to preserve canonical pages, source provenance, history, and exportable artifacts without lock-in
+- any richer backend should still preserve canonical pages, source provenance, history, and exportable artifacts without lock-in
 - if the system has a CLI, MCP server, search index, or automation layer, treat that layer as replaceable plumbing around the maintained knowledge rather than as the knowledge model itself
 
-Suggested logical subareas inside the wiki layer when the user wants more structure:
+## Knowledge taxonomy
 
-- `wiki/sources/` for source summary pages
-- `wiki/entities/` for people, companies, tools, teams, customers, or other named entities
-- `wiki/concepts/` for themes, ideas, methods, technologies, or recurring concepts
-- `wiki/projects/` for project or initiative pages
-- `wiki/synthesis/` for cross-source comparisons, reviews, and durable analyses
+For the maintained knowledge base and other non-timestamped canonical folders, standardize around nested subject taxonomy unless the user already has a better one.
+
+Default pattern:
+
+```text
+knowledge/<domain>/<subject>/<topic>/<case>/
+```
+
+Examples:
+
+```text
+knowledge/engineering/backend/rate-limiting/provider-x/
+knowledge/product/activation/onboarding/enterprise-trial/
+knowledge/company/customers/acme/renewal-2026/
+```
+
+Rules:
+
+- stop at the lowest level that adds real retrieval value; do not pre-create empty depth
+- use stable human-readable slugs unless the user already has an established naming scheme
+- keep canonical knowledge non-timestamped by default
+- put dated evidence inside files or timeline sections rather than encoding every knowledge file by date
+- keep `references/`, `cookbook/`, `runbooks/`, `research/`, `official-documentation/`, and `sources/` flat unless the user already relies on deeper structure
+- when a canonical page does not justify its own folder, a single markdown file is enough inside the appropriate parent directory
+
+Suggested logical subareas inside `knowledge/` when the user wants more structure:
+
+- `knowledge/<domain>/sources/` for durable source summary pages
+- `knowledge/<domain>/entities/` for people, companies, tools, teams, customers, or other named entities
+- `knowledge/<domain>/concepts/` for themes, ideas, methods, technologies, or recurring concepts
+- `knowledge/<domain>/projects/` for project or initiative pages
+- `knowledge/<domain>/synthesis/` for cross-source comparisons, reviews, and durable analyses
 
 These are optional categories, not required folders. Use them only when they improve retrieval and maintenance.
 
 ## Minimum viable setup
 
-When the user is starting from zero, keep setup deliberately small:
+When the user is starting from zero, keep setup AFS-compliant but still small:
 
 ```text
-my-knowledge-base/
+my-second-brain/
+  BRAIN.md
+  logs/
   raw/
-  wiki/
-  outputs/
+  references/
+  knowledge/
 ```
 
-Add one operating-manual file at the root such as `AGENTS.md`, `CLAUDE.md`, `SCHEMA.md`, or `README.md`.
+Add the rest of the AFS folders lazily as the workflow actually needs them.
 
-This is enough to start. No database, no plugin stack, and no specific app are required.
+Default meaning of the minimum folders:
 
-Default meaning of the three folders:
-
-- `raw/` is the source-material inbox or junk drawer. Dump in articles, notes, screenshots, exports, transcripts, and bookmarks without trying to pre-organize them by hand.
-- `wiki/` is the maintained canonical layer. The assistant turns raw material into topic pages, summaries, links, and synthesis here.
-- `outputs/` is where generated answers, reports, briefings, and other one-off deliverables live.
-
-Only add `videos/`, `boards/`, `templates/`, or deeper subfolders when the user actually needs them.
+- `BRAIN.md` is the discovery file and operating contract for this brain
+- `logs/` stores brief dated change logs
+- `raw/` stores unprocessed material waiting for compilation
+- `references/` stores flat references worth reusing directly
+- `knowledge/` stores the maintained canonical knowledge
 
 ## Operating-manual file contract
 
-When setting up or extending the system, create or update one lightweight operating-manual file at the root of the knowledge base. Accept repo-local names such as `AGENTS.md`, `CLAUDE.md`, `SCHEMA.md`, `SECOND_BRAIN.md`, `README.md`, or another instruction file the user already uses.
+Each second brain should have one `BRAIN.md` at its root.
 
-This file is the schema layer. Its job is to make the assistant behave like a disciplined wiki maintainer instead of a generic chatbot.
+`BRAIN.md` is the mandatory discovery marker. In partial or full adaptation modes, it can reference `AGENTS.md`, `CLAUDE.md`, `SCHEMA.md`, `SECOND_BRAIN.md`, `README.md`, or another instruction file the user already uses, but `BRAIN.md` should still exist so the assistant can detect the brain boundary reliably.
 
-If the user already has an architecture, this file should describe that architecture rather than replacing it with the default one.
+Its job is to make the assistant behave like a disciplined knowledge maintainer instead of a generic chatbot.
 
-The operating-manual file should define:
+If the user already has an architecture, `BRAIN.md` should describe that architecture rather than replacing it with the default one.
 
-- what the knowledge base is about
+`BRAIN.md` should define:
+
+- what the brain is about
+- which compatibility mode it uses: strict, partial, or full adaptation
+- the root scope of the brain
 - where raw inputs live
-- where canonical wiki pages live
-- where generated outputs live
-- where optional media outputs or render logs live
-- where optional boards, templates, or schedules live
+- where canonical knowledge lives
+- where logs, plans, specs, audits, and domain folders live
+- whether `raw/` is transient or retained after ingest
 - the preferred link style
 - required page structure or metadata
+- the taxonomy rules for `knowledge/`
 - the topics, people, projects, or domains that deserve extra attention
 - propagation rules for updates
 - maintenance rules for synthesis, reconciliation, health checks, and recurring publication
@@ -193,44 +270,42 @@ The operating-manual file should define:
 
 The operating manual should also define the default workflow for three recurring actions:
 
-- ingesting a new source into the raw layer and propagating it into the wiki
-- answering a question from the wiki before falling back to raw sources
-- linting or health-checking the wiki for contradictions, stale claims, and orphan pages
+- ingesting a new source into `raw/` and propagating it into `knowledge/`, `references/`, `cookbook/`, `runbooks/`, or another AFS destination
+- answering a question from the maintained canonical knowledge before falling back to raw sources
+- linting or health-checking the brain for contradictions, stale claims, and orphan knowledge
 
 If the user has no instruction file, use a template like this:
 
 ```md
-# Knowledge Base Operating Manual
+# BRAIN
 
-## What This Is
-A personal or team knowledge base about [TOPIC OR DOMAIN].
+## Scope
+A personal or team second brain about [TOPIC OR DOMAIN].
 
-## How It's Organized
-- `raw/` contains unprocessed source material. Do not modify these files.
-- `wiki/` contains canonical knowledge. AI maintains this.
-- `outputs/` contains generated reports, answers, analyses, and recurring output logs.
-- `videos/` is optional and stores scripts, transcripts, render payloads, or local media artifacts.
-- `boards/` is optional and tracks open work when needed.
-- `.env` is optional and stores API keys or scheduler-specific secrets. Do not modify or commit it unless the user explicitly asks.
+## Compatibility Mode
+strict-afs
+
+## Structure
+- `logs/` contains brief dated change logs. Append to the current date file and keep entries to two lines max.
+- `raw/` contains incoming source material waiting for compilation.
+- `references/` contains flat code, API, and URL references.
+- `knowledge/` contains canonical maintained knowledge using `knowledge/<domain>/<subject>/<topic>/<case>/...`.
+- `plans/`, `specs/`, and `audits/` are used when the work produces those artifacts.
+- `cookbook/`, `runbooks/`, `research/`, `official-documentation/`, and `sources/` are flat source-of-truth support areas.
 
 ## Writing Rules
 - Search before creating a new page.
 - Update canonical pages instead of creating near-duplicates.
 - Preserve source references for non-obvious claims.
 - Mark inferred statements explicitly.
-- Keep raw sources immutable.
+- Clear or archive `raw/` according to the retention rule after successful compilation.
 
-## Canonical Pages
-- Every durable topic gets its own `.md` file in `wiki/`
-- Every wiki file starts with a short summary paragraph
-- Maintain `wiki/INDEX.md`
-- Append major operations to `wiki/LOG.md`
+## Canonical Knowledge
+- Every durable topic gets its own `.md` file or case folder inside `knowledge/`
+- Every canonical knowledge file starts with a short summary paragraph
+- Maintain `knowledge/INDEX.md`
+- Append major operations to `logs/YYYY-MM-DD.md`
 - Link related pages using the preferred project link style
-
-## Recurring Outputs
-- Keep recurring output logs in a durable text file such as `outputs/daily_videos.md` or another user-chosen registry.
-- If a media workflow exists, check recent entries before choosing the next topic.
-- Promote durable insights discovered while generating outputs back into the wiki.
 
 ## Focus Areas
 - [INTEREST 1]
@@ -242,32 +317,32 @@ If the user already has instruction files, extend them rather than creating redu
 
 ## Context bootstrap files
 
-When the system is active and the user wants continuity between sessions, maintain a small set of lightweight context files inside the canonical knowledge layer. Use only the files that add value for the user.
+When the system is active and the user wants continuity between sessions, maintain a small set of lightweight context files. Use only the files that add value for the user.
 
 Recommended files:
 
-- `wiki/INDEX.md` — catalog of important pages and major topics
-- `wiki/LOG.md` — append-only operation and change log
-- `wiki/CRITICAL_FACTS.md` — tiny file for current, high-salience facts that matter in many sessions
-- `wiki/IDENTITY.md` or `wiki/SOUL.md` — enduring role, preferences, values, and communication context
-- `wiki/CURRENT_STATE.md` — active priorities, open threads, and near-term focus
-- `wiki/PINNED.md` — temporary task-specific facts or schemas that should survive a long working session or context compaction
+- `knowledge/INDEX.md` — catalog of important pages and major topics
+- `logs/YYYY-MM-DD.md` — append-only dated operation and change log
+- `items/CRITICAL_FACTS.md` — tiny file for current, high-salience facts that matter in many sessions
+- `items/IDENTITY.md` or `items/SOUL.md` — enduring role, preferences, values, and communication context
+- `plans/CURRENT_STATE.md` — active priorities, open threads, and near-term focus
+- `items/PINNED.md` — temporary task-specific facts or schemas that should survive a long working session or context compaction
 
 Rules:
 
-- Keep `CRITICAL_FACTS.md` short and current.
-- Use `INDEX.md` as the first navigation aid before broad searching when it exists.
-- Append to `LOG.md`; do not rewrite history unless the user explicitly wants cleanup.
-- Keep `PINNED.md` short, task-specific, and disposable. Clear or archive it when the task is done.
-- If the user already uses a root-level `PINNED.md`, `_CLAUDE.md`, `AGENTS.md`, or another equivalent continuity file, map to that instead of forcing `wiki/PINNED.md`.
-- If these files do not fit the user's system, map the concept onto what they already have.
+- keep `CRITICAL_FACTS.md` short and current
+- use `knowledge/INDEX.md` as the first navigation aid before broad searching when it exists
+- append to the current dated log file in `logs/`; do not rewrite history unless the user explicitly wants cleanup
+- keep every log entry to two lines max
+- keep `PINNED.md` short, task-specific, and disposable; clear or archive it when the task is done
+- if the user already uses root-level continuity files, map the concept onto them instead of forcing new files blindly
 
-If the user wants recurring published outputs, maintain one lightweight registry file in the generated-output layer, such as:
+If the user wants recurring published outputs, store the durable registry in the narrowest AFS-compatible destination, such as:
 
-- `outputs/daily_videos.md` for date, topic, brief, URL, and optional source links
-- `outputs/daily_briefs.md` for text-only daily artifacts
+- `knowledge/communications/publishing/daily-videos/registry.md`
+- `knowledge/communications/publishing/daily-briefs/registry.md`
 
-Do not require a `videos/` directory if the user's system already stores media logs elsewhere.
+Do not require a separate `outputs/` or `videos/` directory if the user's system already stores media logs elsewhere.
 
 ## Core operating model
 
@@ -297,7 +372,7 @@ This is the storage-agnostic equivalent of the "above the line / below the line"
 
 Do not let canonical pages collapse into undifferentiated chronological dumps. The page should answer "what is true now" before it answers "how did we learn this."
 
-When the user wants a concrete page schema, read [references/page_model.md](/Users/alvipe/Desktop/agent-suite/skills/second-brain/references/page_model.md).
+When the user wants a concrete page schema, read [references/page_model.md](./references/page_model.md).
 
 ## Incremental wiki rules
 
@@ -317,7 +392,7 @@ When answering questions:
 - read the smallest useful set of wiki pages first
 - use raw sources mainly to verify, deepen, or resolve ambiguity
 - prefer answers grounded in already-maintained pages because that is where synthesis, contradiction handling, and cross-source structure should live
-- if a valuable answer produces a reusable new synthesis, write it back into the wiki or outputs layer
+- if a valuable answer produces a reusable new synthesis, write it back into canonical knowledge or another narrow AFS-compatible destination
 
 Do not treat query-time retrieval as the whole system. Retrieval is a helper. The maintained wiki is the compounding asset.
 
@@ -353,7 +428,7 @@ If the knowledge already contains user-authored notes, statements, or durable pa
 Raw-input rules:
 
 - Save originals to the input layer when the user wants durable ingestion.
-- Treat the raw layer as immutable unless the user explicitly asks for cleanup.
+- Treat `raw/` according to the retention rule in `BRAIN.md`. In strict AFS it is usually a transient staging area, not a permanent archive.
 - A single ingest should often update several canonical pages, not just create one summary note.
 - Do not confuse imported source preservation with synthesis.
 - New sources should usually produce both a source-specific summary and changes to existing topic, entity, concept, project, or decision pages.
@@ -373,9 +448,9 @@ The assistant should behave like a compiler and maintainer for the wiki, not mer
 
 ## Detailed wiki-compiler playbook
 
-For large compilation, cleanup, gap-finding, or reorganization work, read [references/wiki_compiler.md](/Users/alvipe/Desktop/agent-suite/skills/second-brain/references/wiki_compiler.md). That reference imports the strongest parts of the external personal-wiki workflow while keeping them storage-agnostic.
+For large compilation, cleanup, gap-finding, or reorganization work, read [references/wiki_compiler.md](./references/wiki_compiler.md). That reference imports the strongest parts of the external personal-wiki workflow while keeping them storage-agnostic.
 
-For page-level structure, migration, and query semantics, also read [references/page_model.md](/Users/alvipe/Desktop/agent-suite/skills/second-brain/references/page_model.md) when the task involves:
+For page-level structure, migration, and query semantics, also read [references/page_model.md](./references/page_model.md) when the task involves:
 
 - designing or revising the canonical page schema
 - migrating from another tool or storage backend
@@ -391,11 +466,11 @@ Load that reference when the task involves any of these modes:
 - finding missing pages, missing themes, or missing relationships
 - reorganizing taxonomy, splitting bloated pages, or merging overlapping pages
 
-If the user explicitly mentions Obsidian, a vault, wikilinks, Bases, Canvas, or the Obsidian CLI, also read [references/obsidian_adapter.md](/Users/alvipe/Desktop/agent-suite/skills/second-brain/references/obsidian_adapter.md). Use it to map the portable raw/wiki/outputs model onto those tools while keeping notes, metadata, provenance, and exports portable.
+If the user explicitly mentions Obsidian, a vault, wikilinks, Bases, Canvas, or the Obsidian CLI, also read [references/obsidian_adapter.md](./references/obsidian_adapter.md). Use it to map the portable AFS contract onto those tools while keeping notes, metadata, provenance, and exports portable.
 
 ## Operational modes
 
-When the user asks for a concrete action rather than a broad architecture discussion, load [references/operational_modes.md](/Users/alvipe/Desktop/agent-suite/skills/second-brain/references/operational_modes.md).
+When the user asks for a concrete action rather than a broad architecture discussion, load [references/operational_modes.md](./references/operational_modes.md).
 
 Use that reference to interpret requests such as:
 
@@ -429,7 +504,7 @@ For standard public web pages, prefer a clean markdown extractor before heavier 
 defuddle parse https://example.com/article --md -o raw/2026-04-12_example-article.md
 ```
 
-Treat that file as a preserved source in the raw layer, then run normal absorb or compile steps against it. If the source is already a `.md` file, fetch it directly instead of reprocessing it through an extractor.
+Treat that file as a captured source in `raw/`, then run normal absorb or compile steps against it. Clear or archive it afterward when the brain's retention rule says `raw/` should stay transient. If the source is already a `.md` file, fetch it directly instead of reprocessing it through an extractor.
 
 If the environment supports `agent-browser` and the user wants a concrete CLI option, this is a reasonable example:
 
@@ -464,7 +539,7 @@ Rules:
 
 If the user mentions Obsidian, Marp, or similar tools, position them as optional viewing and rendering frontends around a portable file-based knowledge base.
 
-When the user wants a concrete Obsidian-oriented workflow, read [references/obsidian_adapter.md](/Users/alvipe/Desktop/agent-suite/skills/second-brain/references/obsidian_adapter.md) and treat Obsidian-specific files as optional projections over the same durable source and wiki layers.
+When the user wants a concrete Obsidian-oriented workflow, read [references/obsidian_adapter.md](./references/obsidian_adapter.md) and treat Obsidian-specific files as optional projections over the same durable source and knowledge layers.
 
 ## Living-system rules
 
@@ -522,10 +597,10 @@ Benefits:
 
 Unless the user specifies otherwise:
 
-- Create `wiki/INDEX.md` first.
+- Create `knowledge/INDEX.md` first.
 - Create one canonical page per durable topic, concept, project, customer, process, person, or decision area.
 - Start each wiki page with a short summary paragraph.
-- Keep raw sources immutable. Do not rewrite `raw/` unless the user explicitly asks.
+- Follow the retention rule in `BRAIN.md` for `raw/`. In strict AFS, treat `raw/` as a transient ingest queue and clear or archive processed material once its knowledge has been propagated. In partial or full adaptation modes, preserve originals when the user's system requires it.
 - Update existing pages when new evidence arrives instead of creating parallel near-duplicates.
 - Mark superseded content explicitly rather than silently overwriting history.
 - Preserve source references for non-obvious claims.
@@ -598,13 +673,13 @@ For recurring media workflows, add these sections when relevant:
 
 ### 7. Delivery log
 
-- Output destination such as `outputs/daily_videos.md`
+- Output destination such as `knowledge/communications/publishing/daily-videos/registry.md`
 - External URL or local artifact path
-- Follow-up updates that should be written back into the wiki
+- Follow-up updates that should be written back into canonical knowledge
 
 Do not assume the only useful output is terminal text. Depending on the request, the best artifact may be:
 
-- a markdown note or report filed into `outputs/`
+- a markdown note or report filed into `audits/`, `plans/`, `specs/`, or `knowledge/` depending on what it is
 - a new or updated canonical wiki page
 - a slide deck in markdown slide format such as Marp or another presentation format the user already uses
 - an image, chart, or plot saved locally
@@ -621,7 +696,7 @@ Use this branch of the skill when the user wants the second brain to speak outwa
 - Read the operating-manual file first, then inspect the canonical knowledge layer rather than raw material alone.
 - Prefer the single most interesting insight, update, or cross-topic connection added or changed in the last 24 hours.
 - If nothing is recent, pick the most underexplored durable topic instead of repeating a recently covered one.
-- Check the existing recurring-output registry such as `outputs/daily_videos.md` before choosing a topic.
+- Check the existing recurring-output registry such as `knowledge/communications/publishing/daily-videos/registry.md` before choosing a topic.
 - Avoid topics already covered in the last 7 days unless the user explicitly wants a follow-up.
 
 ### Script rules
@@ -664,14 +739,14 @@ When the user is starting from scratch or adding a new batch of material:
 - Infer missing conventions from the existing knowledge base if the file is incomplete
 - Inspect the user's current architecture and preserve it whenever it is already workable
 - If no instruction file exists, create a minimal one before large-scale compilation
-- Only introduce the default `raw/`, `wiki/`, `outputs/` architecture when the user has no meaningful existing structure
+- Only introduce the default AFS layout when the user has no meaningful existing structure
 
 ### 2.5. Default compile prompt
 
 When the user wants the assistant to perform the first compilation pass from a raw folder, a good default instruction is:
 
 ```text
-Read everything in `raw/`. Then compile a wiki in `wiki/` following the operating manual. Create or refresh `wiki/INDEX.md` first, then create or update one page per major topic. Link related pages. Summarize sources into durable knowledge. Preserve provenance. Update existing canonical pages instead of creating duplicates.
+Read everything in `raw/`. Then compile maintained knowledge following `BRAIN.md`. Create or refresh `knowledge/INDEX.md` first, then create or update canonical pages under `knowledge/<domain>/<subject>/<topic>/<case>/...` as needed. Link related pages. Summarize sources into durable knowledge. Preserve provenance. Update existing canonical pages instead of creating duplicates. Clear or archive processed `raw/` material if the brain's retention rule requires it.
 ```
 
 Adapt the prompt to the user's real folder names when they already have a different layout.
@@ -689,7 +764,7 @@ Assign each item to Fact, Decision, Procedure, Insight, Open question, and optio
 When asked to build or refresh the knowledge base:
 
 - read everything relevant in the raw/input layer
-- create or refresh `INDEX.md`
+- create or refresh `knowledge/INDEX.md` or the mapped equivalent
 - create or refresh source summary pages when durable source-level summaries add retrieval value
 - create or update one page per major topic
 - summarize each source into durable knowledge, not transcript sludge
@@ -706,7 +781,7 @@ When asked to build or refresh the knowledge base:
 Whenever you create or update a durable page, also check:
 
 - should `INDEX.md` change
-- should `LOG.md` record this operation
+- should the current dated file in `logs/` record this operation
 - should a project page, decision page, or daily log reference it
 - should a board or task list reflect new work
 - should a synthesis page be created or refreshed
@@ -737,15 +812,15 @@ Use this concrete workflow when the user says things like "ingest this source", 
 
 ### 8. Save generated work separately
 
-- Put reports, briefings, comparisons, and Q&A outputs into the output layer
+- Put reports, briefings, comparisons, and Q&A outputs into the narrowest AFS-compatible destination
 - Do not confuse generated outputs with canonical source-backed wiki pages
-- If an output contains durable new insight, promote that insight back into the wiki with a source marker
-- For recurring video workflows, keep the cumulative registry in the output layer even if render artifacts live under `videos/` or on an external platform
+- If an output contains durable new insight, promote that insight back into canonical knowledge with a source marker
+- For recurring video workflows, keep the cumulative registry in canonical knowledge or another mapped AFS destination even if render artifacts live externally
 
 ### 8.5. Make the system compound
 
 - Ask questions against the maintained wiki before rereading all raw sources.
-- Save valuable answers into `outputs/` or promote them into canonical wiki pages when they contain reusable synthesis.
+- Save valuable answers into the narrowest AFS-compatible destination or promote them into canonical knowledge pages when they contain reusable synthesis.
 - Treat every good answer as a chance to make the next answer better.
 - Run periodic health checks so mistakes do not silently compound across future updates and outputs.
 
@@ -835,7 +910,7 @@ As the knowledge base grows, the user may want lightweight helper tools around i
 
 Useful examples:
 
-- a small local search CLI over `wiki/` and `raw/`
+- a small local search CLI over `knowledge/`, `references/`, and `raw/`
 - scripts that collect or normalize source material into markdown and local assets
 - renderers that turn wiki content into slides, charts, plots, or publishable briefs
 - validators that check link integrity, missing metadata, empty sections, or unsupported claims
@@ -897,7 +972,7 @@ Offer safe fixes automatically when they are clearly reversible or low-risk. Ask
 
 Treat this as quality control. Errors compound when generated knowledge is reused without audit.
 
-When the audit is broad rather than local, use the cleanup, breakdown, rebuild, and reorganize guidance from [references/wiki_compiler.md](/Users/alvipe/Desktop/agent-suite/skills/second-brain/references/wiki_compiler.md) instead of treating the work as a simple note tidy-up.
+When the audit is broad rather than local, use the cleanup, breakdown, rebuild, and reorganize guidance from [references/wiki_compiler.md](./references/wiki_compiler.md) instead of treating the work as a simple note tidy-up.
 
 ## Provenance rules
 
@@ -914,7 +989,7 @@ When the audit is broad rather than local, use the cleanup, breakdown, rebuild, 
 
 Use this when the user wants to close the loop between the canonical knowledge layer and recurring published outputs.
 
-- Review the recurring-output registry together with `wiki/` and the raw/input layer.
+- Review the recurring-output registry together with canonical knowledge and the raw/input layer.
 - List the topics that appear most often in recurring outputs.
 - Identify durable wiki pages that have never appeared in a published output.
 - Find the biggest gap where the user clearly cares about a topic in raw notes but has not yet promoted it into the wiki or outputs.

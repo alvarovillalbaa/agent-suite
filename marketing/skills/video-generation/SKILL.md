@@ -1,46 +1,209 @@
 ---
 name: video-generation
-description: Best practices for Remotion - programmatic video creation in React. Use when the user wants to create or edit video (animations, captions, timing, assets). Rules in references/rules/; templates in templates/.
-version: 1.0.0
-license: MIT
-compatibility: Instruction-only. Read references/rules/ and templates/; optional tools for file read/write.
-metadata:
-  tags: remotion, video, react, animation, composition
+description: Production workflow for Remotion video creation in React. Use when the user wants to create or edit Remotion-based video code, animations, captions, timing, sequencing, compositions, structured scene manifests, or JSON-render video pipelines. Ask targeted questions, confirm strategy before code, self-evaluate the output, and persist the approved plan. Core rules live in references/rules/ and reusable planning/code scaffolds live in templates/.
 ---
 
-## When to use
+# Video Generation
 
-Use this skills whenever you are dealing with Remotion code to obtain the domain-specific knowledge.
+Treat this skill as the entrypoint for Remotion work in this repo.
 
-## How to use
+This skill is influenced by `browser-use/video-use` and `heygen-com/hyperframes`, but adapted for code-first Remotion builds in React instead of HTML-first compositions.
+
+## When To Use
+
+Use this skill for:
+
+- branded product videos, launch videos, explainers, social cuts, and walkthroughs
+- Remotion scene work that needs composition planning before code
+- manifest-driven video pipelines where scenes or screens are described as data
+- `@json-render/remotion` timelines that render from a JSON spec plus a component catalog
+- revisions to existing Remotion projects where timing, captions, or asset handling must stay coherent
+
+## Principles
+
+1. The plan is the primary reasoning surface. Scene lists, manifests, and timeline specs are the durable artifacts; everything else should derive from them.
+2. Layout before animation. Build the hero frame of a scene first, then animate from a stable layout.
+3. Ask, confirm, implement, self-evaluate, persist. Do not jump from a vague brief straight into code.
+4. Audio, captions, and timing are structural, not decorative. Treat them as part of the core composition model.
+5. The examples in this skill are examples, not presets. Reuse the workflow and rules, not generic aesthetics.
+
+## Hard Rules
+
+These rules are about production correctness and reviewability, not taste:
+
+1. Do not start large composition work until the user has approved a plain-English strategy.
+2. Lock composition metadata early: `durationInFrames` or an equivalent duration plan, `fps`, `width`, `height`, and aspect ratio must be explicit before scene code branches.
+3. Use one source of truth for timing. Do not scatter independent timing numbers across scene components, manifests, and helpers.
+4. Build each scene's readable hero frame before animating it. If the static frame is unclear, animation will not fix it.
+5. Captions and subtitle-safe layouts must be checked against the final layered scene state. Do not let overlays or edge-aligned UI hide them.
+6. Brand choices must come from the project, the user, or an explicit fallback assumption. Never silently invent a generic visual system.
+7. Verify the output before presenting it. Use Studio, still renders, or short renders to catch layout, timing, caption, and asset issues yourself first.
+8. Persist the approved plan in a durable artifact near the implementation: a markdown brief, scene manifest, or JSON timeline spec. Do not force future revisions to reconstruct the intent from code alone.
+
+## Production Workflow
+
+Use this workflow unless the task is a trivial patch:
+
+1. Frame the task with [references/overview.md](references/overview.md).
+2. Gather required inputs with [references/data-sources.md](references/data-sources.md).
+3. Ask the minimum targeted questions needed to resolve format, duration, audience, CTA, assets, and visual direction.
+4. Choose the implementation path with [references/composition-patterns.md](references/composition-patterns.md).
+5. Use [templates/video-plan.md](templates/video-plan.md) to lock the strategy, scenes, assets, timing, validation gates, and persistence artifact before code.
+6. Wait for plan approval before starting major implementation.
+7. Read only the relevant rule files from `references/rules/` and use [templates/video-code.md](templates/video-code.md) as the implementation scaffold.
+8. Run preview, still, or render checks from [references/rendering.md](references/rendering.md).
+9. Self-evaluate the output before presenting it.
+10. Cross-check the output against [references/checklist.md](references/checklist.md) before finishing.
+
+## Choose The Right Operating Mode
+
+Do not jump straight into scene code before deciding which model fits the request.
+
+1. Scene-first Remotion composition:
+   Use for bespoke marketing videos, launch spots, explainers, and branded ads where layout and animation are custom.
+2. Manifest-driven walkthrough:
+   Use for product walkthroughs or screen-to-screen demos where each scene can be described as structured data with durations, titles, descriptions, and assets.
+3. JSON timeline rendering:
+   Use when the project already uses `@json-render/remotion` or when the user explicitly wants a timeline spec that acts as the source of truth. Keep the JSON spec, catalog definitions, and custom components aligned.
+
+## Thinking Order
+
+Before writing Remotion code, think through the work in this order:
+
+1. What: what should the viewer understand, feel, or do by the end?
+2. Structure: how many scenes or compositions are needed, and what each scene is responsible for.
+3. Timing: which scenes set the pacing, where transitions happen, and how long each beat lasts in frames.
+4. Layout: build the most visible frame of each scene first so spacing and readability are correct before animation.
+5. Animate: add motion only after the layout, assets, and timing model are stable.
+
+For minor edits, skip directly to the relevant rule files and preserve the existing timing model, but still state the change strategy before touching risky timing or layout code.
+
+## Visual Identity Gate
+
+Before writing any composition or scene code, make sure the visual system is explicit.
+
+Check in this order:
+
+1. Existing brand inputs: use the user's brand colors, fonts, logo rules, screenshots, or product UI as the source of truth.
+2. Existing project styling: if the target repo already defines a design language, tokens, or reusable layout patterns, match them.
+3. User direction: if the user names a style or reference, translate it into a concrete palette, type system, and motion language.
+4. Missing visual direction: if nothing is defined, ask the minimum three questions before major implementation:
+   mood,
+   light, dark, or mixed canvas,
+   and any brand colors, fonts, or references.
+5. Only after that, state clear fallback assumptions in the plan before implementing.
+
+Do not default to generic colors, default fonts, or placeholder motion without documenting the assumption.
+
+## Data Before Code
+
+When the video can be expressed as data, keep the data model explicit before writing the composition:
+
+- For scene-first work, define the scene plan and frame ranges.
+- For walkthroughs, define a screen or scene manifest with titles, assets, durations, and callouts.
+- For `@json-render/remotion`, define the composition metadata, tracks, clips, and audio model first, then map them to standard or custom components.
+
+Prefer a stable source-of-truth object over hard-coded timings distributed across multiple files.
+
+## Layout Before Animation
+
+Each scene should be correct at its hero frame before you animate it.
+
+1. Identify the frame where the scene is most populated and most readable.
+2. Build that frame with static layout first using normal React layout primitives and CSS.
+3. Use animation to move from or toward that layout, rather than using animation to guess where elements should land.
+4. Keep transitions and sequence boundaries explicit in frames so overlap and dead air are easy to reason about.
+5. Verify the hero frame with Studio, a still render, or an equivalent preview before trusting the motion layer.
+
+This avoids hidden layout bugs where text, captions, or charts only collide once the video renders.
+
+## Quality Checks
+
+Before handoff, inspect the work as a video, not just as code.
+
+- Check the opening, closing, and every major scene boundary.
+- Check the hero frame of every dense scene for clipping, crowding, and subtitle-safe coverage.
+- Check that transitions, trims, and caption timing match the intended pacing.
+- Check that the final visual system still matches the approved brand or fallback assumptions.
+- If visual verification was skipped, say so explicitly instead of implying the output was reviewed.
+
+## Review Loop
+
+Use this loop for substantial video work:
+
+1. Inventory:
+   Read the brief, inspect existing compositions or manifests, and identify the real source material and constraints.
+2. Converse:
+   Ask only the questions the material does not answer: runtime, platform, aspect ratio, CTA, brand direction, narration, captions, missing assets, or revision target.
+3. Propose strategy:
+   Describe the scene structure, timing model, transition style, caption approach, and validation plan in plain English. Wait for confirmation.
+4. Implement:
+   Build the plan using the smallest architecture that fits: scene-first, manifest-driven, or JSON timeline.
+5. Self-evaluate:
+   Preview or render the output yourself and inspect the risky frames: opening, closing, scene boundaries, dense caption moments, and any layout-heavy animation.
+6. Persist:
+   Keep the approved plan in a durable artifact so the next revision starts from intent instead of reverse-engineering the code.
+
+## Output Contract
+
+When using this skill, the output should usually include:
+
+- a brief scene plan before large implementations
+- a plain-English strategy summary before code when the change is non-trivial
+- explicit composition metadata and frame counts
+- the chosen operating mode
+- the visual source of truth that was used
+- a short list of the rule files used
+- preview or render commands when verification matters
+- a short self-eval summary when visual verification was part of the task
+- the artifact where the approved plan now lives
+- clear assumptions for any missing assets, brand direction, or timing inputs
+
+## Rule Index
 
 Read individual rule files for detailed explanations and code examples:
 
 - [references/rules/3d.md](references/rules/3d.md) - 3D content in Remotion using Three.js and React Three Fiber
-- [references/rules/animations.md](references/rules/animations.md) - Fundamental animation skills for Remotion
-- [references/rules/assets.md](references/rules/assets.md) - Importing images, videos, audio, and fonts into Remotion
-- [references/rules/audio.md](references/rules/audio.md) - Using audio and sound in Remotion - importing, trimming, volume, speed, pitch
-- [references/rules/calculate-metadata.md](references/rules/calculate-metadata.md) - Dynamically set composition duration, dimensions, and props
-- [references/rules/can-decode.md](references/rules/can-decode.md) - Check if a video can be decoded by the browser using Mediabunny
-- [references/rules/charts.md](references/rules/charts.md) - Chart and data visualization patterns for Remotion
-- [references/rules/compositions.md](references/rules/compositions.md) - Defining compositions, stills, folders, default props and dynamic metadata
-- [references/rules/display-captions.md](references/rules/display-captions.md) - Displaying captions in Remotion with TikTok-style pages and word highlighting
-- [references/rules/extract-frames.md](references/rules/extract-frames.md) - Extract frames from videos at specific timestamps using Mediabunny
-- [references/rules/fonts.md](references/rules/fonts.md) - Loading Google Fonts and local fonts in Remotion
-- [references/rules/get-audio-duration.md](references/rules/get-audio-duration.md) - Getting the duration of an audio file in seconds with Mediabunny
-- [references/rules/get-video-dimensions.md](references/rules/get-video-dimensions.md) - Getting the width and height of a video file with Mediabunny
-- [references/rules/get-video-duration.md](references/rules/get-video-duration.md) - Getting the duration of a video file in seconds with Mediabunny
-- [references/rules/gifs.md](references/rules/gifs.md) - Displaying GIFs synchronized with Remotion's timeline
-- [references/rules/images.md](references/rules/images.md) - Embedding images in Remotion using the Img component
-- [references/rules/import-srt-captions.md](references/rules/import-srt-captions.md) - Importing .srt subtitle files into Remotion using @remotion/captions
-- [references/rules/lottie.md](references/rules/lottie.md) - Embedding Lottie animations in Remotion
-- [references/rules/measuring-dom-nodes.md](references/rules/measuring-dom-nodes.md) - Measuring DOM element dimensions in Remotion
-- [references/rules/measuring-text.md](references/rules/measuring-text.md) - Measuring text dimensions, fitting text to containers, and checking overflow
-- [references/rules/sequencing.md](references/rules/sequencing.md) - Sequencing patterns for Remotion - delay, trim, limit duration of items
-- [references/rules/tailwind.md](references/rules/tailwind.md) - Using TailwindCSS in Remotion
-- [references/rules/text-animations.md](references/rules/text-animations.md) - Typography and text animation patterns for Remotion
-- [references/rules/timing.md](references/rules/timing.md) - Interpolation curves in Remotion - linear, easing, spring animations
-- [references/rules/transcribe-captions.md](references/rules/transcribe-captions.md) - Transcribing audio to generate captions in Remotion
-- [references/rules/transitions.md](references/rules/transitions.md) - Scene transition patterns for Remotion
-- [references/rules/trimming.md](references/rules/trimming.md) - Trimming patterns for Remotion - cut the beginning or end of animations
-- [references/rules/videos.md](references/rules/videos.md) - Embedding videos in Remotion - trimming, volume, speed, looping, pitch
+- [references/rules/animations.md](references/rules/animations.md) - Fundamental animation patterns
+- [references/rules/assets.md](references/rules/assets.md) - Images, videos, audio, and fonts
+- [references/rules/audio.md](references/rules/audio.md) - Audio import, trim, volume, speed, and pitch
+- [references/rules/calculate-metadata.md](references/rules/calculate-metadata.md) - Dynamic duration, dimensions, and props
+- [references/rules/can-decode.md](references/rules/can-decode.md) - Browser decode checks with Mediabunny
+- [references/rules/charts.md](references/rules/charts.md) - Data visualization patterns
+- [references/rules/compositions.md](references/rules/compositions.md) - Compositions, folders, stills, and default props
+- [references/rules/display-captions.md](references/rules/display-captions.md) - Caption display and word highlighting
+- [references/rules/extract-frames.md](references/rules/extract-frames.md) - Frame extraction utilities
+- [references/rules/fonts.md](references/rules/fonts.md) - Font loading patterns
+- [references/rules/get-audio-duration.md](references/rules/get-audio-duration.md) - Audio duration lookup
+- [references/rules/get-video-dimensions.md](references/rules/get-video-dimensions.md) - Video dimensions lookup
+- [references/rules/get-video-duration.md](references/rules/get-video-duration.md) - Video duration lookup
+- [references/rules/gifs.md](references/rules/gifs.md) - GIF playback patterns
+- [references/rules/images.md](references/rules/images.md) - Image embedding patterns
+- [references/rules/import-srt-captions.md](references/rules/import-srt-captions.md) - `.srt` caption import
+- [references/rules/lottie.md](references/rules/lottie.md) - Lottie integration
+- [references/rules/light-leaks.md](references/rules/light-leaks.md) - Light leak overlay effects
+- [references/rules/maps.md](references/rules/maps.md) - Mapbox-based map and route animations
+- [references/rules/measuring-dom-nodes.md](references/rules/measuring-dom-nodes.md) - DOM measurement patterns
+- [references/rules/measuring-text.md](references/rules/measuring-text.md) - Text measurement and overflow checks
+- [references/rules/parameters.md](references/rules/parameters.md) - Parametrize compositions with Zod schemas
+- [references/rules/sequencing.md](references/rules/sequencing.md) - Sequence timing and offsets
+- [references/rules/silence-detection.md](references/rules/silence-detection.md) - Adaptive silence detection for audio and video
+- [references/rules/subtitles.md](references/rules/subtitles.md) - Router for caption and subtitle workflows
+- [references/rules/tailwind.md](references/rules/tailwind.md) - Tailwind usage in Remotion
+- [references/rules/text-animations.md](references/rules/text-animations.md) - Text animation patterns
+- [references/rules/timing.md](references/rules/timing.md) - Interpolation, easing, and spring timing
+- [references/rules/transcribe-captions.md](references/rules/transcribe-captions.md) - Caption transcription
+- [references/rules/transparent-videos.md](references/rules/transparent-videos.md) - Transparent video export settings
+- [references/rules/transitions.md](references/rules/transitions.md) - Scene transition patterns
+- [references/rules/trimming.md](references/rules/trimming.md) - Trim and cut patterns
+- [references/rules/videos.md](references/rules/videos.md) - Video embedding, looping, trimming, and playback controls
+- [references/rules/voiceover.md](references/rules/voiceover.md) - Scene voiceover generation and duration-driven timing
+- [references/rules/ffmpeg.md](references/rules/ffmpeg.md) - FFmpeg and FFprobe usage from Remotion projects
+
+## Local Extras
+
+- Use `templates/` for reusable planning and implementation scaffolds.
+- Use [references/composition-patterns.md](references/composition-patterns.md) to choose between scene-first, manifest-driven, and JSON-render architectures.
+- Use [references/rendering.md](references/rendering.md) for project setup, Studio preview, single-frame checks, and final render commands.
+- Use `examples/` for marketing-oriented prompts and deliverables.
+- Keep the rule files authoritative when there is a conflict between a template and a rule.

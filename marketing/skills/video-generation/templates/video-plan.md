@@ -1,4 +1,102 @@
 ---
 title: Video Plan
-audience: 
+audience:
 ---
+
+## Operating Mode
+
+- `scene-first` | `manifest-driven` | `json-render`
+- Source of truth for timing:
+
+## Questions To Resolve
+
+- Missing information:
+- Questions for the user:
+- Visual fallback questions if needed:
+  mood,
+  light, dark, or mixed canvas,
+  and any brand colors, fonts, or references
+
+## Goal
+
+- Objective:
+- Primary takeaway:
+- CTA:
+
+## Audience
+
+- Viewer:
+- Desired action:
+
+## Format
+
+- Duration:
+- FPS:
+- Resolution:
+- Aspect ratio:
+- Render target:
+
+## Visual Direction
+
+- Visual source of truth:
+- Brand / style reference:
+- Canvas:
+- Palette:
+- Typography:
+- Motion tone:
+- Tone:
+- Explicit fallback assumptions:
+
+## Assets
+
+- Existing assets:
+- Missing assets:
+- Audio / captions available:
+
+## Strategy Summary
+
+- Plain-English edit / build direction:
+- Narrative shape:
+- Timing model:
+- Caption / audio approach:
+- Validation plan:
+- Approval required before code: `yes`
+
+## Scene Breakdown
+
+1. Scene:
+   Time / frames:
+   Purpose:
+   Visuals:
+   Overlay copy:
+   Layout notes:
+   Audio / captions:
+   Transition in / out:
+
+## Structured Data
+
+- Manifest file or object:
+- JSON timeline spec:
+- Custom component definitions needed:
+
+## Rules To Load
+
+- `references/rules/...`
+
+## Validation Plan
+
+- Quality gates:
+- Preview path:
+- Still-render check:
+- Hero frames / boundaries to inspect:
+- Final render path:
+- Self-eval frames / moments:
+
+## Persistence
+
+- Plan artifact to keep updated:
+- Manifest / JSON spec to update:
+
+## Risks / Assumptions
+
+-

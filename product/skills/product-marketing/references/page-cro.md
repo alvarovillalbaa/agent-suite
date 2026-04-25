@@ -6,6 +6,8 @@ Use this reference when auditing an existing marketing page (homepage, landing p
 
 ## Initial Assessment
 
+Check for product marketing context first. If `.agents/product-marketing-context.md` exists (or `.claude/product-marketing-context.md` in older setups), read it before asking questions. Use that context to avoid repeating discovery work and to keep the audit aligned with the established buyer, proof, and conversion goal.
+
 Before running the analysis, establish three things:
 
 **1. Page type**
@@ -34,6 +36,55 @@ Source shapes intent and therefore what the page must do:
 - Direct / branded (high familiarity — social proof and next step matter most)
 - Email / outbound (warm context — specific follow-through from the message)
 - Referral / product (already converted once — friction reduction and upgrade logic)
+
+Capture these five supporting inputs if they are available:
+- Current conversion rate and target conversion rate
+- What happens immediately after the click or form submit
+- Existing user research, heatmaps, or session recordings
+- Traffic volume by source, especially for test feasibility
+- What has already been tried so the audit does not recycle failed ideas
+
+---
+
+## Operational Scorecard
+
+Use this scorecard when the user wants a recurring audit, portfolio comparison, or a simple benchmarkable CRO health score across multiple pages.
+
+This scorecard does not replace the deeper analysis below. It compresses the audit into a trackable operating view.
+
+### Eight scored dimensions
+
+| Dimension | What it measures | Weight |
+|---|---|---|
+| Headline Clarity | Value proposition and audience clarity in under 5 seconds | 15% |
+| CTA Visibility | Primary CTA prominence, contrast, and above-the-fold presence | 20% |
+| Social Proof | Testimonials, logos, case studies, review signals, usage numbers | 15% |
+| Urgency | Genuine scarcity, timing pressure, or action-forcing incentive | 5% |
+| Trust Signals | Security, guarantees, privacy reassurance, certifications, credibility | 10% |
+| Form Friction | Field count, complexity, intimidation, recovery from errors | 15% |
+| Mobile Responsiveness | Touch targets, layout, scanning, and mobile usability | 10% |
+| Page Speed Indicators | Weight, script load, image handling, obvious performance risks | 10% |
+
+Total CRO score = weighted average across all eight dimensions.
+
+### How to use it
+
+- use for weekly tracking on top landing pages
+- use pre-launch before driving paid traffic
+- use monthly for competitor or portfolio comparisons
+- use alongside, not instead of, the deeper diagnosis and recommendations
+
+### Score interpretation
+
+- **A / A+**: strong page, optimization is mostly in testing and proof density
+- **B**: good base, several meaningful conversion gaps remain
+- **C**: mixed signal, message and flow likely underperforming
+- **D / F**: page is leaking attention or trust in obvious places
+
+If exact benchmarks are unavailable, compare:
+- against the page's own previous score
+- against sister pages in the same funnel
+- against pages of the same type and traffic intent
 
 ---
 
@@ -243,6 +294,94 @@ Variant B: "[copy]" — [rationale: persona-specific, question format, etc.]
 Variant C: "[copy]" — [rationale: numbers/specificity, social proof hook, etc.]
 ```
 
+### 5. Scorecard Summary
+
+When the user asks for a benchmarkable or recurring audit, append:
+
+```markdown
+Overall CRO Score: [0-100]
+Letter Grade: [A+ to F]
+
+Dimension Scores
+- Headline Clarity: [score]
+- CTA Visibility: [score]
+- Social Proof: [score]
+- Urgency: [score]
+- Trust Signals: [score]
+- Form Friction: [score]
+- Mobile Responsiveness: [score]
+- Page Speed Indicators: [score]
+
+Tracking Note: [what to monitor next week / next launch / next test cycle]
+```
+
+---
+
+## Page-Specific Frameworks
+
+Apply the base seven-dimension audit differently depending on the page type:
+
+### Homepage
+- Optimize for cold traffic first: visitors should understand product, buyer, and outcome within one screen
+- Create a fast path for high-intent visitors and a second path for researchers who still need proof
+- Make the primary navigation support discovery rather than distract from the main conversion path
+
+### Campaign Landing Page
+- Match the promise and language from the ad, email, or outbound message exactly enough to preserve message scent
+- Remove or simplify navigation so the page can complete one argument
+- Keep one dominant CTA and repeat it at key decision points
+
+### Pricing Page
+- Make plan differences obvious without forcing line-by-line comparison work
+- Signal the recommended plan clearly
+- Reduce "which plan is right for me?" anxiety with use-case cues, FAQs, and an escalation path
+
+### Feature / Product Page
+- Translate features into user outcomes before showing product detail
+- Use examples, screenshots, and use cases to prove the mechanism
+- End with a clear next step to try, buy, or speak with sales
+
+### Blog / Content Page
+- Match the CTA to the article intent instead of dropping in a generic signup prompt
+- Place inline CTAs at natural stopping points
+- Use lead capture only when it feels like a continuation of the content promise
+
+### Signup / Demo Request Page
+- Strip fields to the minimum needed for routing or follow-up
+- Clarify exactly what happens next and how long it will take
+- Use reassurance near the form: privacy, no credit card, response time, or qualification expectations
+
+---
+
+## Experiment Ideas
+
+When recommending experiments, bias toward the parts of the page with the highest leverage:
+
+- Hero section: headline, subheadline, hero proof, CTA copy, CTA count
+- Trust signals: logo bar placement, testimonial specificity, quantified outcomes, review badges
+- Pricing presentation: plan order, recommendation label, annual/monthly framing, FAQ placement
+- Forms: field count, required fields, reassurance copy, inline validation
+- Navigation and UX: reduced nav, sticky CTA, mobile-first hierarchy, scroll depth pacing
+
+Write tests in If / Then / Because format and estimate feasibility before recommending them as a real next step.
+
+For execution planning, sample sizing, and stopping rules, pair this reference with:
+- `../product-development/references/experiment-playbook.md`
+- `../product-development/references/statistics-reference.md`
+- `../product-development/scripts/sample_size_calculator.py`
+
+---
+
+## Task-Specific Questions
+
+Ask only for information missing from the page, available context files, or supplied materials:
+
+1. What is the current conversion rate and the target improvement?
+2. Where is traffic coming from, and which source matters most?
+3. What does the signup, demo, or purchase flow look like after this page?
+4. Do you have user research, heatmaps, or session recordings?
+5. What have you already tested or changed?
+
 ---
 
 ## Integration with Other References
@@ -267,3 +406,4 @@ Variant C: "[copy]" — [rationale: numbers/specificity, social proof hook, etc.
 - Writing test ideas without estimating the traffic required — an underpowered test is worse than no test
 - Treating mobile as an afterthought — mobile traffic commonly exceeds 60% on paid campaigns
 - Adding trust signals without making them specific — vague social proof erodes trust instead of building it
+- Recommending experiments without checking whether the post-click flow can actually absorb more conversions

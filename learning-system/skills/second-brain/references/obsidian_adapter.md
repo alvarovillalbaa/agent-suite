@@ -11,8 +11,8 @@ Treat Obsidian as an optional interface and automation layer around a portable k
 Keep the durable contract the same:
 
 - raw sources stay preserved
-- canonical wiki pages stay source-backed and assistant-maintained
-- outputs stay separate from canonical knowledge
+- canonical knowledge pages stay source-backed and assistant-maintained
+- reports, plans, audits, and other deliverables stay separate from canonical knowledge unless the brain explicitly stores them under `knowledge/`
 - metadata, links, and exports should remain legible outside Obsidian
 
 Do not redesign the knowledge base around vault-specific affordances unless the user explicitly wants that tradeoff.
@@ -21,16 +21,17 @@ Do not redesign the knowledge base around vault-specific affordances unless the 
 
 Reasonable folder mappings inside an Obsidian vault:
 
-- `raw/` or `Sources/` for preserved source material
-- `wiki/` or domain folders for canonical topic pages
-- `outputs/` for reports, briefings, and recurring publishable artifacts
+- `raw/` or `Sources/` for intake material
+- `knowledge/` or domain folders for canonical topic pages
+- `references/`, `cookbook/`, `runbooks/`, `research/`, `official-documentation/`, and `sources/` for the rest of the AFS source-of-truth layer
+- `audits/`, `plans/`, and `specs/` for operational artifacts
 - `attachments/` or nearby asset folders for images, PDFs, and figures
 
 If the vault already has a different layout, adapt to it. The important mapping is logical, not nominal:
 
 - source layer
-- canonical wiki layer
-- output layer
+- canonical knowledge layer
+- operational artifact layer
 - optional view or automation layer
 
 ## Obsidian Markdown
@@ -153,7 +154,7 @@ Use this workflow:
 
 1. preserve the cleaned markdown in the raw layer
 2. store the source URL and capture date in the file or nearby metadata
-3. absorb the source into canonical pages
+3. absorb the source into canonical pages under `knowledge/` or another mapped canonical area
 4. keep any figures or attachments that materially affect the synthesis
 
 If the source is already markdown, fetch it directly.
