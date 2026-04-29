@@ -34,7 +34,7 @@ Likely promotion targets:
 - service `README.md`
 - `ARCHITECTURE.md`
 - `TESTS.md`
-- `docs/cookbook/`
+- `cookbook/`
 
 ### Frontend repo
 

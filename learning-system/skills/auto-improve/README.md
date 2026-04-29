@@ -8,6 +8,7 @@ Self-improvement skill for auditing memories, reviewing system drift, and tighte
 - reviewing whether docs, skills, or operating habits have drifted
 - running evaluation loops on skills, agents, or documentation
 - turning recurring friction into explicit improvements
+- capturing or refreshing `writing-style-guide.md` when drafts keep missing the user's or brand's real voice
 
 ## Install
 
@@ -30,3 +31,5 @@ https://github.com/alvarovillalbaa/plugins/tree/main/learning-system/skills/auto
 - `references/`
 - `scripts/`
 - `templates/`
+- `references/writing-style-learning.md`
+- `templates/writing-style-guide.md`

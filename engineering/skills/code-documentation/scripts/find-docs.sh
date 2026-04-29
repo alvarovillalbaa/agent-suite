@@ -1,24 +1,23 @@
 #!/usr/bin/env bash
-# find-docs.sh — Locate documentation files relevant to the current task.
+# find-docs.sh — Locate AFS documentation paths and detect legacy conflicts.
 #
 # Usage:
-#   ./find-docs.sh            Print locations for common doc targets
-#   ./find-docs.sh log        Print path to latest memory log
-#   ./find-docs.sh audit      Print path for a new audit (today's date folder)
-#   ./find-docs.sh service    Print service-level doc locations (requires being in a service dir)
+#   ./find-docs.sh             Print common doc targets and legacy conflicts
+#   ./find-docs.sh log         Print path to latest log file
+#   ./find-docs.sh audit       Print path for a new audit
+#   ./find-docs.sh service     Print in-folder doc coverage for the current directory
+#   ./find-docs.sh conflicts   Print legacy doc locations that conflict with AFS
 
 set -euo pipefail
 
 TODAY=$(date +%Y-%m-%d)
 YEAR=$(date +%Y)
 DATE_DIR=$(date +%Y-%m-%d)
-DOCS_ROOT="docs"
 
-# Find repo root (walk up until we find a docs/ directory or .git)
 find_repo_root() {
     local dir="$PWD"
     while [[ "$dir" != "/" ]]; do
-        if [[ -d "$dir/docs" || -d "$dir/.git" ]]; then
+        if [[ -d "$dir/.git" || -f "$dir/AGENTS.md" || -d "$dir/logs" || -d "$dir/audits" || -d "$dir/specs" || -d "$dir/docs" ]]; then
             echo "$dir"
             return
         fi
@@ -33,29 +32,67 @@ print_separator() {
     echo "────────────────────────────────────────────────"
 }
 
+latest_timestamped_file() {
+    local base="$1"
+    if [[ ! -d "$base" ]]; then
+        return 1
+    fi
+
+    local latest_year latest_day latest_file
+    latest_year=$(find "$base" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | tail -1)
+    [[ -n "$latest_year" ]] || return 1
+    latest_day=$(find "$base/$latest_year" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort | tail -1)
+    [[ -n "$latest_day" ]] || return 1
+    latest_file=$(find "$base/$latest_year/$latest_day" -mindepth 1 -maxdepth 1 -type f -name "*.md" -exec basename {} \; | sort | tail -1)
+    [[ -n "$latest_file" ]] || return 1
+
+    echo "$base/$latest_year/$latest_day/$latest_file"
+}
+
+print_legacy_conflicts() {
+    local found=0
+    for legacy in \
+        "$REPO_ROOT/docs/memories" \
+        "$REPO_ROOT/docs/guides" \
+        "$REPO_ROOT/docs/references" \
+        "$REPO_ROOT/docs/cookbook" \
+        "$REPO_ROOT/docs/plans" \
+        "$REPO_ROOT/docs/specs" \
+        "$REPO_ROOT/docs/audits"
+    do
+        if [[ -e "$legacy" ]]; then
+            if [[ $found -eq 0 ]]; then
+                echo "⚠️  LEGACY / CONFLICTING DOC TREES"
+                found=1
+            fi
+            echo "   $legacy"
+        fi
+    done
+
+    if [[ $found -eq 0 ]]; then
+        echo "No legacy docs/* conflict surfaces detected."
+    fi
+}
+
 cmd="${1:-all}"
 
 case "$cmd" in
-
     log)
-        LOG_DIR="$REPO_ROOT/$DOCS_ROOT/memories/logs"
-        if [[ -d "$LOG_DIR" ]]; then
-            LATEST_YEAR=$(ls "$LOG_DIR" | sort | tail -1)
-            LATEST_DAY=$(ls "$LOG_DIR/$LATEST_YEAR" 2>/dev/null | sort | tail -1)
-            LATEST_FILE=$(ls "$LOG_DIR/$LATEST_YEAR/$LATEST_DAY" 2>/dev/null | sort | tail -1)
-            echo "Latest log: $LOG_DIR/$LATEST_YEAR/$LATEST_DAY/$LATEST_FILE"
+        LOG_DIR="$REPO_ROOT/logs"
+        if path=$(latest_timestamped_file "$LOG_DIR"); then
+            echo "Latest log: $path"
             echo ""
             echo "Append with:"
-            echo "  echo '- Your log entry here' >> $LOG_DIR/$LATEST_YEAR/$LATEST_DAY/$LATEST_FILE"
+            echo "  echo '- Your log entry here' >> $path"
         else
-            echo "No docs/memories/logs/ directory found in repo root: $REPO_ROOT"
-            echo "Create it with: mkdir -p $REPO_ROOT/$DOCS_ROOT/memories/logs/$YEAR/$DATE_DIR"
-            echo "Then create:    touch $REPO_ROOT/$DOCS_ROOT/memories/logs/$YEAR/$DATE_DIR/dev.md"
+            echo "No logs/ directory with dated markdown files found in repo root: $REPO_ROOT"
+            echo "Create it with: mkdir -p $REPO_ROOT/logs/$YEAR/$DATE_DIR"
+            echo "Then create:    touch $REPO_ROOT/logs/$YEAR/$DATE_DIR/dev.md"
         fi
         ;;
 
     audit)
-        AUDIT_DIR="$REPO_ROOT/$DOCS_ROOT/audits/$YEAR/$DATE_DIR"
+        AUDIT_DIR="$REPO_ROOT/audits/$YEAR/$DATE_DIR"
         echo "New audit location: $AUDIT_DIR/"
         echo ""
         echo "Create with:"
@@ -64,159 +101,71 @@ case "$cmd" in
         ;;
 
     service)
-        # Look for the nearest service-level directory
         CURRENT="$PWD"
-        echo "Service docs for: $CURRENT"
+        echo "In-folder docs for: $CURRENT"
         echo ""
         echo "Core:"
         for f in README.md ARCHITECTURE.md TESTS.md; do
-            if [[ -f "$CURRENT/$f" ]]; then
-                echo "  ✓ $f"
-            else
-                echo "  ✗ $f (missing)"
-            fi
+            [[ -f "$CURRENT/$f" ]] && echo "  ✓ $f" || echo "  ✗ $f (missing)"
         done
         echo ""
         echo "Conditional:"
         for f in SETUP.md RUNBOOK.md CHANGELOG.md SECURITY.md; do
-            if [[ -f "$CURRENT/$f" ]]; then
-                echo "  ✓ $f"
-            else
-                echo "  ✗ $f (missing)"
-            fi
+            [[ -f "$CURRENT/$f" ]] && echo "  ✓ $f" || echo "  ✗ $f (missing)"
         done
         echo ""
         echo "Rare:"
         for f in OVERVIEW.md FAQ.md DECISIONS.md DEPENDENCIES.md; do
-            if [[ -f "$CURRENT/$f" ]]; then
-                echo "  ✓ $f"
-            else
-                echo "  ✗ $f (missing)"
-            fi
+            [[ -f "$CURRENT/$f" ]] && echo "  ✓ $f" || echo "  ✗ $f (missing)"
         done
+        ;;
+
+    conflicts)
+        print_legacy_conflicts
         ;;
 
     all|*)
         print_separator
-        echo "Code Documentation — File Locations"
+        echo "Code Documentation — AFS Locations"
         print_separator
         echo ""
 
-        # Memory logs
-        LOG_DIR="$REPO_ROOT/$DOCS_ROOT/memories/logs"
-        echo "📓 MEMORY LOGS (docs/memories/logs/YYYY/YYYY-MM-DD/)"
-        if [[ -d "$LOG_DIR" ]]; then
-            LATEST_YEAR=$(ls "$LOG_DIR" 2>/dev/null | sort | tail -1)
-            if [[ -n "$LATEST_YEAR" ]]; then
-                LATEST_DAY=$(ls "$LOG_DIR/$LATEST_YEAR" 2>/dev/null | sort | tail -1)
-                LATEST_FILE=$(ls "$LOG_DIR/$LATEST_YEAR/$LATEST_DAY" 2>/dev/null | sort | tail -1 2>/dev/null || echo "")
-                echo "   Latest: $LOG_DIR/$LATEST_YEAR/$LATEST_DAY/$LATEST_FILE"
+        echo "📝 TIMESTAMPED HISTORY"
+        for dir in logs lessons items fixes audits raw plans; do
+            base="$REPO_ROOT/$dir"
+            if path=$(latest_timestamped_file "$base" 2>/dev/null); then
+                echo "   $dir: $path"
             else
-                echo "   Directory exists but is empty: $LOG_DIR"
-            fi
-        else
-            echo "   Not found — expected: $LOG_DIR/"
-            echo "   New log: $LOG_DIR/$YEAR/$DATE_DIR/dev.md"
-        fi
-        echo ""
-
-        # Memory lessons/facts/procedures/fixes
-        echo "🧠 MEMORY ARTIFACTS (docs/memories/<type>/YYYY/YYYY-MM-DD/)"
-        for TYPE in lessons facts procedures fixes; do
-            MEM_DIR="$REPO_ROOT/$DOCS_ROOT/memories/$TYPE"
-            if [[ -d "$MEM_DIR" ]]; then
-                COUNT=$(find "$MEM_DIR" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-                echo "   $TYPE: $COUNT file(s)"
-            else
-                echo "   $TYPE: not found — new: $MEM_DIR/$YEAR/$DATE_DIR/"
+                echo "   $dir: $base/$YEAR/$DATE_DIR/"
             fi
         done
         echo ""
 
-        # Audits
-        echo "📊 AUDITS (docs/audits/YYYY/YYYY-MM-DD/)"
-        AUDIT_BASE="$REPO_ROOT/$DOCS_ROOT/audits"
-        if [[ -d "$AUDIT_BASE" ]]; then
-            RECENT=$(find "$AUDIT_BASE" -name "*.md" 2>/dev/null | sort | tail -3)
-            if [[ -n "$RECENT" ]]; then
-                echo "   Recent:"
-                echo "$RECENT" | while read -r f; do
-                    echo "     $f"
-                done
+        echo "📚 LIVING DOCS"
+        for dir in specs sources lib references cookbook knowledge runbooks research official-documentation context; do
+            base="$REPO_ROOT/$dir"
+            if [[ -d "$base" ]]; then
+                echo "   ✓ $base"
             else
-                echo "   Directory exists but is empty"
+                echo "   ✗ $base (missing)"
             fi
-        else
-            echo "   Not found — new audit: $AUDIT_BASE/$YEAR/$DATE_DIR/report-name.md"
-        fi
+        done
         echo ""
 
-        # Plans and Specs
-        echo "📋 PLANS / SPECS"
-        echo "   New plan: $REPO_ROOT/$DOCS_ROOT/plans/$YEAR/$DATE_DIR/plan-name.md"
-        echo "   New spec: $REPO_ROOT/$DOCS_ROOT/specs/$YEAR/$DATE_DIR/spec-name.md"
-        echo ""
-
-        # Flat project docs
-        echo "📚 GUIDES / REFERENCES / COOKBOOK"
-        echo "   Guides: $REPO_ROOT/$DOCS_ROOT/guides/"
-        echo "   References: $REPO_ROOT/$DOCS_ROOT/references/"
-        echo "   Cookbook: $REPO_ROOT/$DOCS_ROOT/cookbook/"
-        echo ""
-
-        # Root instruction docs
         echo "🧭 ROOT INSTRUCTION DOCS"
         for f in AGENTS.md PLAN.md SPEC.md SOUL.md PRINCIPLES.md DESIGN.md; do
-            if [[ -f "$REPO_ROOT/$f" ]]; then
-                echo "   ✓ $REPO_ROOT/$f"
-            else
-                echo "   ✗ $REPO_ROOT/$f (missing)"
-            fi
+            [[ -f "$REPO_ROOT/$f" ]] && echo "   ✓ $REPO_ROOT/$f" || echo "   ✗ $REPO_ROOT/$f (missing)"
         done
         echo ""
 
-        # Runbooks
-        RUNBOOKS_DIR="$REPO_ROOT/runbooks"
-        echo "📚 RUNBOOKS (runbooks/*.md)"
-        if [[ -d "$RUNBOOKS_DIR" ]]; then
-            COUNT=$(find "$RUNBOOKS_DIR" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-            echo "   Directory: $RUNBOOKS_DIR"
-            echo "   Markdown files: $COUNT"
-        else
-            echo "   Not found — create shared workflow docs here: $RUNBOOKS_DIR/"
-        fi
+        echo "📁 IN-FOLDER DOC CONTRACT"
+        echo "   Core: README.md, ARCHITECTURE.md, TESTS.md"
+        echo "   Conditional: SETUP.md, RUNBOOK.md, CHANGELOG.md, SECURITY.md"
+        echo "   Rare: OVERVIEW.md, FAQ.md, DECISIONS.md, DEPENDENCIES.md"
         echo ""
 
-        # Service docs (if in a service dir)
-        if [[ "$PWD" == *"/services/"* ]]; then
-            SERVICE_ROOT=$(echo "$PWD" | sed 's|\(.*services/[^/]*\).*|\1|')
-            echo "🔧 SERVICE DOCS (detected: $SERVICE_ROOT)"
-            echo "   Core:"
-            for f in README.md ARCHITECTURE.md TESTS.md; do
-                if [[ -f "$SERVICE_ROOT/$f" ]]; then
-                    echo "   ✓ $SERVICE_ROOT/$f"
-                else
-                    echo "   ✗ $SERVICE_ROOT/$f (missing)"
-                fi
-            done
-            echo "   Conditional:"
-            for f in SETUP.md RUNBOOK.md CHANGELOG.md SECURITY.md; do
-                if [[ -f "$SERVICE_ROOT/$f" ]]; then
-                    echo "   ✓ $SERVICE_ROOT/$f"
-                else
-                    echo "   ✗ $SERVICE_ROOT/$f (missing)"
-                fi
-            done
-            echo "   Rare:"
-            for f in OVERVIEW.md FAQ.md DECISIONS.md DEPENDENCIES.md; do
-                if [[ -f "$SERVICE_ROOT/$f" ]]; then
-                    echo "   ✓ $SERVICE_ROOT/$f"
-                else
-                    echo "   ✗ $SERVICE_ROOT/$f (missing)"
-                fi
-            done
-            echo ""
-        fi
+        print_legacy_conflicts
+        echo ""
 
         print_separator
         echo "Templates: skills/code-documentation/templates/"

@@ -8,7 +8,7 @@ allowed-tools: [Read, Write, AskUserQuestion, Skill]
 Use skills: **prospect-research**, **message-outreach**, and optionally **linkedin-engagement**.
 
 1. **Gather inputs** – Ask for prospect or account data, URLs, notes, or a clear outreach goal if the argument is thin.
-2. **Choose the research depth** – Use `message-outreach` for a shorter scored brief, or `prospect-research` for a fuller GTM brief.
-3. **Build the brief** – Produce the research artifact with evidence and a clear next motion.
-4. **Draft the outreach** – Turn the brief into email, LinkedIn, or follow-up messaging as requested.
-5. **Deliver** – Output the brief plus the message drafts and suggest the next touchpoint.
+2. **Research first** – Use `prospect-research` when the outreach needs stronger account, persona, or timing evidence.
+3. **Draft the outreach** – Use `message-outreach` for the actual email, LinkedIn, reply, or short sequence.
+4. **Adapt to channel** – Keep copy plain-text, concise, and appropriate for email, LinkedIn, or reply-thread context.
+5. **Deliver** – Output the final message drafts, any supporting research basis, and the suggested next touchpoint.

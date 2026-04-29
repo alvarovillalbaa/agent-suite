@@ -32,6 +32,7 @@ If you maintain repo-specific install or validation commands, document them in a
 ## Publishing Checklist
 
 1. Confirm `SKILL.md` frontmatter is valid.
-2. Confirm `references/agents/openai.yaml` is up to date.
+2. Confirm `agents/openai.yaml` is up to date.
 3. Confirm scripts run with `python3`/`bash` without external assumptions.
 4. Confirm template assets include both HTML default and React/TS explicit-mode starters.
+5. Confirm the AI image deck flow ships `scripts/generate_image_deck.py` plus its references/examples.

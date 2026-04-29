@@ -1,6 +1,6 @@
 # Daily Log Template
 
-Development logs go in `docs/memories/logs/YYYY/YYYY-MM-DD/*.md` — always append to the latest existing file, never create new files unless today's date directory doesn't exist yet.
+Development logs go in `logs/YYYY/YYYY-MM-DD/*.md` — always append to the latest existing file, never create new files unless today's date directory doesn't exist yet.
 
 ---
 
@@ -44,17 +44,10 @@ One bullet per logical change. One or two lines maximum. Past tense. Active voic
 - Added SENTRY_TRACES_SAMPLE_RATE env var — enables configurable APM trace sampling without deploy
 ```
 
-### Migrations
-```
-- Added GinIndex on search_vector field in jobs_job — reduces full-text search from 800ms to 40ms
-- Migrated JobSkillLink FK to ObjectItem pattern — part of polymorphic relations refactor
-- Added company_id index on candidate_candidate — required for multi-tenant query isolation
-```
-
 ### Documentation
 ```
 - Added ARCHITECTURE.md for services/mcp — documents connection lifecycle and tool filtering
-- Updated services/agents/README.md to reflect ConversationResultHandler consolidation
+- Updated PLAN.md and SPEC.md — separated historical plans from living desired-state contracts
 ```
 
 ---
@@ -77,13 +70,10 @@ These are not useful to anyone — they contain no searchable information.
 ## Finding the Latest Log File
 
 ```bash
-# Find the latest year/day directory
-YEAR=$(ls docs/memories/logs/ | sort | tail -1)
-DATE_DIR=$(ls docs/memories/logs/$YEAR/ | sort | tail -1)
-FILE=$(ls docs/memories/logs/$YEAR/$DATE_DIR/ | sort | tail -1)
-
-# Append to it
-echo "- Your log entry here" >> docs/memories/logs/$YEAR/$DATE_DIR/$FILE
+YEAR=$(ls logs/ | sort | tail -1)
+DATE_DIR=$(ls logs/$YEAR/ | sort | tail -1)
+FILE=$(ls logs/$YEAR/$DATE_DIR/ | sort | tail -1)
+echo "- Your log entry here" >> logs/$YEAR/$DATE_DIR/$FILE
 ```
 
 Or use: `skills/code-documentation/scripts/find-docs.sh log`

@@ -5,7 +5,7 @@ description: Runs targeted prospect research, online enrichment, and outbound me
 
 # Sales Prospecting Agent
 
-**Scope:** Account research, contact research, people enrichment, and outreach sequence drafting.
+**Scope:** Account research, contact research, people enrichment, and outreach drafting across single messages, replies, and short sequences.
 
 Use this agent when the user wants outbound prospecting work that requires both research and messaging.
 

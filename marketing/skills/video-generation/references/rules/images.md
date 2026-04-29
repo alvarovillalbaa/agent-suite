@@ -49,6 +49,8 @@ import { Img, staticFile } from "remotion";
 <Img src={staticFile("logo.png")} />
 ```
 
+If an image exists elsewhere in the repo, move or copy it into `public/` before using it as a render dependency.
+
 ## Remote images
 
 Remote URLs can be used directly without `staticFile()`:
@@ -58,6 +60,16 @@ Remote URLs can be used directly without `staticFile()`:
 ```
 
 Ensure remote images have CORS enabled.
+
+Prefer remote URLs when the repo already stores the asset in S3, Azure Blob Storage, Cloudinary, or another stable asset host.
+
+## Generated images
+
+If the image is generated during the task, persist it into `public/generated/...` or another explicit render input path first, then reference it with `staticFile()`.
+
+## Product-first images
+
+For screenshots, dashboards, and interface-heavy product visuals, prefer code-as-image or a live composition when fidelity matters. Use static screenshots only when they are already authoritative and current.
 
 For animated GIFs, use the `<Gif>` component from `@remotion/gif` instead.
 

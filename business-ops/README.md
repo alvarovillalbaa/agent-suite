@@ -33,7 +33,7 @@ https://github.com/alvarovillalbaa/plugins/tree/main/business-ops
 
 ## Skills
 
-- [`finances`](./skills/finances/README.md): reconciliation, modeling, and fundraising support
+- [`finances`](./skills/finances/README.md): reconciliation, close management, modeling, and fundraising support
 - [`reporting`](./skills/reporting/README.md): weekly, monthly, board, and KPI reporting
-- [`research`](./skills/research/README.md): research workspace placeholder that still needs its main skill spec
+- [`research`](./skills/research/README.md): decision-oriented market, account, customer, and synthesis research workflows
 - [`review`](./skills/review/README.md): intensive review workflows for code, plans, and executive thinking

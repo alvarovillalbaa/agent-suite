@@ -35,13 +35,14 @@ It should behave like a lightweight hyperagent, not a one-shot optimizer:
    - user directions, corrections, and constraints
    - failures, retries, or moments where the agent needed extra steering
    - weak outputs from skills or agents
+   - draft corrections about tone, voice, or "this doesn't sound like me/us"
    - missing, stale, or confusing documentation surfaced during execution
    - durable preferences or workflow patterns worth persisting
 
 2. Build a candidate improvement list across these target types:
    - `skill` — a `SKILL.md` file whose instructions caused weak or awkward execution
    - `agent` — an agent definition under `agents/` whose routing, trigger text, or workflow was off
-   - `documentation` — repo docs like `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`, `README.md`, `ARCHITECTURE.md`, `TESTS.md`, `SETUP.md`, `RUNBOOK.md`, `CHANGELOG.md`, `SECURITY.md`, `OVERVIEW.md`, `FAQ.md`, `DECISIONS.md`, `DEPENDENCIES.md`, `CONTRIBUTING.md`, `TESTING.md`, `runbooks/**/*.md`, or `docs/**/*.md`
+   - `documentation` — repo docs like `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`, `README.md`, `ARCHITECTURE.md`, `TESTS.md`, `SETUP.md`, `RUNBOOK.md`, `CHANGELOG.md`, `SECURITY.md`, `OVERVIEW.md`, `FAQ.md`, `DECISIONS.md`, `DEPENDENCIES.md`, `CONTRIBUTING.md`, `TESTING.md`, `writing-style-guide.md`, `logs/`, `lessons/`, `items/`, `fixes/`, `audits/`, `raw/`, `plans/`, `specs/`, `sources/`, `lib/`, `references/`, `cookbook/`, `knowledge/`, `runbooks/`, `research/`, `official-documentation/`, `context/`, or domain-specific AFS doc trees
    - `memory` — memory files under `~/.claude/projects/*/memory/` that are stale, contradictory, or missing key durable facts
    - `conversation` — harvest durable memory or reusable workflows from the current conversation
 
@@ -55,6 +56,7 @@ It should behave like a lightweight hyperagent, not a one-shot optimizer:
    - Sometimes this is one skill.
    - Sometimes it is multiple skills.
    - Sometimes it is a skill plus one or more agents or docs such as `AGENTS.md`, `PLAN.md`, `SPEC.md`, `DESIGN.md`, or a runbook.
+   - If the failure is mostly "wrong voice" rather than "wrong workflow", prefer a style artifact such as `writing-style-guide.md` plus the consuming skill, not just more drafting rules.
    - Do not improve everything just because you can. Improve everything that the evidence says is necessary.
 
 5. For each selected target that is a skill, agent, or documentation file, determine its **source origin**:
@@ -64,6 +66,8 @@ It should behave like a lightweight hyperagent, not a one-shot optimizer:
    Mark each selected target with its origin before starting any sub-flow.
 
 6. Route each selected target to the appropriate sub-flow below. Process multiple targets one at a time, highest leverage first.
+
+If the evidence shows repeated voice mismatch, brand-tone drift, or user feedback like "too AI", "too salesy", or "this doesn't sound like me/us", route through **sub-flow: writing-style capture and refresh** before or alongside the eval loop.
 
 If the evidence does not justify any durable improvement, stop and make no changes.
 
@@ -240,6 +244,86 @@ If nothing was saved: no status line needed.
 
 ---
 
+## sub-flow: writing-style capture and refresh
+
+Use this sub-flow when the real failure is not missing task logic but missing first-party voice grounding.
+
+Load `references/writing-style-learning.md` for the source-order and diagnosis heuristics before changing the guide or the consuming skill.
+
+### when to trigger
+
+Trigger when one or more of these are true:
+
+- the user corrects drafts mainly on tone, phrasing, warmth, directness, or "sounds like me/us"
+- a writing skill keeps producing generic or channel-inappropriate copy despite otherwise correct structure
+- there is no durable `writing-style-guide.md` but the agent is repeatedly drafting on behalf of the same sender, founder, exec, team, or brand
+- an existing style guide clearly drifted from the user's recent writing
+
+### step 1 — identify the drafting owner and channels
+
+Pin down:
+
+- who the draft is supposed to sound like
+- which channels matter: email, LinkedIn, social, docs, messages, or call scripts
+- whether the voice is personal, team, executive, or brand-level
+
+Do not merge multiple voices into one guide unless the evidence says they are intentionally shared.
+
+### step 2 — discover available first-party sources
+
+Look for the strongest available sources in this order:
+
+1. existing `writing-style-guide.md` or brand voice docs
+2. recent approved or sent messages from the same sender on the same channel
+3. recent first-party public writing such as posts, newsletters, or blog entries
+4. approved templates already known to match the sender
+
+Do not learn voice from inbound messages, quoted reply text, signatures, disclaimers, or auto-generated boilerplate.
+
+### step 3 — extract and analyze patterns
+
+Bias recent content higher than old content. Separate the analysis by channel.
+
+For each channel, capture:
+
+- typical length and paragraph shape
+- openings and closings
+- level of warmth, directness, and formality
+- punctuation habits
+- repeated phrases, contractions, abbreviations, and intensifiers
+- patterns the sender consistently avoids
+
+Also write a `General` layer that captures patterns common across all channels.
+
+### step 4 — write or refresh the guide
+
+Create or update `writing-style-guide.md` using `templates/writing-style-guide.md`.
+
+The guide must:
+
+- have a `General` section plus one section per meaningful channel
+- state concrete drafting rules, not just adjectives
+- note confidence and source quality when the corpus is thin
+- avoid storing unnecessary raw private text
+
+### step 5 — wire the guide into consumers
+
+Update the relevant drafting skill, agent, or root documentation so future writing reads the guide first and uses **General + closest channel section**.
+
+Prefer changing the consumer instructions once over repeating style notes in every future task response.
+
+### step 6 — fold corrections back in
+
+When the user corrects a draft, decide whether the correction belongs in:
+
+- the skill instructions because the workflow was wrong
+- the style guide because the voice pattern was wrong
+- both, when routing and voice both failed
+
+Do not keep stuffing voice rules into the drafting skill if the durable fix is really a better style artifact.
+
+---
+
 ## sub-flow: eval loop (skills · agents · documentation)
 
 ### before starting — gather context
@@ -248,6 +332,7 @@ If nothing was saved: no status line needed.
 
 1. **Target file** — exact path to the SKILL.md, agent `.md`, or documentation `.md`
 2. **Evidence package** — the concrete failures, user directions, weak outputs, changed files, or missing docs that justify improving this target
+   - If the target writes on behalf of a user or brand, include the active style source or explicitly note that it is missing.
 3. **Test inputs** — 3–5 scenarios derived from the evidence package; prefer real failures and near-failures over invented examples
 4. **Eval criteria** — 3–6 binary yes/no checks defining good behavior for this target, derived from intended behavior plus the evidence package (see [eval criteria guide](#eval-criteria-guide) below)
 5. **Runs per test input** — how many times to run each test input per experiment. Default: 3 for skills, agents, and documentation (probabilistic — multiple runs smooth out variance). Max score = evals × test inputs × runs per input.
@@ -271,6 +356,7 @@ Do not assume the evaluation task and the self-modification task are perfectly a
 Before changing anything, read and understand the target completely:
 - Read the full target file
 - For skills: read any files in `references/` that the skill links to
+- For writing-related skills, also read the active `writing-style-guide.md` or equivalent voice doc when one exists
 - For agents: read the commands and skills the agent references
 - For documentation: read the docs it points to or depends on, plus the repo files it claims to describe
 - Identify the target's core job, process steps, and output format
@@ -520,12 +606,14 @@ Good mutations:
 - Move a buried instruction higher in the skill (priority = position)
 - Add or improve an example showing correct behavior
 - Remove an instruction causing over-optimization at the expense of other evals
+- If the problem is voice mismatch, make the skill consume a style guide or voice brief rather than hard-coding more subjective style adjectives
 
 Bad mutations:
 - Rewriting the entire skill from scratch
 - Adding 10 new rules at once
 - Making the skill longer without a specific reason
 - Adding vague instructions like "be more thorough" or "do better"
+- Using the skill to impersonate a voice it has no first-party evidence for
 
 Mutation scope: the body text of SKILL.md — instructions, anti-patterns, examples, ordering.
 
@@ -547,10 +635,10 @@ Bad mutations:
 
 Mutation scope: the frontmatter description, `When to use`, commands/skills tables, workflow steps.
 
-### documentation (`AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`, `README.md`, `ARCHITECTURE.md`, `TESTS.md`, `SETUP.md`, `RUNBOOK.md`, `CHANGELOG.md`, `SECURITY.md`, `OVERVIEW.md`, `FAQ.md`, `DECISIONS.md`, `DEPENDENCIES.md`, `CONTRIBUTING.md`, `TESTING.md`, `runbooks/**/*.md`, `docs/**/*.md`)
+### documentation (`AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`, `README.md`, `ARCHITECTURE.md`, `TESTS.md`, `SETUP.md`, `RUNBOOK.md`, `CHANGELOG.md`, `SECURITY.md`, `OVERVIEW.md`, `FAQ.md`, `DECISIONS.md`, `DEPENDENCIES.md`, `CONTRIBUTING.md`, `TESTING.md`, `logs/`, `lessons/`, `items/`, `fixes/`, `audits/`, `raw/`, `plans/`, `specs/`, `sources/`, `lib/`, `references/`, `cookbook/`, `knowledge/`, `runbooks/`, `research/`, `official-documentation/`, `context/`, `runbooks/**/*.md`)
 
 Good mutations:
-- Use the `code-documentation` contract consistently: Core docs (`README.md`, `ARCHITECTURE.md`, `TESTS.md`), Conditional docs (`SETUP.md`, `RUNBOOK.md`, `CHANGELOG.md`, `SECURITY.md`), Rare docs (`OVERVIEW.md`, `FAQ.md`, `DECISIONS.md`, `DEPENDENCIES.md`), root instruction docs, `runbooks/`, timestamped docs on `*/YYYY/YYYY-MM-DD/*.md`, and flat repo docs in `docs/guides/`, `docs/references/`, and `docs/cookbook/`
+- Use the `code-documentation` contract consistently: Core docs (`README.md`, `ARCHITECTURE.md`, `TESTS.md`), Conditional docs (`SETUP.md`, `RUNBOOK.md`, `CHANGELOG.md`, `SECURITY.md`), Rare docs (`OVERVIEW.md`, `FAQ.md`, `DECISIONS.md`, `DEPENDENCIES.md`), root instruction docs, timestamped AFS docs on `*/YYYY/YYYY-MM-DD/*.md`, and living AFS docs in `specs/`, `sources/`, `lib/`, `references/`, `cookbook/`, `knowledge/`, `runbooks/`, `research/`, `official-documentation/`, and `context/`
 - Add missing sections that users repeatedly need to complete the workflow
 - Tighten vague instructions so the next action is obvious and testable
 - Reorder sections so the highest-priority operational guidance appears earlier
@@ -560,6 +648,7 @@ Good mutations:
 - Promote repo-wide rules into the correct root doc instead of burying them in unrelated READMEs
 - Split workflow procedures into `runbooks/` or `RUNBOOK.md` when they are currently scattered across long docs
 - Treat `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, and `DESIGN.md` as first-class documentation targets that should improve automatically when the repo's operating model changes
+- Create or refresh `writing-style-guide.md` when repeated draft corrections point to missing voice guidance rather than missing workflow guidance
 
 Bad mutations:
 - Turning operational docs into long narrative essays

@@ -8,6 +8,7 @@ Platform-native engagement writing for X and LinkedIn.
 - connection requests and relationship-building outreach
 - engagement sequences around launches, posts, or debates
 - writing social responses that sound sharp, specific, and non-generic
+- turning a launch or post idea into copy that can later pair with generated imagery, repo assets, or code-as-image product visuals
 
 ## Install
 

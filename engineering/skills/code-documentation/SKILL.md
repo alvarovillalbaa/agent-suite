@@ -1,73 +1,158 @@
 ---
 name: code-documentation
-description: This skill should be used when the user asks to write, update, review, scaffold, or reorganize documentation for code, folders, services, repos, workflows, architectural decisions, or operational processes. Trigger for `README.md`, `ARCHITECTURE.md`, `TESTS.md`, `SETUP.md`, `RUNBOOK.md`, `CHANGELOG.md`, `SECURITY.md`, `OVERVIEW.md`, `FAQ.md`, `DECISIONS.md`, `DEPENDENCIES.md`, `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`, `runbooks/**/*.md`, `docs/**/*.md`, MDX docs, JSDoc/TSDoc, docstrings, ADRs, post-mortems, migration guides, and PR documentation-impact reviews.
-version: 1.3.0
+description: This skill should be used when the user asks to write, update, review, scaffold, move, remove, or continuously improve documentation for code, folders, services, repos, workflows, architectural decisions, or operational processes. Trigger for inline docs, `README.md`, `ARCHITECTURE.md`, `TESTS.md`, `SETUP.md`, `RUNBOOK.md`, `CHANGELOG.md`, `SECURITY.md`, `OVERVIEW.md`, `FAQ.md`, `DECISIONS.md`, `DEPENDENCIES.md`, `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`, `logs/`, `lessons/`, `items/`, `fixes/`, `audits/`, `raw/`, `plans/`, `specs/`, `sources/`, `lib/`, `references/`, `cookbook/`, `knowledge/`, `runbooks/`, `research/`, `official-documentation/`, `context/`, MDX docs, JSDoc/TSDoc, docstrings, ADRs, post-mortems, migration guides, documentation cleanups, and documentation-impact reviews.
+version: 2.0.0
 ---
 
 # Code Documentation
 
-Write documentation that stays close to the code, tells the next reader what to do, and remains maintainable by both humans and agents.
+Last updated: 2026-04-25
+
+Write documentation that stays close to the code, stays coherent over time, and gives humans and agents one clear place to look.
+
+This skill owns the documentation contract, not only doc generation. Use it to:
+
+- create or update docs
+- continuously improve stale docs
+- use docs as reference and historical record
+- detect conflicting live-vs-historical documentation
+- move, merge, or remove misplaced docs so the repo has one clear source of truth
 
 ## Core model
 
-Documentation in this repo falls into five surfaces:
+Documentation in this repo falls into six surfaces:
 
 1. **Inline docs** — docstrings, JSDoc/TSDoc, comments, types
-2. **In-folder docs** — `README.md`, `ARCHITECTURE.md`, `TESTS.md`, and related files that explain one directory
+2. **In-folder docs** — `README.md`, `ARCHITECTURE.md`, `TESTS.md`, and related files that explain one folder
 3. **Root instruction docs** — `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`
-4. **Operational runbooks** — workflow-specific procedures in `runbooks/` or a local `RUNBOOK.md`
-5. **Project docs** — `docs/` for memories, audits, guides, references, cookbook entries, plans, specs, and longer-form artifacts
+4. **Timestamped history** — logs, lessons, items, fixes, audits, raw material, implementation plans
+5. **Living source-of-truth docs** — specs, references, cookbook, knowledge, runbooks, research, official docs, context, source registries, generated libraries
+6. **Domain-specific AFS paths** — `<domain>/<folder>/` only when the repo genuinely needs domain-specific surfaces such as `health/` or `investing/`
 
-Default rule: put the doc in the narrowest place that future readers will naturally look first.
+Default rule: put the doc in the narrowest place that future readers will naturally check first.
 
 ## Quick routing
 
 | Need | Default location |
 |---|---|
 | Explain a public function, component, hook, API surface, or class | Inline docs |
-| Explain what a directory is for and how to navigate it | `README.md` in that directory |
-| Explain internal design or data flow for one directory | `ARCHITECTURE.md` in that directory |
-| Explain how to test one directory or service | `TESTS.md` in that directory |
-| Document setup or bootstrap steps for one area | `SETUP.md` in that directory |
-| Document a repeatable operational workflow | `runbooks/<name>.md` or local `RUNBOOK.md` |
-| Record repo-wide customization for agents, contributors, and the user's ways of working | `AGENTS.md` |
-| Record how planning should be done and what plans should look like | `PLAN.md` |
-| Record how specs should be written and what they must define | `SPEC.md` |
+| Explain what one folder is for and how to navigate it | `README.md` in that folder |
+| Explain internal design or data flow for one folder | `ARCHITECTURE.md` in that folder |
+| Explain how to test one folder or service | `TESTS.md` in that folder |
+| Explain setup for one area | `SETUP.md` in that folder |
+| Explain a folder-local workflow | `RUNBOOK.md` in that folder |
+| Record repo-wide customization to the user's needs, codebase, and ways of working | `AGENTS.md` |
+| Record how plans should be made and reviewed | `PLAN.md` |
+| Record how specs should be written and maintained | `SPEC.md` |
 | Record the agents' personality and collaboration stance | `SOUL.md` |
-| Record principles, constraints, and max/min rules that always apply | `PRINCIPLES.md` |
+| Record invariants, constraints, and max/min rules | `PRINCIPLES.md` |
 | Record the design system or frontend interaction language | `DESIGN.md` |
-| Record a repo-level implementation plan and verification shape | `docs/plans/YYYY/YYYY-MM-DD/` |
-| Record a repo-level behavior contract or requirements spec | `docs/specs/YYYY/YYYY-MM-DD/` |
-| Record a general technical how-to that is not implementation-specific to this repo | `docs/guides/` |
-| Record stable code or system references | `docs/references/` |
-| Record how something is actually done in this codebase | `docs/cookbook/` |
-| Record audits, ADRs, post-mortems, reports, or migrations | `docs/audits/YYYY/YYYY-MM-DD/` |
+| Append a terse change note | `logs/YYYY/YYYY-MM-DD/*.md` |
+| Record a verified reusable lesson | `lessons/YYYY/YYYY-MM-DD/*.md` |
+| Record a durable fact about the user, company, or project | `items/YYYY/YYYY-MM-DD/*.md` |
+| Record a reusable non-obvious fix | `fixes/YYYY/YYYY-MM-DD/*.md` |
+| Record an analytical report, ADR, post-mortem, or audit | `audits/YYYY/YYYY-MM-DD/` |
+| Store raw material pending ingest | `raw/YYYY/YYYY-MM-DD/` unless the repo already has a different ingest convention |
+| Record an implementation plan or plan-driven-development artifact | `plans/YYYY/YYYY-MM-DD/` |
+| Record a living desired-state behavior contract | `specs/` |
+| Keep monitored URLs and source registries | `sources/` |
+| Keep generated drafts, registries, or reusable library artifacts | `lib/` |
+| Keep stable code, API, or URL references | `references/` |
+| Keep "how we actually do this here" technical recipes | `cookbook/` |
+| Keep timeless canonical knowledge | `knowledge/` |
+| Keep operational procedures | `runbooks/` |
+| Keep ongoing research | `research/` |
+| Keep copied or vendor official documentation | `official-documentation/` |
+| Keep contextual docs such as goals, roadmap, budget, or preferences | `context/` |
 
-## `docs/` taxonomy
+## Final AFS
 
-Use these locations consistently:
+The final Agentic File System is:
 
-- `docs/memories/logs/` — brief logs (2 lines max, append to the latest date file) about every change made in the code
-- `docs/memories/lessons/` — lessons learned from experience, related to the code
-- `docs/memories/facts/` — facts about the user, company, or project that are not derivable from code
-- `docs/memories/procedures/` — how things ought to be done after discovering the right workflow
-- `docs/memories/fixes/` — non-obvious error solutions and fixes
-- `docs/audits/` — comprehensive reports and analytical audits
-- `docs/guides/` — technical guides for how to do something; not about how this repo implements it
-- `docs/references/` — code and system reference docs
-- `docs/cookbook/` — technical guides for how something is done in this codebase
-- `docs/plans/` — implementation plans: how something should be built, tested, and behaviorally verified
-- `docs/specs/` — specifications: how something should behave
+### Memory
 
-Timestamped doc families use one layout only:
+- `logs/` — brief logs, 2 lines max, append to the latest date file, about every meaningful code or doc change
+- `lessons/` — lessons learned from experience, related to code
+- `items/` — facts about the user, company, customers, environments, or other durable context
+- `fixes/` — reusable error solutions and debugging resolutions
+
+### Operational
+
+- `audits/` — comprehensive reports and analytical audits
+- `raw/` — raw source material waiting to be ingested and then promoted into `knowledge/` or another canonical destination
+- `<domain>/<folder>/` — additional domain-specific paths only when the domain genuinely needs them
+- `plans/` — implementation plans and plan-driven-development artifacts
+- `specs/` — living specs describing how something should behave
+- `sources/` — URL-based source registries worth monitoring over time
+- `lib/` — generated drafts, registries, support artifacts, or other reusable generated content
+
+### Source of truth
+
+- `references/` — code, URL, API, schema, and factual references
+- `cookbook/` — technical guides for how something is actually done in this codebase
+- `knowledge/` — timeless maintained knowledge about the codebase and how to do things
+- `runbooks/` — operational procedures and exact workflows
+- `research/` — continuous research on engineering topics
+- `official-documentation/` — copied external official documentation; not continuously iterated
+- `context/` — contextual docs such as `VALUES.md`, `USER.md`, `PREFERENCES.md`, `context/goals/`, `context/budget/`, `context/roadmap/`
+
+## Timestamped vs living docs
+
+Use one rule only for timestamped material:
 
 - `*/YYYY/YYYY-MM-DD/*.md`
 
-That applies to memories, audits, plans, and specs. `guides/`, `references/`, and `cookbook/` stay flat with no timestamp subfolders.
+Default timestamped families:
+
+- `logs/`
+- `lessons/`
+- `items/`
+- `fixes/`
+- `audits/`
+- `raw/`
+- `plans/`
+
+Default living documentation families:
+
+- `specs/`
+- `sources/`
+- `lib/`
+- `references/`
+- `cookbook/`
+- `knowledge/`
+- `runbooks/`
+- `research/`
+- `official-documentation/`
+- `context/`
+- root instruction docs
+- in-folder docs
+
+Important distinction:
+
+- timestamped docs are historical evidence or work-in-time artifacts
+- living docs are the current source of truth
+
+Do not keep the same operational guidance as both a live doc and a timestamped doc unless the timestamped doc is clearly historical context and the living doc clearly owns the current rule.
+
+## Last-updated rule
+
+Every living documentation file must include:
+
+```markdown
+Last updated: YYYY-MM-DD
+```
+
+Place it directly under the H1 or immediately after frontmatter. Refresh it whenever the file is touched.
+
+This applies to:
+
+- `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`
+- in-folder docs such as `README.md`, `ARCHITECTURE.md`, `TESTS.md`, `SETUP.md`, `RUNBOOK.md`, `SECURITY.md`, `OVERVIEW.md`, `FAQ.md`, `DECISIONS.md`, `DEPENDENCIES.md`
+- living AFS docs in `specs/`, `sources/`, `lib/`, `references/`, `cookbook/`, `knowledge/`, `runbooks/`, `research/`, `official-documentation/`, and `context/`
 
 ## In-folder documentation contract
 
-Outside `docs/`, every meaningful folder can carry its own documentation. Unless repo-local rules say otherwise, use this default set.
+Outside the AFS folders, every meaningful code folder can carry its own documentation.
 
 ### Core
 
@@ -79,7 +164,7 @@ Always consider these first:
 
 ### Conditional
 
-Add these only when the folder actually needs them:
+Add only when the folder actually needs them:
 
 - `SETUP.md`
 - `RUNBOOK.md`
@@ -88,7 +173,7 @@ Add these only when the folder actually needs them:
 
 ### Rare
 
-Use these when the domain justifies them:
+Use when the domain justifies them:
 
 - `OVERVIEW.md`
 - `FAQ.md`
@@ -98,95 +183,66 @@ Use these when the domain justifies them:
 ### File intent
 
 - `README.md` — entry point, purpose, usage, links to neighboring docs
-- `ARCHITECTURE.md` — internals, flows, boundaries, design decisions
-- `TESTS.md` — how to run tests, test layout, fixtures, expectations
+- `ARCHITECTURE.md` — internals, boundaries, flows, and design decisions
+- `TESTS.md` — how to run tests, patterns, fixtures, expectations
 - `SETUP.md` — non-obvious environment and initialization steps
-- `RUNBOOK.md` — local operational procedure for this folder
+- `RUNBOOK.md` — local operational workflow for this folder
 - `CHANGELOG.md` — user-facing or package-facing release history
 - `SECURITY.md` — security boundaries, secrets handling, abuse cases, review expectations
-- `OVERVIEW.md` — concept-first orientation when a README would become too dense
+- `OVERVIEW.md` — concept-first orientation when README would become too dense
 - `FAQ.md` — repeated questions and troubleshooting
 - `DECISIONS.md` — folder-local decisions that do not justify standalone ADRs
 - `DEPENDENCIES.md` — dependency map, contracts, and upgrade notes
 
-Use the smallest set that makes the folder legible. Do not create files just to satisfy the list.
+Use the smallest set that makes the folder legible.
 
 ## Root instruction docs are documentation
 
 Treat these as first-class documentation, not miscellaneous meta files:
 
 - `AGENTS.md` — general customization to the user's needs, codebase, and ways of working
-- `PLAN.md` — how planning should be done and what plans should look like
-- `SPEC.md` — how specs should be written and what they must contain
-- `SOUL.md` — personality and collaboration stance for AI agents
-- `PRINCIPLES.md` — principles, constraints, and max/min rules that should always be followed
-- `DESIGN.md` — the design system and frontend interaction language when the repo has one
+- `PLAN.md` — customize how planning should be done and what plans should look like
+- `SPEC.md` — customize how specs should look and what they must define
+- `SOUL.md` — provide personality to AI agents
+- `PRINCIPLES.md` — customize principles, constraints, and max/min rules that should always hold
+- `DESIGN.md` — define the design system and frontend interaction language
 
-When a change affects how the repo is operated, designed, or extended, review these files the same way you would review a README or architecture doc.
+When the repo's operating model changes, update these the same way you would update a README or runbook.
 
-## Runbooks
+## Conflict handling
 
-Use a runbook when the reader must perform a workflow, not just understand a concept.
+Before creating or expanding docs:
 
-### When to create one
+1. Check whether the topic already exists in both a historical path and a living path.
+2. Decide which file should own the current truth.
+3. Move misplaced docs with plain `mv` and normalize missing structure with plain `mkdir`.
+4. Remove redundant docs when they add no historical value and only create drift.
+5. Keep timestamped docs as evidence, not as the current contract.
 
-- The process crosses files, tools, environments, or services
-- Order matters and mistakes are expensive
-- The workflow has verification, rollback, escalation, or handoff steps
-- The procedure is likely to be repeated by a different person or agent
+Examples:
 
-### Where it lives
+- If a one-off implementation plan became the durable policy, keep the original under `plans/YYYY/YYYY-MM-DD/` and promote the lasting rule into `PLAN.md`, `SPEC.md`, `runbooks/`, `cookbook/`, or `knowledge/`.
+- If an old `docs/memories/` or `docs/guides/` tree conflicts with the final AFS, move or remove it instead of preserving two competing systems.
 
-- `runbooks/<workflow>.md` for repo-wide or multi-folder processes
-- `<folder>/RUNBOOK.md` for a folder-local workflow tied to one subsystem
+## Relationship to other skills
 
-Prefer `runbooks/` when the workflow spans folders, services, or roles. Do not bury repeatable procedures inside long `docs/` pages or unrelated READMEs.
-
-### Minimum sections
-
-1. Purpose
-2. Preconditions
-3. Inputs or required context
-4. Step-by-step procedure
-5. Verification
-6. Rollback or recovery
-7. Escalation and linked docs
-
-Keep commands copy-pasteable. Prefer concrete checks over narrative explanation.
-
-### Quality cues
-
-Borrow the quality bar from mature operational runbooks:
-
-- state when to use the workflow and when not to use it
-- surface dangerous or irreversible steps before the reader reaches them
-- include health checks before and after risky steps
-- record owner and last-verified context when the runbook will be reused operationally
-- rehearse or dry-run the procedure outside incidents whenever practical
-
-## Relationship to `auto-improve`
-
-`code-documentation` defines what good documentation looks like. `auto-improve` is the mechanism that should tighten documentation that keeps drifting, confusing readers, or missing operational details.
-
-When documentation work reveals repeated gaps, stale instruction files, or recurring workflow confusion:
-
-- treat `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, `DESIGN.md`, `runbooks/**/*.md`, the in-folder docs above, and the `docs/` taxonomy here as valid documentation targets
-- prefer fixing the upstream doc rather than patching the same explanation into many places
-- keep the same surface model between skills: `code-documentation` defines the doc taxonomy, and `auto-improve` should harden that same taxonomy automatically
-- make `auto-improve` treat the root instruction docs as first-class documentation, not special-case meta files
-- keep timestamped docs on `*/YYYY/YYYY-MM-DD/*.md` and flat docs on `docs/guides/`, `docs/references/`, and `docs/cookbook/`
-- if the issue is systemic rather than one-off, route follow-up hardening through `skills/auto-improve/`
+- `auto-improve` should use this taxonomy as its documentation contract and treat root instruction docs as first-class mutation targets.
+- `agentic-development` should consult this skill before writing plans, specs, runbooks, or promoted learning artifacts.
+- `second-brain` owns the broader AFS and the `raw/ -> knowledge/` compilation model; this skill owns how documentation is routed inside that filesystem.
+- `memory-management` can shape how memory systems persist and retrieve information, but durable human-readable documentation should still route through this skill's contract.
 
 ## Workflow
 
-1. Check for repo-local rules first: `AGENTS.md`, `CLAUDE.md`, project READMEs, or existing doc conventions.
-2. Decide the surface: inline, folder, root instruction doc, runbook, or `docs/`.
-3. Update the closest existing document before creating a new one.
-4. If creating folder docs, start with the Core set and add Conditional or Rare files only when justified.
-5. If the destination is timestamped, use `*/YYYY/YYYY-MM-DD/*.md`; do not invent alternative date layouts.
-6. Link neighboring docs so readers can move from overview to procedure to deeper design.
-7. Keep code examples real and commands executable.
-8. If the task is a documentation impact review, inspect the diff and map changed code to the docs above.
+1. Check repo-local rules first: `AGENTS.md`, `CLAUDE.md`, project READMEs, `BRAIN.md`, or existing doc conventions.
+2. Detect whether the repo already has a working AFS or whether legacy paths conflict with it.
+3. Decide the surface: inline doc, folder doc, root instruction doc, timestamped historical doc, or living source-of-truth doc.
+4. Update the closest existing document before creating a new one.
+5. For timestamped destinations, use `*/YYYY/YYYY-MM-DD/*.md` and normalize directories with `mkdir` if needed.
+6. For living docs, add or refresh `Last updated: YYYY-MM-DD`.
+7. If durable guidance is buried in a historical note, promote it upstream into the proper living doc.
+8. Move or delete docs that no longer fit the contract.
+9. Link neighboring docs so readers can move from overview to procedure to deeper design.
+10. If the task is a documentation impact review, inspect the diff and map changed code to the right doc surfaces.
 
 ## Quality bar
 
@@ -196,29 +252,30 @@ Good documentation lets the next engineer or agent answer all of these quickly:
 - When should I use it?
 - What do I do next?
 - What can go wrong?
-- Where is the deeper detail?
+- Where does the current truth live?
+- Where is the historical trail if I need it?
 
-Prefer short, high-signal docs over exhaustive prose. If a README becomes dense, split depth into `ARCHITECTURE.md`, `RUNBOOK.md`, `DECISIONS.md`, or `docs/`.
+Prefer short, high-signal docs over exhaustive prose. If a doc becomes dense, split the durable parts into the right living doc and keep only the historical context in timestamped artifacts.
 
 ## Next.js / MDX
 
-For Next.js or MDX-heavy repositories, keep using the existing references and templates in this skill:
+For Next.js or MDX-heavy repos, keep using the existing references and templates in this skill:
 
 - `references/nextjs-doc-conventions.md`
 - `references/nextjs-code-to-docs-mapping.md`
 - `templates/nextjs-api-reference.mdx`
 - `templates/nextjs-guide.mdx`
 
-Use them only when the repo actually follows that MDX documentation style.
+Use them only when the repo actually follows that style.
 
 ## References
 
 Load only what the task needs:
 
-- `references/documentation-types.md` — documentation taxonomy, including root docs and in-folder defaults
-- `references/continuous-docs.md` — logs, changelogs, inline docs, maintenance cadence
+- `references/documentation-types.md` — AFS taxonomy, root docs, in-folder docs, timestamp/live rules
+- `references/continuous-docs.md` — logs, lessons, items, fixes, living-doc maintenance
 - `references/frontend-documentation.md` — component, hook, route, and UX-contract docs
-- `references/one-off-docs.md` — ADRs, reports, post-mortems, migrations
+- `references/one-off-docs.md` — audits, ADRs, post-mortems, migration notes
 - `references/writing-standards.md` — tone, structure, anti-patterns
 - `references/nextjs-doc-conventions.md` — MDX conventions
 - `references/nextjs-code-to-docs-mapping.md` — Next.js source-to-doc mapping
@@ -228,10 +285,9 @@ Load only what the task needs:
 - `templates/service-readme.md`
 - `templates/runbook.md`
 - `templates/daily-log.md`
-- `templates/memory-lesson.md`
-- `templates/memory-fact.md`
-- `templates/memory-procedure.md`
-- `templates/memory-fix.md`
+- `templates/lesson.md`
+- `templates/item.md`
+- `templates/fix.md`
 - `templates/technical-report.md`
 - `templates/adr.md`
 - `templates/post-mortem.md`
@@ -240,4 +296,4 @@ Load only what the task needs:
 
 ## Script
 
-- `scripts/find-docs.sh` — locate existing docs and recent log destinations before creating new files
+- `scripts/find-docs.sh` — locate AFS paths, root instruction docs, in-folder docs, and legacy conflicts before creating or moving files

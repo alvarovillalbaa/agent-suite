@@ -21,6 +21,7 @@ Use `visualizer` when plain chat output would be structurally correct but visual
 ## What it includes
 
 - `SKILL.md`: workflow and decision rules
+- `agents/`: UI metadata for skill browsers and default prompts
 - `references/`: rendering strategy, visual systems, and QA checklist
 - `templates/`: reusable HTML shells
 - `scripts/scaffold_visualizer.py`: starter artifact generator

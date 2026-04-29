@@ -1,12 +1,15 @@
 # Code Documentation
 
-Documentation skill for READMEs, architecture notes, runbooks, ADRs, changelogs, and code-adjacent technical writing.
+Last updated: 2026-04-25
+
+Documentation skill for AFS-first repo docs, in-folder docs, root instruction docs, runbooks, audits, plans, specs, and code-adjacent technical writing.
 
 ## Use this for
 
-- writing or reorganizing docs close to code
-- documenting services, folders, or workflows
-- updating runbooks, operational notes, or engineering references
+- writing, updating, moving, or removing docs
+- continuously improving stale documentation
+- routing content into the final AFS
+- checking live-vs-historical documentation conflicts
 - reviewing whether a code change also needs documentation work
 
 ## Install
@@ -25,8 +28,6 @@ https://github.com/alvarovillalbaa/plugins/tree/main/engineering/skills/code-doc
 
 ## What is bundled
 
-- `examples/`
-- `hooks/`
 - `references/`
 - `scripts/`
 - `templates/`

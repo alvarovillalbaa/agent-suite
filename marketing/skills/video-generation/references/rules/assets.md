@@ -9,7 +9,9 @@ metadata:
 
 ## The public folder
 
-Place assets in the `public/` folder at your project root.
+Place production assets in the `public/` folder at your project root.
+
+If an image only exists elsewhere in the repo, do not rely on an arbitrary relative path at render time. Copy or promote it into `public/` first, or use a stable remote URL.
 
 ## Using staticFile()
 
@@ -71,6 +73,18 @@ Remote URLs can be used directly without `staticFile()`:
 <Img src="https://example.com/image.png" />
 <Video src="https://remotion.media/video.mp4" />
 ```
+
+Use remote URLs when the repo already references a stable hosted asset or when the project intentionally serves media from cloud storage.
+
+## Generated assets
+
+If you generate imagery during the task, write the result into `public/` or another deliberate render input path before wiring it into the composition.
+
+Do not treat temporary output files as invisible dependencies.
+
+## Product visuals
+
+For product-heavy visuals, prefer code-as-image or a live Remotion composition over asking an image model to invent a fake dashboard or UI state.
 
 ## Important notes
 

@@ -26,6 +26,8 @@ Use this skill for:
 3. Ask, confirm, implement, self-evaluate, persist. Do not jump from a vague brief straight into code.
 4. Audio, captions, and timing are structural, not decorative. Treat them as part of the core composition model.
 5. The examples in this skill are examples, not presets. Reuse the workflow and rules, not generic aesthetics.
+6. Image sourcing is part of production design. Reuse real assets when they exist, prefer code-as-image for product visuals, and generate only the gaps.
+7. Scene variety matters. Do not let the entire video collapse into the same centered card layout with minor copy changes.
 
 ## Hard Rules
 
@@ -40,6 +42,19 @@ These rules are about production correctness and reviewability, not taste:
 7. Verify the output before presenting it. Use Studio, still renders, or short renders to catch layout, timing, caption, and asset issues yourself first.
 8. Persist the approved plan in a durable artifact near the implementation: a markdown brief, scene manifest, or JSON timeline spec. Do not force future revisions to reconstruct the intent from code alone.
 
+## Anti-Slop Guardrails
+
+Do not silently ship any of these defaults:
+
+1. Inter, Roboto, Arial, Helvetica, or system-ui as the only type choice.
+2. Indigo / violet accent defaults.
+3. Gradient text headlines.
+4. Generic dark-glass cards floating over a blurred background.
+5. Continuous glowing or pulsing effects that do not communicate state.
+6. Three or more consecutive scenes with the same centered composition pattern.
+
+If the visual system would still look interchangeable after swapping the logo, it is under-designed.
+
 ## Production Workflow
 
 Use this workflow unless the task is a trivial patch:
@@ -48,12 +63,13 @@ Use this workflow unless the task is a trivial patch:
 2. Gather required inputs with [references/data-sources.md](references/data-sources.md).
 3. Ask the minimum targeted questions needed to resolve format, duration, audience, CTA, assets, and visual direction.
 4. Choose the implementation path with [references/composition-patterns.md](references/composition-patterns.md).
-5. Use [templates/video-plan.md](templates/video-plan.md) to lock the strategy, scenes, assets, timing, validation gates, and persistence artifact before code.
-6. Wait for plan approval before starting major implementation.
-7. Read only the relevant rule files from `references/rules/` and use [templates/video-code.md](templates/video-code.md) as the implementation scaffold.
-8. Run preview, still, or render checks from [references/rendering.md](references/rendering.md).
-9. Self-evaluate the output before presenting it.
-10. Cross-check the output against [references/checklist.md](references/checklist.md) before finishing.
+5. Choose the image source plan with [references/image-sourcing.md](references/image-sourcing.md).
+6. Use [templates/video-plan.md](templates/video-plan.md) to lock the strategy, scenes, assets, timing, validation gates, and persistence artifact before code.
+7. Wait for plan approval before starting major implementation.
+8. Read only the relevant rule files from `references/rules/` and use [templates/video-code.md](templates/video-code.md) as the implementation scaffold.
+9. Run preview, still, or render checks from [references/rendering.md](references/rendering.md).
+10. Self-evaluate the output before presenting it.
+11. Cross-check the output against [references/checklist.md](references/checklist.md) before finishing.
 
 ## Choose The Right Operating Mode
 
@@ -76,6 +92,21 @@ Before writing Remotion code, think through the work in this order:
 4. Layout: build the most visible frame of each scene first so spacing and readability are correct before animation.
 5. Animate: add motion only after the layout, assets, and timing model are stable.
 
+## Composition Variety
+
+Consecutive scenes should vary the viewer's spatial experience.
+
+Rotate between approaches such as:
+
+1. centered statement scene
+2. left-heavy editorial scene
+3. right-heavy product or UI scene
+4. split layout
+5. full-bleed scene
+6. grid or data-led scene
+
+Do not repeat the same "headline centered over supporting cards" pattern throughout the runtime unless the brief explicitly demands a rigid template.
+
 For minor edits, skip directly to the relevant rule files and preserve the existing timing model, but still state the change strategy before touching risky timing or layout code.
 
 ## Visual Identity Gate
@@ -94,6 +125,24 @@ Check in this order:
 5. Only after that, state clear fallback assumptions in the plan before implementing.
 
 Do not default to generic colors, default fonts, or placeholder motion without documenting the assumption.
+
+## Image Asset Strategy
+
+Use all of these image paths when appropriate:
+
+1. Images generated on the fly during the task
+2. Existing external image URLs already referenced in the repo
+3. Existing local repo images
+4. Code-as-image product visuals
+5. Mixed compositions that combine multiple sources
+
+Apply this decision logic:
+
+1. If the visual is a product dashboard, UI state, terminal flow, or other interface-heavy surface, prefer code-as-image or a live Remotion composition over prompting an image model to invent the UI.
+2. If the needed asset already exists as a stable external URL, reuse it.
+3. If the needed asset only exists locally, copy or promote it into the active `public/` asset pipeline or hosted URL before treating it as a production dependency.
+4. Generate missing backgrounds, mood frames, or supporting illustrations on the fly only when the repo does not already provide what is needed.
+5. Combine generated backgrounds with coded product foregrounds when the video needs both visual richness and product fidelity.
 
 ## Data Before Code
 
@@ -158,6 +207,7 @@ When using this skill, the output should usually include:
 - a short self-eval summary when visual verification was part of the task
 - the artifact where the approved plan now lives
 - clear assumptions for any missing assets, brand direction, or timing inputs
+- whether scene composition variety was intentionally maintained or intentionally standardized
 
 ## Rule Index
 
@@ -204,6 +254,7 @@ Read individual rule files for detailed explanations and code examples:
 
 - Use `templates/` for reusable planning and implementation scaffolds.
 - Use [references/composition-patterns.md](references/composition-patterns.md) to choose between scene-first, manifest-driven, and JSON-render architectures.
+- Use [references/image-sourcing.md](references/image-sourcing.md) for when to reuse, host, generate, or code imagery.
 - Use [references/rendering.md](references/rendering.md) for project setup, Studio preview, single-frame checks, and final render commands.
 - Use `examples/` for marketing-oriented prompts and deliverables.
 - Keep the rule files authoritative when there is a conflict between a template and a rule.

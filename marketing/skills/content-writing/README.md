@@ -9,6 +9,7 @@ Unified content-writing skill covering writing, repurposing, auditing, refreshin
 - GEO optimization and AI-citation-ready rewrites
 - content quality audits, refreshes, and gap analysis
 - keyword research and support-ticket-driven content planning
+- article, carousel, or distribution work that needs a deliberate visual asset brief alongside the copy
 
 ## Install
 

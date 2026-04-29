@@ -1,464 +1,220 @@
 # Documentation Types Reference
 
-Complete taxonomy of documentation types, when to use each, who reads it, where it lives, and how long it stays relevant.
+Last updated: 2026-04-25
 
----
+Canonical taxonomy for documentation types, where they live, and whether they are historical or living.
 
-## Tier 1: Inline Documentation (Highest Proximity)
+## Surfaces
 
-Inline docs live inside the source code itself. They are the highest-priority documentation because they degrade alongside the code and are impossible to miss.
+Documentation falls into these surfaces:
 
-### Docstrings / JSDoc / TSDoc
+1. Inline docs
+2. In-folder docs
+3. Root instruction docs
+4. Timestamped historical AFS docs
+5. Living AFS docs
 
-**What it is:** Structured comment blocks directly on a function, class, method, or module.
+Default rule: choose the narrowest authoritative surface first.
 
-**When to write:** Always, on every public-facing function, class, method, or module. Required for library code. Required for API endpoints. Required for any logic that isn't self-evident from its name and type signature.
+## Inline docs
 
-**Audience:** Engineers reading the code directly, IDEs showing hover-docs, auto-generated API reference sites.
+Use inline docs for public functions, classes, methods, hooks, components, modules, and non-obvious code behavior that should be visible without leaving the editor.
 
-**Format (Python):**
-```python
-def process_candidate(candidate_id: str, options: dict | None = None) -> dict:
-    """
-    Process a candidate through the recruitment pipeline.
+Prefer type annotations over prose when types can carry the meaning cleanly.
 
-    Triggers background enrichment, validation, and notification dispatch.
-    Does NOT immediately update the database — changes are queued.
+## In-folder docs
 
-    Args:
-        candidate_id: UUID string of the candidate record.
-        options: Optional overrides. Supported keys:
-            - skip_enrichment (bool): Skip background enrichment step.
-            - notify (bool): Send notification on completion. Default True.
-
-    Returns:
-        dict with keys: status, queued_at, task_id
-
-    Raises:
-        CandidateNotFoundError: If candidate_id doesn't exist.
-        ValidationError: If candidate data fails pipeline validation.
-    """
-```
-
-**Format (TypeScript):**
-```typescript
-/**
- * Formats a candidate's full name for display.
- *
- * Returns "First Last" or falls back to email prefix if name fields are empty.
- * Never returns an empty string — always has a displayable fallback.
- *
- * @param candidate - Candidate object from the API.
- * @returns Formatted display name string.
- */
-export function formatCandidateName(candidate: Candidate): string
-```
-
-**Format (React component):**
-```typescript
-/**
- * CandidateCard — compact display card for a single candidate.
- *
- * Used in list views and pipeline boards. Does not handle its own
- * data fetching — caller is responsible for passing a populated candidate.
- *
- * @example
- * <CandidateCard candidate={candidate} onSelect={handleSelect} compact />
- */
-interface CandidateCardProps {
-  /** The candidate to display. Must be populated (not a stub). */
-  candidate: Candidate;
-  /** Called when the card is clicked or activated via keyboard. */
-  onSelect?: (candidate: Candidate) => void;
-  /** Renders a condensed single-line layout. Default: false. */
-  compact?: boolean;
-}
-```
-
-### Inline Comments
-
-**What it is:** Single-line or short block comments within function bodies.
-
-**When to write:** Only when the logic isn't self-evident from variable names and types. The bar is: "would a competent engineer pause here and wonder why?"
-
-**When NOT to write:**
-- Restating what the code does (`# increment counter`)
-- Obvious algorithmic steps (`# loop through items`)
-- Type information already in annotations
-- High-level descriptions better suited to docstrings
-
-**Good examples:**
-```python
-# Retry with exponential backoff — Stripe API returns 429 on burst traffic
-# RFC 3339 format required — AWS SDK rejects ISO 8601 with timezone offset
-# Use raw SQL here — Django ORM cannot express window functions in this version
-# Intentionally not catching ValueError — caller is expected to validate input upstream
-```
-
-**Bad examples:**
-```python
-# Get the user
-user = get_user(user_id)
-# Return the result
-return result
-```
-
-### Type Annotations
-
-**What they are:** Static type declarations in typed languages (Python type hints, TypeScript types, Java/Go types).
-
-**When to use:** Always. Type annotations are documentation that gets checked automatically. In dynamically typed languages like Python, they are especially valuable.
-
-**Priority:** Type annotations over prose comments for parameter/return documentation.
-
----
-
-## Tier 2: Service-Level Documentation
-
-Service docs live at the root of each service or module directory. They document the service as a whole, not individual functions.
-
-### README.md
-
-**Purpose:** Entry point for anyone encountering this service for the first time.
-
-**Audience:** Any engineer, including those unfamiliar with this service.
-
-**Freshness:** Update whenever the service's purpose, API, or key patterns change.
-
-**Required sections:**
-1. **What it does** (1–2 sentences, not how — what)
-2. **When to use it** (and when NOT to use it — alternatives)
-3. **Key concepts** (2–5 bullets covering the mental model)
-4. **Quick start** (minimal working example)
-5. **Links** to ARCHITECTURE.md, TESTS.md, and any related services
-
-**Optional sections:** Prerequisites, Configuration, Known limitations, Version history
-
-### ARCHITECTURE.md
-
-**Purpose:** Internal technical design of the service — how it actually works, data flows, design decisions, and dependencies.
-
-**Audience:** Engineers actively working on or debugging this service.
-
-**Freshness:** Update when the internal design changes significantly.
-
-**Required sections:**
-1. **Overview diagram** (even ASCII art is fine) showing main components
-2. **Data flow** — how data enters, transforms, and exits
-3. **Key design decisions** — the non-obvious choices and why they were made
-4. **Dependencies** — what this service depends on and why
-5. **Extension points** — where/how to add new functionality
-
-### TESTS.md
-
-**Purpose:** Everything needed to understand the test suite for this service.
-
-**Audience:** Engineers adding features or fixing bugs who need to run or extend tests.
-
-**Required sections:**
-1. **How to run** the tests (exact commands)
-2. **Test structure** — what lives where and why
-3. **Testing patterns** — mocking strategy, factory usage, fixtures
-4. **Coverage expectations** — what's covered and what's intentionally not
-5. **Integration test notes** — any external dependencies, how to mock them
-
-### SETUP.md
-
-**Purpose:** Non-obvious setup, configuration, or initialization steps.
-
-**When to create:** When `pip install` / `npm install` alone isn't sufficient to get the service running.
-
-**Required:** Step-by-step that a new engineer can follow exactly, with expected outputs at each step.
-
-### FAQ.md
-
-**Purpose:** Common questions, gotchas, and troubleshooting entries.
-
-**When to create:** Once 3+ questions about the same service have been asked and answered.
-
-**Format:** Q&A pairs. Short questions, concise answers. Link to deeper resources.
-
-### Root Instruction Docs
-
-These are documentation, not miscellaneous meta files. Treat them as first-class repo docs and review them whenever operating rules, delivery expectations, or design guidance change.
-They are valid targets for ongoing hardening by `auto-improve`, just like README or runbook files.
-
-| File | Purpose |
-|---|---|
-| `AGENTS.md` | General customization to the user's needs, the codebase, and preferred ways of working |
-| `PLAN.md` | How planning should be done and what plans should look like |
-| `SPEC.md` | How specs should be structured and what they must define |
-| `SOUL.md` | Personality and collaboration stance for AI agents |
-| `PRINCIPLES.md` | Invariants, constraints, and max/min rules that should always hold |
-| `DESIGN.md` | Design-system and frontend interaction guidance when the repo has one |
-
-### Runbooks
-
-**Purpose:** Step-by-step operational procedures for workflows where order, verification, rollback, or escalation matter.
-
-**When to write:** When a task crosses tools, services, environments, or approvals and should be repeatable by a different engineer or agent.
-
-**Where it lives:**
-- `runbooks/<workflow>.md` for repo-wide or multi-folder workflows
-- `RUNBOOK.md` inside a folder for subsystem-local procedures
-
-Prefer `runbooks/` for shared workflows that span multiple folders. Keep `docs/` for references, audits, specs, and narrative artifacts rather than operational step lists.
-
-**Minimum sections:**
-1. Purpose
-2. Preconditions
-3. Inputs
-4. Procedure
-5. Verification
-6. Rollback / recovery
-7. Escalation / related docs
-
----
-
-## Tier 3: Project-Level Documentation
-
-Project docs are repo-wide and live in the `docs/` directory.
-
-### Memory Logs (`docs/memories/logs/YYYY/YYYY-MM-DD/`)
-
-**Purpose:** Chronological log of what changed and why — the engineering team's shared memory.
-
-**Audience:** Team engineers, future debugging sessions, the agent reviewing context.
-
-**Freshness:** Written in real-time after each change. Never retroactively backdated.
-
-**Characteristics:** Extremely brief (2 lines max per entry), factual, past tense.
-
-See: `references/continuous-docs.md` for full format guide.
-
-### Memory Lessons (`docs/memories/lessons/YYYY/YYYY-MM-DD/`)
-
-**Purpose:** Reusable insights that should change future behavior — verified discoveries from real work.
-
-**Audience:** Engineers and agents encountering the same situation later.
-
-**Freshness:** Written once when the insight is verified. Updated if the lesson is later disproved.
-
-See: `references/continuous-docs.md` for format guide.
-
-### Memory Facts (`docs/memories/facts/YYYY/YYYY-MM-DD/`)
-
-**Purpose:** Stable facts about the team, company, or project not derivable from code.
-
-**Audience:** Agents and engineers who would make wrong assumptions without this fact.
-
-**Freshness:** Updated when the fact changes. Removed when no longer true.
-
-### Memory Procedures (`docs/memories/procedures/YYYY/YYYY-MM-DD/`)
-
-**Purpose:** Repeatable workflows — the right way to do something after discovery.
-
-**Audience:** Anyone performing the procedure again in the future.
-
-**Freshness:** Update the "last verified" date each time the procedure is successfully followed.
-
-### Memory Fixes (`docs/memories/fixes/YYYY/YYYY-MM-DD/`)
-
-**Purpose:** Solutions to non-obvious errors or bugs likely to recur.
-
-**Audience:** Engineers (or agents) hitting the same error.
-
-**Freshness:** Written once. Update if the fix stops working or a better solution is found.
-
-### Audits (`docs/audits/YYYY/YYYY-MM-DD/`)
-
-**Purpose:** Structured investigation or analysis artifacts — audits, ADRs, post-mortems, findings, performance analyses.
-
-**Audience:** Engineering leads, the team, future engineers investigating similar problems.
-
-**Freshness:** One-off. Created once, rarely updated (updates are noted with edit timestamps).
-
-See: `references/one-off-docs.md` for structure guide.
-
-### Guides (`docs/guides/`)
-
-**Purpose:** General technical how-to guides for doing something, independent of how this repo happens to implement it.
-
-**Audience:** Engineers who need the general method or approach.
-
-**Freshness:** Updated when the recommended approach changes. Flat structure, no timestamps.
-
-### References (`docs/references/`)
-
-**Purpose:** Stable code, system, API, or domain reference material.
-
-**Audience:** Engineers who need definitions, mappings, or lookup-style reference docs.
-
-**Freshness:** Updated when the referenced system changes. Flat structure, no timestamps.
-
-### Cookbook (`docs/cookbook/`)
-
-**Purpose:** Technical guides for how something is done in this codebase.
-
-**Audience:** Engineers implementing a pattern in this repo and needing the local way of doing it.
-
-**Freshness:** Updated when the repo's implementation pattern changes. Flat structure, no timestamps.
-
-### Plans (`docs/plans/YYYY/YYYY-MM-DD/`)
-
-**Purpose:** Source of truth for how something should be implemented, tested, and behaviorally verified.
-
-**Audience:** The team executing the plan, reviewers, future engineers understanding why something was built a certain way.
-
-**Freshness:** Updated as the plan evolves during execution. Archived after completion.
-
-### Specs (`docs/specs/YYYY/YYYY-MM-DD/`)
-
-**Purpose:** Source of truth for how something should behave — requirements, contracts, and acceptance criteria before or during implementation.
-
-**Audience:** Implementors, reviewers, QA.
-
-**Freshness:** Written before implementation begins. Updated if requirements change.
-
-## Tier 3b: In-Folder Documentation
-
-In-folder docs orient readers to a directory — what it contains, how it's organized, and how to navigate it. They apply at every directory level, not just service roots.
-Outside `docs/`, this is the default folder contract.
+These explain one directory or subsystem.
 
 ### Core
 
-Default set to consider first in every meaningful folder:
-
-| File | Purpose | Create when |
-|------|---------|-------------|
-| `README.md` | Overview and navigation | Any directory a reader might enter without context |
-| `ARCHITECTURE.md` | Technical deep-dive — structure, data flows, design decisions | Non-obvious internal organization |
-| `TESTS.md` | Testing patterns, how to run, what's covered | Any directory with a meaningful test surface |
+- `README.md`
+- `ARCHITECTURE.md`
+- `TESTS.md`
 
 ### Conditional
 
-Add when the folder genuinely needs them:
-
-| File | Purpose | Create when |
-|------|---------|-------------|
-| `SETUP.md` | Config, install, env — non-obvious setup steps | Installation alone isn't sufficient |
-| `RUNBOOK.md` | Folder-local operational workflow | The folder has a repeatable procedure with verification or rollback |
-| `CHANGELOG.md` | Version history | Versioned service, library, or package |
-| `SECURITY.md` | Security boundaries, review notes, secrets handling | The folder has sensitive surfaces or special security rules |
+- `SETUP.md`
+- `RUNBOOK.md`
+- `CHANGELOG.md`
+- `SECURITY.md`
 
 ### Rare
 
-Use only when the domain merits them:
+- `OVERVIEW.md`
+- `FAQ.md`
+- `DECISIONS.md`
+- `DEPENDENCIES.md`
 
-| File | Purpose | Create when |
-|------|---------|-------------|
-| `OVERVIEW.md` | High-level concepts before diving into details | Concepts deserve their own orientation beyond README |
-| `FAQ.md` | Common questions and troubleshooting | 3+ repeated questions exist |
-| `DECISIONS.md` | Folder-local design decisions | Decisions should be kept close to the folder, not as standalone ADRs |
-| `DEPENDENCIES.md` | Dependency map, contracts, upgrade notes | Dependency behavior is non-obvious or risky |
+### What each one does
 
-**Applies at every level:**
-- `docs/README.md` — navigation index for the docs folder
-- `docs/memories/README.md` — what memory artifacts are and how to write them
-- `docs/memories/logs/README.md` — log format, rules, finding the latest file
-- `services/auth/README.md` — auth service overview
-- `services/auth/handlers/README.md` — handlers sub-module
-- `src/components/README.md` — component library overview
+- `README.md` — purpose, entry point, usage, links
+- `ARCHITECTURE.md` — internals, flows, boundaries, decisions
+- `TESTS.md` — how to run tests, patterns, fixtures, expectations
+- `SETUP.md` — non-obvious bootstrap or local environment steps
+- `RUNBOOK.md` — folder-local operational workflow
+- `CHANGELOG.md` — user-facing or package-facing release history
+- `SECURITY.md` — security boundaries, secrets, abuse cases, review rules
+- `OVERVIEW.md` — concept-first orientation when README would become too dense
+- `FAQ.md` — repeated questions and troubleshooting
+- `DECISIONS.md` — local decisions that do not justify a separate ADR
+- `DEPENDENCIES.md` — dependency map, contracts, upgrade notes
 
-**`README.md` is always the highest priority.** It's the entry point for any directory. Leaf directories inside timestamped trees (date folders like `2026/2026-03-21/`) do not need in-folder docs.
+These are living docs. Add `Last updated: YYYY-MM-DD` near the top.
 
----
+## Root instruction docs
 
-## Tier 4: External Documentation
+These are first-class documentation:
 
-External docs live outside the repository — wikis, Notion pages, Confluence spaces, customer-facing sites.
+| File | Purpose |
+|---|---|
+| `AGENTS.md` | General customization to the user's needs, codebase, and ways of working |
+| `PLAN.md` | How planning should be done and how plans should look |
+| `SPEC.md` | How specs should be written and how they should be maintained |
+| `SOUL.md` | Agent personality and collaboration stance |
+| `PRINCIPLES.md` | Constraints, heuristics, and max/min rules |
+| `DESIGN.md` | Design-system and frontend interaction guidance |
 
-### When to use external docs:
+These are living docs. Add `Last updated: YYYY-MM-DD` near the top.
 
-- Documentation that non-engineers need to edit
-- Customer-facing product documentation
-- Organization-wide policies (not repo-specific)
-- Collaborative decision records that need rich formatting and comments
+## Final AFS
 
-### Sync risk:
+### Memory
 
-External docs drift from the code faster than in-repo docs. Mitigate by:
-- Linking from the code/repo to the external doc (not the reverse)
-- Adding a "last verified" timestamp to external docs
-- Treating code as the source of truth when there's conflict
-
----
-
-## Documentation Anti-Patterns
-
-| Anti-pattern | Problem | Fix |
+| Path | Purpose | Default mode |
 |---|---|---|
-| Doc lives in chat/Slack | Discoverable only with perfect search | Write it to the repo |
-| README 500+ lines | No one reads past line 50 | Split into README + ARCHITECTURE |
-| Commented-out code | "We might need this" — almost never true | Delete it; git history has it |
-| "See code for details" | Circular non-documentation | Document the non-obvious parts |
-| Outdated example | Teaches wrong patterns | Either update or delete |
-| Jargon without definition | Excludes new team members | Define terms on first use |
-| Giant monolithic doc | Hard to scan, impossible to update piecemeal | Split by audience and topic |
-| No "why" — only "what" | Future engineers can't evaluate whether to change it | Always document the reasoning |
+| `logs/` | terse change log for meaningful code or doc changes | timestamped |
+| `lessons/` | reusable lessons learned from experience | timestamped |
+| `items/` | durable facts about user, company, project, customers, environments | timestamped |
+| `fixes/` | reusable debugging solutions and error fixes | timestamped |
 
----
+### Operational
 
-## Choosing Between Doc Types: Decision Tree
+| Path | Purpose | Default mode |
+|---|---|---|
+| `audits/` | reports, audits, ADRs, post-mortems, investigations | timestamped |
+| `raw/` | raw source material waiting to be ingested | timestamped |
+| `plans/` | implementation plans and plan-driven-development artifacts | timestamped |
+| `specs/` | living desired-state behavior contracts | living |
+| `sources/` | monitored URL/source registries | living |
+| `lib/` | generated drafts, registries, support artifacts | living |
+| `<domain>/<folder>/` | domain-specific surfaces only when truly needed | repo-defined |
 
+### Source of truth
+
+| Path | Purpose | Default mode |
+|---|---|---|
+| `references/` | factual code, API, schema, or URL references | living |
+| `cookbook/` | "how we actually do this here" recipes | living |
+| `knowledge/` | timeless maintained knowledge | living |
+| `runbooks/` | operational procedures | living |
+| `research/` | ongoing research work | living |
+| `official-documentation/` | copied external official docs | living, but not iterated heavily |
+| `context/` | contextual docs such as values, goals, roadmap, budget, preferences | living |
+
+## Timestamp rule
+
+Timestamped doc families use one layout only:
+
+```text
+*/YYYY/YYYY-MM-DD/*.md
 ```
-New information to document?
-│
-├─ Is it about a specific function/method/class?
-│   └─ Inline docstring or comment
-│
-├─ Is it about how a service works as a whole?
-│   ├─ External behavior → README.md
-│   └─ Internal design → ARCHITECTURE.md
-│
-├─ Is it what changed today?
-│   └─ Memory log (docs/memories/logs/YYYY/YYYY-MM-DD/)
-│
-├─ Is it a lesson learned from real work?
-│   └─ Memory lesson (docs/memories/lessons/YYYY/YYYY-MM-DD/)
-│
-├─ Is it a stable fact about the team/project/company?
-│   └─ Memory fact (docs/memories/facts/YYYY/YYYY-MM-DD/)
-│
-├─ Is it the right way to do something?
-│   └─ Memory procedure (docs/memories/procedures/YYYY/YYYY-MM-DD/)
-│
-├─ Is it a non-obvious error solution?
-│   └─ Memory fix (docs/memories/fixes/YYYY/YYYY-MM-DD/)
-│
-├─ Is it a decision with non-obvious trade-offs?
-│   └─ ADR in docs/audits/YYYY/YYYY-MM-DD/
-│
-├─ Is it a structured investigation or analysis?
-│   └─ Technical report in docs/audits/YYYY/YYYY-MM-DD/
-│
-├─ Is it a production incident?
-│   └─ Post-mortem in docs/audits/YYYY/YYYY-MM-DD/
-│
-├─ Is it a feature spec or API contract?
-│   └─ Spec doc in docs/specs/YYYY/YYYY-MM-DD/
-│
-├─ Is it a repo-wide operating rule, execution plan, product principle, or design rule?
-│   └─ `AGENTS.md`, `PLAN.md`, `SPEC.md`, `SOUL.md`, `PRINCIPLES.md`, or `DESIGN.md`
-│
-├─ Is it a repeatable operational workflow with verification and rollback?
-│   └─ `runbooks/<workflow>.md` or local `RUNBOOK.md`
-│
-├─ Is it a plan or migration?
-│   └─ Plan doc in docs/plans/YYYY/YYYY-MM-DD/
-│
-├─ Is it a versioned release history?
-│   └─ CHANGELOG.md at the service or package root (not in docs/)
-│
-├─ Is it navigation/orientation for a directory?
-│   └─ README.md (or ARCHITECTURE.md / OVERVIEW.md) in that directory
-│
-├─ Is it a general reusable how-to?
-│   └─ Guide in docs/guides/
-│
-├─ Is it lookup-style reference material?
-│   └─ Reference in docs/references/
-│
-└─ Is it a reusable how-to for this repo's implementation?
-    └─ Cookbook entry in docs/cookbook/
+
+Default timestamped families:
+
+- `logs/`
+- `lessons/`
+- `items/`
+- `fixes/`
+- `audits/`
+- `raw/`
+- `plans/`
+
+Examples:
+
+```text
+logs/2026/2026-04-25/dev.md
+lessons/2026/2026-04-25/retry-budget.md
+items/2026/2026-04-25/acme-contracting-rules.md
+fixes/2026/2026-04-25/postgres-socket-timeout.md
+audits/2026/2026-04-25/release-audit.md
+plans/2026/2026-04-25/queue-backpressure.md
+raw/2026/2026-04-25/vendor-export.md
 ```
+
+## Living-doc rule
+
+Living docs do not use timestamped folders as their primary organization.
+
+Every living doc should include:
+
+```markdown
+Last updated: YYYY-MM-DD
+```
+
+Put it directly under the H1 or immediately after frontmatter.
+
+Applies to:
+
+- root instruction docs
+- in-folder docs
+- `specs/`
+- `sources/`
+- `lib/`
+- `references/`
+- `cookbook/`
+- `knowledge/`
+- `runbooks/`
+- `research/`
+- `official-documentation/`
+- `context/`
+
+## Time-based vs live conflicts
+
+Use this rule whenever docs overlap:
+
+- timestamped docs own history
+- living docs own the current rule
+
+Good split:
+
+- `plans/2026/2026-04-25/payment-retry.md` explains one implementation effort
+- `PLAN.md` explains the lasting repo-wide planning standard
+
+Bad split:
+
+- current operational instructions duplicated in both `audits/...` and `runbooks/...`
+- current repo rules duplicated in both `lessons/...` and `AGENTS.md`
+
+When conflicts exist:
+
+1. Move the durable rule into the right living doc.
+2. Keep the timestamped doc only as evidence or archive.
+3. Delete redundant drift when it adds no value.
+
+## Decision guide
+
+Use this routing sequence:
+
+1. If the reader needs the answer inside code, use inline docs.
+2. If the doc explains one folder, use in-folder docs.
+3. If the doc changes how the repo is operated, use a root instruction doc.
+4. If the artifact is historical, investigative, or event-like, use a timestamped AFS path.
+5. If the artifact is the current durable truth, use a living AFS path.
+
+## Common placements
+
+| Scenario | Destination |
+|---|---|
+| Daily change note | `logs/YYYY/YYYY-MM-DD/*.md` |
+| Durable lesson from repeated debugging | `lessons/YYYY/YYYY-MM-DD/*.md` |
+| Fact about user/company/project | `items/YYYY/YYYY-MM-DD/*.md` |
+| Non-obvious recurring fix | `fixes/YYYY/YYYY-MM-DD/*.md` |
+| Release audit or architecture report | `audits/YYYY/YYYY-MM-DD/` |
+| New feature implementation plan | `plans/YYYY/YYYY-MM-DD/` |
+| Repo-wide behavior contract | `specs/` |
+| Stable API mapping | `references/` |
+| Repo-specific technical recipe | `cookbook/` |
+| Timeless engineering knowledge | `knowledge/` |
+| Exact operational workflow | `runbooks/` |
+| Context such as roadmap, budget, goals, preferences | `context/` |

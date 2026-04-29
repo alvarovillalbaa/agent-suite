@@ -7,7 +7,10 @@ Gather these inputs before generating or editing Remotion video code:
 - Format: landscape, square, vertical, or a specific pixel size.
 - Runtime target: total duration, or at least a scene count and pacing expectation.
 - Script or copy: narration, captions, headline text, CTA, disclaimers.
-- Assets: logos, product shots, screenshots, videos, audio, charts, brand colors, fonts.
+- Assets:
+  logos, product shots, screenshots, videos, audio, charts, brand colors, fonts,
+  existing external image URLs from the repo, local repo images, generated imagery needs,
+  and any product surfaces that should be treated as code-as-image instead of screenshots.
 - Visual direction: brand guidelines, references, motion tone, or explicit assumptions.
 - Technical constraints: deliverable codec, safe zones, subtitle requirements, or platform-specific limits.
 - Delivery context: ad, social post, landing page embed, product demo, internal presentation.
@@ -20,7 +23,8 @@ Gather these inputs before generating or editing Remotion video code:
 - Scene manifest:
   scene id, title, purpose, asset path, duration, transition, captions or narration, and any callouts.
 - Screen manifest:
-  screen title, description, image path, width, height, duration, and overlay copy.
+  screen title, description, image path or URL, width, height, duration, overlay copy,
+  and whether the screen is a static asset, hosted URL, generated image, or code-as-image scene.
 - JSON timeline spec:
   composition metadata, tracks, clips, and audio tracks when using `@json-render/remotion`.
 - Component catalog decisions:

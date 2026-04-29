@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 HTML_REQUIRED_FILES = ["index.html", "remote.html", "styles.css", "deck.js"]
@@ -13,6 +14,7 @@ REACT_REQUIRED_FILES = [
     "src/lib/remote.ts",
     "src/styles/slide-deck.css",
 ]
+AI_IMAGE_REQUIRED_FILES = ["normalized-content.json", "prompt-plan.md", "summary.json"]
 
 REQUIRED_REMOTE_COMMANDS = ["next", "prev", "goto"]
 
@@ -24,7 +26,7 @@ class ValidationError(Exception):
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate a code-slides deck")
     parser.add_argument("--project-root", required=True)
-    parser.add_argument("--mode", choices=["html", "react-ts"], required=True)
+    parser.add_argument("--mode", choices=["html", "react-ts", "ai-image"], required=True)
     return parser.parse_args()
 
 
@@ -96,6 +98,29 @@ def validate_react(root: Path) -> None:
         raise ValidationError("Responsive rules are missing (need @media and/or clamp).")
 
 
+def validate_ai_image(root: Path) -> None:
+    validate_required_files(root, AI_IMAGE_REQUIRED_FILES)
+
+    summary = json.loads(read_text(root / "summary.json"))
+    prompt_plan = read_text(root / "prompt-plan.md")
+    normalized = json.loads(read_text(root / "normalized-content.json"))
+
+    slides = normalized.get("slides")
+    if not isinstance(slides, list) or not slides:
+        raise ValidationError("normalized-content.json must contain a non-empty slides array.")
+
+    if summary.get("slides_total") != len(slides):
+        raise ValidationError("summary.json slides_total must match normalized-content.json.")
+
+    if "# Prompt Plan" not in prompt_plan:
+        raise ValidationError("prompt-plan.md must include a rendered prompt plan header.")
+
+    if not summary.get("dry_run"):
+        images = summary.get("images") or []
+        if not images:
+            raise ValidationError("Non-dry-run ai-image decks must list generated images in summary.json.")
+
+
 def main() -> int:
     args = parse_args()
     root = Path(args.project_root).resolve()
@@ -107,8 +132,10 @@ def main() -> int:
         validate_no_placeholders(root)
         if args.mode == "html":
             validate_html(root)
-        else:
+        elif args.mode == "react-ts":
             validate_react(root)
+        else:
+            validate_ai_image(root)
     except ValidationError as exc:
         print(f"Validation failed: {exc}")
         return 1

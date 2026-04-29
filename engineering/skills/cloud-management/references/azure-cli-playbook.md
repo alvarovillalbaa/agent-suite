@@ -9,6 +9,7 @@
 - Automatic deployments
 - Troubleshooting
 - Optimization
+- Specialized Azure task routing
 - Multi-runtime backend mapping
 
 ## Scope and Identity
@@ -159,6 +160,20 @@ Common failure classes:
 - review Redis SKU and always-on non-prod caches
 - clean up unused public IPs, NAT, gateways, and stale revisions
 - keep Key Vault references and managed identity wiring consistent instead of duplicating secrets
+
+## Specialized Azure Task Routing
+
+Load the narrower reference before going deep on Azure-specific work:
+
+- architecture diagrams and dependency maps: [azure-resource-visualization.md](./azure-resource-visualization.md)
+- live diagnostics, Monitor queries, Container Apps or Functions triage: [azure-diagnostics-guide.md](./azure-diagnostics-guide.md)
+- cost and savings analysis: [azure-cost-optimization-guide.md](./azure-cost-optimization-guide.md)
+- storage tiers, blob or file operations, and data movement: [azure-storage-guide.md](./azure-storage-guide.md)
+- VM or VMSS sizing, pricing, connectivity, and reservations: [azure-compute-guide.md](./azure-compute-guide.md)
+- plan, tier, or SKU upgrades inside Azure: [azure-upgrade-guide.md](./azure-upgrade-guide.md)
+- compliance posture, azqr, and Key Vault expiration scans: [azure-compliance-guide.md](./azure-compliance-guide.md)
+- Entra app registration and OAuth wiring: [azure-entra-app-registration.md](./azure-entra-app-registration.md)
+- Foundry projects, model quotas, agent deploys, and evaluation loops: [azure-foundry-guide.md](./azure-foundry-guide.md)
 
 ## Multi-Runtime Backend Mapping
 

@@ -44,12 +44,19 @@ audience:
 - Palette:
 - Typography:
 - Motion tone:
+- Anti-slop constraints:
+- Scene variety plan:
 - Tone:
 - Explicit fallback assumptions:
 
 ## Assets
 
-- Existing assets:
+- Existing external URLs:
+- Existing local repo assets:
+- Upload or `public/` promotion plan for local assets:
+- Code-as-image product visuals:
+- Generated imagery:
+- Mixed composition plan:
 - Missing assets:
 - Audio / captions available:
 

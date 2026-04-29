@@ -25,8 +25,17 @@ https://github.com/alvarovillalbaa/plugins/tree/main/engineering/skills/cloud-ma
 
 ## What is bundled
 
-- `examples/`
-- `hooks/`
 - `references/`
 - `scripts/`
-- `templates/`
+
+Notable Azure-specific references now bundled:
+
+- `references/azure-diagnostics-guide.md`
+- `references/azure-resource-visualization.md`
+- `references/azure-cost-optimization-guide.md`
+- `references/azure-storage-guide.md`
+- `references/azure-compute-guide.md`
+- `references/azure-upgrade-guide.md`
+- `references/azure-compliance-guide.md`
+- `references/azure-entra-app-registration.md`
+- `references/azure-foundry-guide.md`

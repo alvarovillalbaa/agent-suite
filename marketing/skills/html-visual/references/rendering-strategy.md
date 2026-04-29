@@ -2,6 +2,8 @@
 
 Choose the smallest rendering system that communicates the idea cleanly.
 
+If you are about to render a terminal table with 4 or more rows or 3 or more columns, stop and generate HTML instead.
+
 ## Use Mermaid for
 
 - flowcharts
@@ -13,6 +15,8 @@ Choose the smallest rendering system that communicates the idea cleanly.
 
 Use Mermaid when the relationships matter more than the prose.
 
+Prefer Mermaid for topology-first diagrams. If each node needs real explanatory copy, metadata, or recommendations, switch to a hybrid page instead of cramming everything into nodes.
+
 ## Use CSS Grid or cards for
 
 - architecture summaries with rich component annotations
@@ -21,6 +25,8 @@ Use Mermaid when the relationships matter more than the prose.
 - dashboards with mixed metric cards and commentary
 
 Use cards when each node needs meaningful text, metadata, or actions.
+
+For pages with 4 or more sections, add a sticky or compact table of contents.
 
 ## Use HTML tables for
 
@@ -31,6 +37,12 @@ Use cards when each node needs meaningful text, metadata, or actions.
 - capability matrices
 
 Prefer semantic tables over fake table layouts.
+
+For wide tables:
+
+- wrap them in a horizontal scroll container
+- keep headers visually strong
+- use status badges instead of plain "yes/no" text when it improves scan speed
 
 ## Use timeline layouts for
 
@@ -53,6 +65,16 @@ Hybrid pattern:
 2. diagram or matrix
 3. annotated findings
 4. recommendation or next steps
+
+## Architecture Heuristic
+
+Use this split for architecture-style artifacts:
+
+- Text-heavy architecture: CSS Grid cards plus directional arrows.
+- Topology-heavy architecture: Mermaid.
+- Complex architecture with both needs: Mermaid overview on top, detailed cards below.
+
+Do not try to force 15+ detailed concepts into one diagram. Split overview from explanation.
 
 ## Chart guidance
 

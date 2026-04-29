@@ -8,8 +8,17 @@ Use these presets when the user wants visual direction quickly, or use them as i
 - Favor bold, intentional design over generic startup gradients.
 - Use expressive fonts instead of system defaults when the delivery format permits web fonts.
 - Preserve existing brand language if the repository already establishes one.
+- Prefer constrained presets first when the brief is ambiguous.
 
-## Presets
+## Explicitly Avoid
+
+- Inter, Roboto, Arial, Helvetica, or system-ui as the only primary deck font
+- violet / indigo accent defaults
+- gradient text headings
+- neon-cyan-magenta-dark dashboards by reflex
+- identical centered hero slides repeated throughout the deck
+
+## Constrained Presets
 
 ### Bold Signal
 
@@ -43,22 +52,6 @@ Use these presets when the user wants visual direction quickly, or use them as i
 - Color direction: warm paper base with tab accents
 - Motion: tab changes, page shifts, understated reveals
 
-### Pastel Geometry
-
-- Vibe: friendly, approachable, modern
-- Best for: product overviews, education, light brand narratives
-- Typography: rounded or geometric sans pairing
-- Color direction: soft pastels with clear contrast anchors
-- Motion: pill, shape, and block transitions with playful timing
-
-### Neon Cyber
-
-- Vibe: futuristic, tech-heavy, electric
-- Best for: developer tools, AI products, forward-looking demos
-- Typography: sharp display sans with utilitarian mono accents
-- Color direction: dark canvas with neon green, cyan, or acid accents
-- Motion: scanline, glow, and terminal-inspired transitions
-
 ### Swiss Modern
 
 - Vibe: precise, minimal, information-first
@@ -75,6 +68,16 @@ Use these presets when the user wants visual direction quickly, or use them as i
 - Color direction: off-white, charcoal, muted ink tones
 - Motion: calm fades and line-drawing accents
 
+## Flexible Presets
+
+### Pastel Geometry
+
+- Vibe: friendly, approachable, modern
+- Best for: product overviews, education, light brand narratives
+- Typography: rounded or geometric sans pairing
+- Color direction: soft pastels with clear contrast anchors
+- Motion: pill, shape, and block transitions with playful timing
+
 ## Preview Workflow
 
 When the user is unsure, generate three lightweight previews that intentionally span different directions:
@@ -90,3 +93,4 @@ Each preview should show:
 - Background treatment
 - Accent and navigation treatment
 - Entry animation style
+- A distinct composition pattern so the user can compare layout logic, not just colors

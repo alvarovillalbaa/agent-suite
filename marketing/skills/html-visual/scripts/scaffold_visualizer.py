@@ -109,7 +109,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_template(mode: str) -> str:
-    base = Path(__file__).resolve().parent.parent / "assets" / "templates"
+    base = Path(__file__).resolve().parent.parent / "templates"
     filename = {
         "explainer": "explainer.html",
         "review": "review.html",

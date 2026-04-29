@@ -24,6 +24,13 @@ These rules apply regardless of platform:
 - If disagreeing, keep the disagreement clear and civil.
 - Never pitch aggressively in a first touch unless the user explicitly asks for that style.
 
+If the user also needs a visual asset to support the post or campaign:
+
+1. Prefer code-as-image for product-focused visuals.
+2. Reuse existing external URLs or local repo images when they already fit the message.
+3. Use generated imagery for missing backgrounds or supporting scenes.
+4. Hand off asset production to `code-as-images`, `html-visualization`, `code-slides`, or `video-generation` depending on the artifact.
+
 ---
 
 ## X / Twitter
@@ -120,5 +127,9 @@ These rules apply regardless of platform:
 - If the user wants a long-form X piece first, create it with `x-articles` and then derive engagement from it.
 - If the user wants to turn a long-form idea into LinkedIn-native content before engaging, use `linkedin-articles`.
 - If the user wants a broader multi-channel distribution pack, use `content-syndication`.
+- If the user needs a product-focused visual asset, use `code-as-images`.
+- If the user needs a shareable visual explainer or social landing page, use `html-visualization`.
+- If the user needs presentation graphics or slide-style assets, use `code-slides`.
+- If the user needs motion graphics or a social video, use `video-generation`.
 - If the user needs account or persona context first, start with `prospect-research`.
 - If the LinkedIn DM is part of a broader outbound motion, use `message-outreach`.

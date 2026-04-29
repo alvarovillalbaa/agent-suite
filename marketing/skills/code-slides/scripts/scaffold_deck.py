@@ -85,7 +85,7 @@ def main() -> int:
 
     script_dir = Path(__file__).resolve().parent
     skill_dir = script_dir.parent
-    template_dir = skill_dir / "assets" / "templates" / args.mode
+    template_dir = skill_dir / "templates" / args.mode
     output_dir = Path(args.output).resolve()
 
     if not template_dir.exists():

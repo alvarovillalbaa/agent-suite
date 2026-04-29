@@ -10,10 +10,12 @@ Use this skill to build or revise Remotion-based marketing videos in a consisten
 6. Plan the scene list and frame budget before writing animation code.
 7. Get strategy approval before major implementation.
 8. Identify which assets are available versus which need placeholders or assumptions.
-9. Read only the rule files needed for the current implementation.
-10. Keep captions, sequencing, and audio timing tied to frames instead of ad hoc delays.
-11. Run Studio, still, or short render checks before treating the output as done.
-12. Persist the approved plan in a durable artifact for the next revision.
+9. Choose the image source plan: reuse hosted URLs, promote local assets into `public/`, code the product surface, generate missing support imagery, or combine sources.
+10. Lock the visual system and scene variety rules before code so the composition does not drift into one repeated layout.
+11. Read only the rule files needed for the current implementation.
+12. Keep captions, sequencing, and audio timing tied to frames instead of ad hoc delays.
+13. Run Studio, still, or short render checks before treating the output as done.
+14. Persist the approved plan in a durable artifact for the next revision.
 
 This skill is strongest when the request involves React/Remotion code, not generic video editing advice.
 
@@ -21,6 +23,7 @@ This skill is strongest when the request involves React/Remotion code, not gener
 
 - Brief first: objective, audience, CTA, runtime, format.
 - Style second: brand or visual assumptions must be explicit.
+- Visual discipline includes anti-slop constraints and scene variety, not just palette selection.
 - Architecture third: decide whether code should be driven by scenes, a manifest, or a JSON timeline spec.
 - Approval fourth: state the strategy in plain English and wait for confirmation before large changes.
 - Layout fifth: compose the hero frame of each scene before adding motion.
@@ -46,6 +49,17 @@ Resolve the visual system before building scenes:
 
 Do not silently fall back to generic blue palettes, default fonts, or placeholder motion.
 
+## Scene Variety Gate
+
+Before implementation, confirm how the runtime will vary spatially:
+
+1. Which scenes are centered versus off-axis.
+2. Which scenes are full-bleed versus framed.
+3. Which scenes are UI-first versus typography-first.
+4. Which scenes intentionally slow down or simplify after dense moments.
+
+If every scene uses the same composition pattern, redesign the plan before coding.
+
 ## Layout before animation
 
 Use this order inside each scene:
@@ -70,7 +84,7 @@ Use these gates before moving to the next phase:
 2. Narrative gate:
    Every scene has a job, a frame range, and a reason to exist.
 3. Asset gate:
-   Logos, screenshots, video, audio, fonts, and captions are either available or called out as placeholders.
+   Logos, screenshots, video, audio, fonts, captions, generated imagery, and code-as-image scenes are either available or called out as placeholders.
 4. Approval gate:
    The strategy is explicit enough for the user to approve or redirect before code starts.
 5. Timing gate:

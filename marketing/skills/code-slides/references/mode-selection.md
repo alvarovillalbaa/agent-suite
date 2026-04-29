@@ -4,13 +4,22 @@ Use this decision tree before writing deck code.
 
 ## Decision Tree
 
-1. Ask whether the user explicitly requested `React`, `TypeScript`, or a component library implementation.
-2. If yes, choose `react-ts` mode.
-3. If no, choose `html` mode.
-4. If the repository already contains shadcn-ui/Radix/Headless but no explicit request exists, keep `html` mode.
-5. If the user explicitly requests a component library, implement UI controls using that library.
+1. Ask whether the user explicitly wants each slide rendered as a static AI-generated image, already has a markdown/JSON content spec, or needs Google-Slides-ready slide images instead of a browser-authored deck.
+2. If yes, choose `ai-image` mode.
+3. Otherwise ask whether the user explicitly requested `React`, `TypeScript`, or a component library implementation.
+4. If yes, choose `react-ts` mode.
+5. If no, choose `html` mode.
+6. If the repository already contains shadcn-ui/Radix/Headless but no explicit request exists, keep `html` mode.
+7. If the user explicitly requests a component library, implement UI controls using that library.
 
 ## Output Contracts
+
+### `ai-image` mode
+
+- Accept markdown or JSON slide specs.
+- Normalize slide content into deterministic prompts.
+- Emit prompt artifacts even in dry-run mode.
+- Render slide images only when the image API key is available.
 
 ### `html` mode (default)
 
@@ -35,6 +44,7 @@ Use this decision tree before writing deck code.
 
 ## Resolution Rules for Ambiguity
 
-1. If user intent is ambiguous, choose default `html` mode.
-2. If user later requests framework migration, convert deck architecture incrementally slide-by-slide.
-3. Never silently switch from HTML to React without an explicit user request.
+1. If the user explicitly asks for slide images, pick `ai-image`.
+2. If user intent is otherwise ambiguous, choose default `html` mode.
+3. If user later requests framework migration, convert deck architecture incrementally slide-by-slide.
+4. Never silently switch from HTML to React without an explicit user request.

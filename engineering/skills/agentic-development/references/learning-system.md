@@ -1,5 +1,7 @@
 # Repo-Local Learning System
 
+Last updated: 2026-04-25
+
 Run this reference when: the user says "save what we learned", "update learning", "extract lessons", "mine this session", "remember this repo pattern", or wants a `learning/` folder that stores engineering knowledge; or when a session ends and the learning loop should be run to consolidate discoveries into durable artifacts.
 
 ---
@@ -49,13 +51,14 @@ After the learning artifacts are written, check whether the knowledge should als
 - `SOUL.md` for persistent collaboration or tone corrections.
 - `PRINCIPLES.md` for decision heuristics.
 - Service docs such as `README.md`, `ARCHITECTURE.md`, `TESTS.md`, `SETUP.md` when teammates benefit.
-- **`docs/memories/`** for human-readable documentation of discoveries — the shared team knowledge base:
-  - `docs/memories/lessons/YYYY/YYYY-MM-DD/` — verified insights that should change future behavior
-  - `docs/memories/facts/YYYY/YYYY-MM-DD/` — stable facts about team/company/project context
-  - `docs/memories/procedures/YYYY/YYYY-MM-DD/` — repeatable workflows discovered during work
-  - `docs/memories/fixes/YYYY/YYYY-MM-DD/` — solutions to non-obvious errors
+- AFS documentation destinations for human-readable discoveries:
+  - `lessons/YYYY/YYYY-MM-DD/` — verified insights that should change future behavior
+  - `items/YYYY/YYYY-MM-DD/` — stable facts about team/company/project context
+  - `fixes/YYYY/YYYY-MM-DD/` — solutions to non-obvious errors
+  - `logs/YYYY/YYYY-MM-DD/` — terse historical change notes
+  - `audits/`, `plans/`, `specs/`, `references/`, `cookbook/`, `knowledge/`, or `runbooks/` when that is the correct durable destination
 
-**Documentation placement rules** (what goes where in `docs/`) are owned by the `code-documentation` skill. Read `skills/code-documentation/SKILL.md` before writing to `docs/` to ensure placement is correct.
+**Documentation placement rules** are owned by the `code-documentation` skill. Read `skills/code-documentation/SKILL.md` before writing to AFS docs so the content lands in the right current-vs-historical surface.
 
 Use `references/learning-promotion.md` for the promotion rules.
 

@@ -1,5 +1,7 @@
 # Folder Structure
 
+Last updated: 2026-04-25
+
 Canonical file layout and schemas for the repo-local `learning/` system.
 
 ## Two-Layer Architecture
@@ -8,11 +10,11 @@ The learning system has two complementary layers:
 
 **`learning/`** — agent-internal state (machine-readable, structured JSON/JSONL, operated on by scripts). Lives at the repo root. This is the working memory of the agent.
 
-**`docs/memories/`** — human-readable documentation output (Markdown, browsable by teammates). Defined by the `code-documentation` skill. This is what gets promoted after verification.
+**AFS documentation output** — human-readable markdown for collaborators. Defined by the `code-documentation` skill and routed into `logs/`, `lessons/`, `items/`, `fixes/`, `audits/`, `plans/`, `specs/`, `references/`, `cookbook/`, `knowledge/`, `runbooks/`, and related AFS surfaces.
 
-The promotion path: `learning/` artifacts → verified → `docs/memories/` for lessons/facts/procedures/fixes.
+The promotion path: `learning/` artifacts → verified → the correct AFS destination for the content type.
 
-See `skills/code-documentation/references/continuous-docs.md` for `docs/memories/` format templates.
+See `skills/code-documentation/references/continuous-docs.md` for timestamped and living AFS format rules.
 
 ## Layout
 
@@ -50,7 +52,7 @@ Core synthesis path:
 ```text
 items -> episodes -> decision-traces -> triples -> lessons
                                                        ↓
-                                              docs/memories/ (human docs)
+                                             AFS human docs
 ```
 
 Collections, procedures, beliefs, and doc promotion run alongside that path.

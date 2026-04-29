@@ -62,6 +62,26 @@ Existing content → [Content Refresh mode] → Updated article with fresh stats
 
 Use **Keyword Research** first when you need to discover what people are actually searching for before defining your strategy. Use **Content Gap Analysis** when you already know your topic space and want to benchmark against competitors. Use **Blog** first when starting from scratch on a specific topic. Use **Syndication** when you already have a finished canonical piece. Use **Humanize** on any draft — yours or AI-generated — that reads like a machine wrote it. Use **Content Audit** as a final quality gate before publishing.
 
+### Visual Companion Assets
+
+When the user also needs visuals for the content, keep the asset plan explicit instead of treating imagery as an afterthought.
+
+Supported paths:
+
+1. Images generated during the task
+2. Existing external image URLs already referenced in the repo
+3. Existing local repo images
+4. Code-as-image product visuals
+5. Mixed compositions
+
+Decision rules:
+
+1. Prefer code-as-image for product-led articles, carousels, and feature explainers where the image should faithfully represent the product.
+2. Reuse existing external URLs when the right asset already exists.
+3. Local repo images are valid, but if the artifact is meant for hosted distribution, prefer promoting them to the active asset host or public URL.
+4. Generate supporting imagery on the fly when the repo does not already cover the need.
+5. For actual visual production, hand off to `code-as-images`, `code-slides`, `html-visualization`, or `video-generation` as appropriate.
+
 ---
 
 ## Mode 1 — Blog Articles

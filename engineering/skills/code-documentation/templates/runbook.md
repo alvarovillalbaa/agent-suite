@@ -9,6 +9,8 @@ Replace all placeholder text. Keep commands executable and verification steps ex
 ```markdown
 # [Workflow Name]
 
+Last updated: YYYY-MM-DD
+
 ## Purpose
 
 [One paragraph describing what this workflow accomplishes and when to use it.]
@@ -69,4 +71,4 @@ Replace all placeholder text. Keep commands executable and verification steps ex
 - [Relevant README, ARCHITECTURE, TESTS, or SPEC file](#)
 ```
 
-When the workflow is operationally important, rehearse it outside incident conditions and update the `Last verified` line after a successful run.
+When the workflow is operationally important, rehearse it outside incident conditions and update both `Last updated` and `Last verified` after a successful run.

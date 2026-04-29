@@ -1,5 +1,7 @@
 # Writing Standards Reference
 
+Last updated: 2026-04-25
+
 Standards for tone, voice, structure, and quality across all code documentation.
 
 ---
@@ -7,6 +9,13 @@ Standards for tone, voice, structure, and quality across all code documentation.
 ## Core Principle: Audience First
 
 Every documentation decision starts with: **who reads this, and what do they need to know?**
+
+Also decide whether the file is:
+
+- a **living doc** that owns the current truth
+- a **timestamped historical doc** that records what happened at a specific time
+
+If it is living, add `Last updated: YYYY-MM-DD` near the top.
 
 | Audience | What they need | Tone | Length |
 |---|---|---|---|

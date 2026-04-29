@@ -13,6 +13,7 @@ Use this before handing off a Remotion implementation.
   mood,
   light, dark, or mixed canvas,
   and any brand colors, fonts, or references.
+- Confirm the plan records explicit anti-slop constraints and scene-variety intent.
 - Confirm all required assets exist or are clearly stubbed.
 - Confirm each scene has an explicit frame range and purpose.
 - Confirm the source of truth for sequencing: frame constants, manifest durations, or timeline clips.
@@ -27,6 +28,7 @@ Use this before handing off a Remotion implementation.
 - Avoid layout assumptions that break at the chosen width and height.
 - Keep font loading and asset imports compatible with Remotion rendering.
 - Ensure overlays, panels, and edge-aligned UI do not hide captions or subtitle-safe areas.
+- Ensure consecutive scenes do not all use the same composition pattern unless the brief explicitly requires it.
 - If using a manifest, ensure IDs, asset paths, durations, and ordering match the composition logic.
 - If using `@json-render/remotion`, ensure composition metadata, clip timing, and catalog definitions stay in sync.
 
@@ -38,6 +40,7 @@ Use this before handing off a Remotion implementation.
 - Check trims, transitions, and sequence offsets for gaps or overlaps.
 - Check media duration assumptions against actual video or audio metadata.
 - Check that brand colors, typography, and motion feel consistent across scenes.
+- Check that the visual system avoids generic defaults such as Inter-only typography, indigo accents, gradient-text headings, and decorative glow effects.
 - Check that the rendered or previewed output matches the approved strategy, not just the code intent.
 - Check the final structure against the requested brief before closing.
 - Run `npx remotion studio` or the project's preview path when practical.

@@ -9,6 +9,7 @@ It also now borrows key skill patterns from [`heygen-com/hyperframes`](https://g
 
 - React-based video generation
 - animations, captions, timing, and asset workflows
+- videos that combine repo assets, generated imagery, and code-as-image product visuals
 - rule-driven video builds that need a brief, a timing plan, reusable templates, and render QA
 - structured video pipelines that describe scenes as manifests or JSON timeline specs
 
@@ -40,6 +41,7 @@ Start with the brief and visual direction, choose the right architecture, get st
 - `references/composition-patterns.md` chooses between scene, manifest, and JSON-render modes.
 - `references/rendering.md` covers preview and render verification.
 - `references/data-sources.md` lists the required inputs.
+- `references/image-sourcing.md` defines how to reuse, host, generate, or code image assets.
 - `templates/video-plan.md` is the pre-code planning scaffold.
 - `templates/video-code.md` is the implementation scaffold.
 - `references/checklist.md` is the final QA pass.

@@ -24,6 +24,7 @@ audience:
 - Static layout source of truth:
 - Caption / subtitle-safe strategy:
 - Animation entry / exit strategy:
+- Scene-to-scene composition changes:
 
 ## Components
 
@@ -65,4 +66,5 @@ audience:
 - Still frames checked:
 - Studio / preview review:
 - Risky scene boundaries reviewed:
+- Anti-slop checks reviewed:
 - Remaining visual risks:

@@ -1,6 +1,6 @@
 # Code Slides
 
-Create and evolve slide decks implemented in code, especially HTML/CSS/JS or React/TypeScript presentations.
+Create and evolve slide decks implemented in code, especially HTML/CSS/JS or React/TypeScript presentations, and generate AI-image slide packs from markdown or JSON content specs.
 
 ## Use this for
 
@@ -42,6 +42,7 @@ https://github.com/alvarovillalbaa/code-slides
 
 ## What is bundled
 
+- `agents/`
 - `examples/`
 - `hooks/`
 - `references/`

@@ -1,10 +1,6 @@
 # Code As Images
 
-Code-as-images skill slot for the `marketing` plugin.
-
-## Current status
-
-This is a real README, but the underlying [`SKILL.md`](./SKILL.md) is still a placeholder. The folder already has `examples/`, `hooks/`, `references/`, `scripts/`, and `templates/`, so the packaging is ready even though the core instructions are not.
+Create product visuals, UI mockups, terminal cards, and technical image assets by authoring the image itself in code.
 
 ## Install
 
@@ -19,3 +15,12 @@ Codex `$skill-installer` path:
 ```text
 https://github.com/alvarovillalbaa/plugins/tree/main/marketing/skills/code-as-images
 ```
+
+## What is bundled
+
+- `agents/`
+- `examples/`
+- `hooks/`
+- `references/`
+- `scripts/`
+- `templates/`

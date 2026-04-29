@@ -1,5 +1,7 @@
 # Identity And Documentation Promotion
 
+Last updated: 2026-04-25
+
 Use learning artifacts to improve the right source of truth. Do not promote everything everywhere.
 
 ## Promotion order
@@ -26,14 +28,22 @@ If the knowledge is useful only as session memory, stop at `learning/`.
 | `ARCHITECTURE.md` | Structural decisions, ownership, boundaries | When architecture changed or was clarified |
 | `TESTS.md` / `TESTING.md` | Durable test workflows and pitfalls | When test strategy or gotchas changed |
 | `SETUP.md` | Environment, setup, bootstrap behavior | When operational steps changed |
-| `docs/guides/*` | General technical how-to guidance | When the method is reusable beyond this repo's implementation |
-| `docs/references/*` | Stable lookup/reference material | When teammates need a factual reference surface |
-| `docs/cookbook/*` | Repo-specific technical guidance | When a pattern needs broader documentation in this codebase |
-| `docs/memories/logs/` | Development log entries | After any meaningful code change |
-| `docs/memories/lessons/` | Verified reusable insights | When a discovery should change future behavior |
-| `docs/memories/facts/` | Stable project/team facts | When teammates would make wrong assumptions without it |
-| `docs/memories/procedures/` | Repeatable workflows | After discovering the right way to do something |
-| `docs/memories/fixes/` | Error solutions | After solving a non-obvious or recurring problem |
+| `logs/` | Development log entries | After any meaningful code or doc change |
+| `lessons/` | Verified reusable insights | When a discovery should change future behavior |
+| `items/` | Stable project/team/user/company facts | When teammates would make wrong assumptions without it |
+| `fixes/` | Error solutions | After solving a non-obvious or recurring problem |
+| `audits/` | Reports, ADRs, post-mortems, analytical audits | When the artifact is historical and investigative |
+| `plans/` | Historical implementation plans | When the artifact explains how one change should be executed |
+| `specs/` | Living desired-state behavior contracts | When the rule should remain current, not historical |
+| `sources/` | Monitored URL/source registries | When source monitoring itself is durable knowledge |
+| `lib/` | Generated drafts or support artifacts | When a reusable generated artifact should persist |
+| `references/` | Stable lookup/reference material | When teammates need a factual reference surface |
+| `cookbook/` | Repo-specific technical guidance | When a pattern needs broader documentation in this codebase |
+| `knowledge/` | Timeless maintained knowledge | When the content should compound and stay canonical |
+| `runbooks/` | Exact operational workflows | When the content is a repeatable procedure |
+| `research/` | Ongoing engineering research | When the work is exploratory but still source-of-truth |
+| `official-documentation/` | Copied external official docs | When the repo keeps vendor/source docs locally |
+| `context/` | Goals, roadmap, budget, preferences, values, other contextual docs | When the repo needs current shared context |
 
 ## `AGENTS.md`
 
@@ -94,7 +104,7 @@ Update these when the learning changes the repo-wide documentation contract:
 - `SPEC.md` — how specs should be written and what they must define
 - `DESIGN.md` — the design system and frontend interaction language for the repo
 
-Do not use these files for one feature's local content when a timestamped doc in `docs/plans/` or `docs/specs/` is the narrower source of truth.
+Do not use these files for one feature's local content when a timestamped doc in `plans/YYYY/YYYY-MM-DD/` or a living contract in `specs/` is the narrower source of truth.
 
 ## Other markdown docs
 
@@ -120,31 +130,24 @@ Promote there when the knowledge is for humans first, not just agents.
 
 - install, bootstrap, credentials flow, or local runtime setup changed
 
-### Promote to `docs/guides/` when
+### Promote to AFS docs when
 
-- the knowledge is a general technical how-to
-- it should not depend on how this repo implements the pattern
+Use the `code-documentation` contract and choose the narrowest correct destination:
 
-### Promote to `docs/references/` when
+- `logs/` for terse historical change notes
+- `lessons/` for verified reusable insights
+- `items/` for durable facts about user/company/project context
+- `fixes/` for reusable debugging resolutions
+- `audits/` for reports, ADRs, post-mortems, and analytical history
+- `plans/` for historical implementation plans
+- `specs/` for living desired-state contracts
+- `references/` for factual lookup docs
+- `cookbook/` for repo-specific technical recipes
+- `knowledge/` for timeless maintained knowledge
+- `runbooks/` for exact repeatable procedures
+- `research/`, `official-documentation/`, `sources/`, `context/`, or `lib/` when those surfaces are the right current home
 
-- the knowledge is mostly lookup material, mappings, or reference data
-- readers will use it to check facts rather than follow a workflow
-
-### Promote to `docs/cookbook/` when
-
-- the knowledge is a reusable technical recipe for this codebase
-- it spans multiple modules or teams
-
-### Promote to `docs/memories/` when
-
-The `docs/memories/` folder (owned by the `code-documentation` skill) is the human-readable layer on top of the `learning/` system. Use it when knowledge should be readable by teammates, not just agents.
-
-- **`lessons/`** — verified, non-trivial insight that should change future behavior; confirmed by real work
-- **`facts/`** — stable fact about team, company, or project not obvious from code
-- **`procedures/`** — repeatable workflow that would require rediscovery without documentation
-- **`fixes/`** — non-obvious error solution that is reproducible and likely to recur
-
-All paths follow `docs/memories/<type>/YYYY/YYYY-MM-DD/*.md`. See `skills/code-documentation/references/continuous-docs.md` for format templates.
+All timestamped AFS paths follow `*/YYYY/YYYY-MM-DD/*.md`. All living docs should carry `Last updated: YYYY-MM-DD`.
 
 ## Conflict handling
 

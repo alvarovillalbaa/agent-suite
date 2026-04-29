@@ -394,7 +394,7 @@ When a plan file was written before implementation, cross-reference its actionab
 ### Finding the plan file
 
 1. Check if the current conversation or session references an active plan file path.
-2. Search common plan directories: `~/.claude/plans/`, `.gstack/plans/`, `docs/plans/` — find the most recent file mentioning the current branch or repo.
+2. Search common plan directories: `~/.claude/plans/`, `.gstack/plans/`, `plans/` — find the most recent file mentioning the current branch or repo.
 3. Validate: if found via search, read the first 20 lines and confirm it is relevant to this branch.
 4. If no plan file found, skip this audit.
 

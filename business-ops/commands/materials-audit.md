@@ -5,7 +5,8 @@ argument-hint: "[deck, model, data room, or materials set]"
 allowed-tools: [Read, Write, AskUserQuestion, Skill]
 ---
 
-Use skill: **fundraising** — `skills/fundraising/SKILL.md`, but focus on the Materials Upgrade Report.
+Use skill: **finances** — `skills/finances/SKILL.md`, focusing on **Mode 4:
+Fundraising**, especially the **Materials Upgrade Report**.
 
 1. **Gather the materials** – Ask for the deck, model, data room summary, and any stage context if it is missing.
 2. **Review the materials** – Score the assets and identify the most important gaps.

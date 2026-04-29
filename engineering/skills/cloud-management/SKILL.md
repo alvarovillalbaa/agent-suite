@@ -36,6 +36,16 @@ In command examples below, `<skill-dir>` means the installed `cloud-management` 
      - [aws-cli-playbook.md](./references/aws-cli-playbook.md)
      - [azure-cli-playbook.md](./references/azure-cli-playbook.md)
      - [gcp-cli-playbook.md](./references/gcp-cli-playbook.md)
+   - Azure deep-dive references when the task is Azure-specific:
+     - diagnostics and incident loops: [azure-diagnostics-guide.md](./references/azure-diagnostics-guide.md)
+     - architecture diagrams and relationship mapping: [azure-resource-visualization.md](./references/azure-resource-visualization.md)
+     - cost and savings analysis: [azure-cost-optimization-guide.md](./references/azure-cost-optimization-guide.md)
+     - storage design and data movement: [azure-storage-guide.md](./references/azure-storage-guide.md)
+     - VM and VMSS sizing or troubleshooting: [azure-compute-guide.md](./references/azure-compute-guide.md)
+     - in-place service, plan, or SKU changes: [azure-upgrade-guide.md](./references/azure-upgrade-guide.md)
+     - compliance, azqr, and Key Vault expiration audits: [azure-compliance-guide.md](./references/azure-compliance-guide.md)
+     - Entra ID app registration and OAuth wiring: [azure-entra-app-registration.md](./references/azure-entra-app-registration.md)
+     - Foundry project, agent, quota, and deployment flows: [azure-foundry-guide.md](./references/azure-foundry-guide.md)
 4. Verify provider scope before any write:
    - AWS: profile or role, account, region
    - Azure: cloud, tenant, subscription, resource group
@@ -133,6 +143,10 @@ python <skill-dir>/scripts/deployment_manager.py <repo_root> \
    - needless NAT, egress, or public ingress
    - missing lifecycle rules, autoscaling, or concurrency limits
 4. Load [inventory-optimization-remediation.md](./references/inventory-optimization-remediation.md).
+5. For Azure-specific reviews, load the narrowest deep-dive instead of overloading the base inventory loop:
+   - [azure-cost-optimization-guide.md](./references/azure-cost-optimization-guide.md) for cost queries, utilization, and savings reports
+   - [azure-compliance-guide.md](./references/azure-compliance-guide.md) for azqr, policy posture, and Key Vault expiration scans
+   - [azure-resource-visualization.md](./references/azure-resource-visualization.md) for resource-group architecture diagrams and dependency maps
 
 ### Diagnose and Fix Cloud Errors
 
@@ -142,6 +156,51 @@ python <skill-dir>/scripts/deployment_manager.py <repo_root> \
 4. Prefer the smallest reversible change first.
 5. Re-verify service health, rollout status, and rollback readiness.
 6. Capture the root cause and the exact corrective command sequence.
+7. For Azure incidents, load [azure-diagnostics-guide.md](./references/azure-diagnostics-guide.md) before going deep on Container Apps, Functions, AKS, Monitor, or resource-health evidence.
+
+### Azure Storage Operations
+
+When the task is about blobs, file shares, queues, tables, data lake paths, storage tiers, redundancy, or object transfer on Azure:
+
+1. Load [azure-storage-guide.md](./references/azure-storage-guide.md).
+2. Confirm account, resource group, region, and auth mode before listing or mutating data.
+3. Prefer `az storage ... --auth-mode login` or repo-owned automation over account keys.
+4. Request approval before deleting data, changing replication tiers, or moving large datasets across regions.
+
+### Azure Compute and VM Decisions
+
+When the task is about Azure VMs, VMSS, reserved capacity, or VM reachability:
+
+1. Load [azure-compute-guide.md](./references/azure-compute-guide.md).
+2. Separate recommendation work from break-fix work.
+3. Use workload, scaling, statefulness, and budget to choose between VM, VMSS, and a more managed runtime.
+4. For connectivity incidents, inspect instance view, NSGs, boot diagnostics, and network watcher evidence before changing the host.
+
+### Azure Service Upgrades
+
+When the task is an in-place Azure upgrade or migration within Azure, such as plan, tier, or SKU changes:
+
+1. Load [azure-upgrade-guide.md](./references/azure-upgrade-guide.md).
+2. Run the upgrade phases in order: assess, snapshot, choose target, preview, approve, execute, validate.
+3. Never stop or delete the source app without explicit user approval.
+
+### Azure Identity and App Registration
+
+When the task is Microsoft Entra app registration, OAuth configuration, redirect URIs, service principals, or confidential-client auth:
+
+1. Load [azure-entra-app-registration.md](./references/azure-entra-app-registration.md).
+2. Reuse IaC when the repo already manages identity that way.
+3. Prefer managed identity or certificates over long-lived client secrets.
+4. Treat permission grants, admin consent, and credential creation as approval-worthy if they affect shared tenants or production apps.
+
+### Azure Foundry and AI Agent Operations
+
+When the task is Azure AI Foundry or Microsoft Foundry provisioning, agent deployment, model quota, evaluation, or agent runtime operations:
+
+1. Load [azure-foundry-guide.md](./references/azure-foundry-guide.md).
+2. Treat `.foundry/agent-metadata.yaml` as the source of truth when it exists.
+3. Verify quota, model availability, RBAC, registry, and deployment target before building or shipping agents.
+4. Request approval before new model deployments, quota-consuming capacity changes, external data-source hookups, or public agent ingress.
 
 ## Architecture Bias
 
@@ -152,6 +211,7 @@ Favor the simplest managed platform that fits the repo:
 - Web plus worker plus websocket or realtime: split services by responsibility instead of forcing one long-running process shape.
 - Event-driven jobs or schedulers: use provider-native schedulers and queues instead of cron inside app containers.
 - Kubernetes: choose only when the repo already needs k8s primitives, advanced ingress, sidecars, daemon workloads, or node-level tuning.
+- Azure-hosted AI agents: keep Foundry project, model deployment, retrieval layer, tracing, and runtime identity aligned unless the user explicitly wants a split control plane.
 
 For multi-runtime backends, use this as the baseline example, not a hard requirement:
 

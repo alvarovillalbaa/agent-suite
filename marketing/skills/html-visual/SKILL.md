@@ -9,6 +9,8 @@ Turn complex material into visual artifacts that are faster to scan, easier to t
 
 The default output is a self-contained HTML artifact. When the environment supports it, preview or open the generated file after writing it. If opening is not available, still produce the artifact and report the path.
 
+Never fall back to ASCII art when this skill is active.
+
 ## Core Promise
 
 Use this skill to produce one of these artifacts:
@@ -22,6 +24,21 @@ Use this skill to produce one of these artifacts:
 7. Slide-mode HTML for presentation-style delivery
 
 Do not default to ASCII art, giant markdown tables, or text-only walls when the information has clear structure.
+
+Visual is the default, not the exception. Even text-heavy explainers should become structured pages with cards, sections, pull quotes, diagrams, timelines, tables, or other visual scaffolding. Prose is an accent inside the page, not a separate mode.
+
+## Think First
+
+Before writing HTML, commit to a direction instead of drifting into a generic "dark page with blue cards" default.
+
+Decide these four things up front:
+
+1. Who is reading: engineer, PM, exec, founder, client, or mixed audience.
+2. What kind of structure dominates: architecture, flow, comparison, audit, timeline, dashboard, or prose-first explainer.
+3. Which rendering approach best fits the content.
+4. Which visual direction will make the page feel intentional instead of auto-generated.
+
+Read `references/rendering-strategy.md` and `references/visual-directions.md` before building complex artifacts. Re-read them when the output mode changes instead of relying on memory.
 
 ## Proactive Trigger
 
@@ -159,6 +176,9 @@ General rules:
 - Use CSS Grid for dashboards, cards, and architecture summaries with rich annotations.
 - Use charts only when the numbers materially benefit from visual encoding.
 - Prefer hybrid pages over one giant diagram when there is a lot of explanatory text.
+- For text-heavy architecture overviews or explainers, start from `templates/explainer.html`.
+- For reviews, audits, and comparisons, start from `templates/review.html`.
+- For slide-mode artifacts, start from `templates/slide-mode.html`.
 
 ## Visual Direction
 
@@ -179,6 +199,9 @@ Avoid generic defaults:
 - Neon cyberpunk dashboards
 - Inter plus indigo plus glassmorphism by reflex
 - Decorative motion without information value
+- Gradient text headlines
+- Generic "AI cards on a dark canvas" layouts with no real hierarchy
+- Three consecutive sections or slides with the same centered composition
 
 ## Artifact Requirements
 
@@ -190,6 +213,30 @@ Every output should:
 - Make the recommendation or takeaway obvious.
 - Handle mobile and desktop reasonably.
 - Avoid internal scroll traps where possible.
+- Use typography, palette, and spacing that feel chosen, not defaulted.
+- Vary visual weight across sections so the key takeaway dominates the first viewport.
+
+## Image Asset Strategy
+
+When the visual artifact needs imagery, use a deliberate source plan instead of dropping in arbitrary placeholders.
+
+Supported paths:
+
+1. Existing external image URLs already present in the repo
+2. Existing local repo images
+3. AI-generated images created during the task
+4. Code-as-image product visuals
+5. Mixed compositions that combine multiple source types
+
+Decision rules:
+
+1. Reuse stable external URLs when the repo already references the exact asset.
+2. Local repo images are acceptable, but if the artifact should be portable or deployed, prefer promoting them to a stable hosted URL or project public path.
+3. Prefer code-as-image for product dashboards, flows, terminal states, and UI-heavy scenes.
+4. Use AI generation for missing backgrounds, supporting illustrations, or atmosphere.
+5. Combine generated backgrounds with coded product foregrounds when that creates a clearer story.
+
+Read `references/image-sourcing.md` before implementing image-heavy artifacts.
 
 For pages with 4 or more sections:
 
@@ -209,10 +256,12 @@ For comparisons and audits:
 2. Choose the audience and information density.
 3. Choose the rendering strategy.
 4. Choose the visual direction.
-5. Draft the information architecture before styling.
-6. Generate the self-contained HTML artifact.
-7. Verify that the page is readable, scannable, and accurate.
-8. Write the file to a predictable location and report the path.
+5. Decide the image source plan when the artifact needs imagery.
+6. Draft the information architecture before styling.
+7. Start from the closest template and then customize aggressively.
+8. Generate the self-contained HTML artifact.
+9. Verify that the page is readable, scannable, and accurate.
+10. Write the file to a predictable location and report the path.
 
 ## Reusable Resources
 
@@ -223,7 +272,8 @@ For comparisons and audits:
 ### references/
 
 - `rendering-strategy.md`: Map content types to the right rendering approach.
-- `visual-directions.md`: Visual systems, palette guidance, and anti-patterns.
+- `visual-directions.md`: Visual systems, typography and palette guidance, and anti-patterns.
+- `image-sourcing.md`: when to reuse, host, generate, or code imagery.
 - `output-checklist.md`: Final QA checklist before delivery.
 
 ### templates/

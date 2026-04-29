@@ -36,4 +36,4 @@ https://github.com/alvarovillalbaa/plugins/tree/main/sales
 - [`go-to-market`](./skills/go-to-market/README.md): GTM planning, messaging, and commercial execution
 - [`sales-pipeline`](./skills/sales-pipeline/README.md): forecast, stage health, and deal inspection
 - [`prospect-research`](./skills/prospect-research/README.md): decision-ready account and persona briefs
-- [`message-outreach`](./skills/message-outreach/README.md): skimmable outreach briefs and qualification framing
+- [`message-outreach`](./skills/message-outreach/README.md): outbound drafts, replies, follow-ups, and short sequences

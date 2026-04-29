@@ -9,6 +9,8 @@ Replace all `[placeholder]` text. Remove sections that don't apply. Keep the res
 ```markdown
 # [Service Name]
 
+Last updated: YYYY-MM-DD
+
 [One sentence describing what this service does — its primary responsibility, not how it works.]
 
 ---
