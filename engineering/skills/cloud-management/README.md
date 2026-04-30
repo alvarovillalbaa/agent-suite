@@ -5,6 +5,7 @@ CLI-first cloud operations skill for AWS, Azure, and GCP.
 ## Use this for
 
 - identifying which cloud estate a repo actually uses
+- designing AWS, Azure, or GCP target architectures before provisioning
 - deploying services or wiring CI/CD from the terminal
 - inventory, optimization, and incident remediation
 - cloud changes that need explicit approval gates and rollback thinking
@@ -39,3 +40,12 @@ Notable Azure-specific references now bundled:
 - `references/azure-compliance-guide.md`
 - `references/azure-entra-app-registration.md`
 - `references/azure-foundry-guide.md`
+
+Cross-cloud architecture references:
+
+- `references/cloud-architecture-patterns.md`
+- `references/service-selection-matrix.md`
+
+Notable architecture tooling:
+
+- `scripts/architecture_designer.py`

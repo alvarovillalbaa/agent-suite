@@ -120,6 +120,10 @@ jobs:
 
 ## Quality Gates
 
+Agent-first CI should be fast, parseable, and close to the branch where agents work. Feature branches need the checks agents rely on: lint, typecheck, tests, build where practical, import-cycle or boundary checks, i18n/schema/generated-artifact checks, and migration drift checks for backend repos.
+
+When a failure is likely to be repaired by an agent, prefer output with stable path, line, rule, and remediation text. GitHub annotations, JUnit/XML/JSON/SARIF reports, and `$GITHUB_STEP_SUMMARY` are more useful than long human-only logs.
+
 ### Threshold Configuration
 
 **Jest (package.json):**

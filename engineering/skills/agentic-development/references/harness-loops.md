@@ -62,6 +62,18 @@ Preferred pattern: an orchestration layer spawns a fresh session per contract, p
 - Prefer quiet commands and focused scopes.
 - Shape test or log output so the loop sees failures and decision-useful lines, not pages of passing noise.
 
+## Harness Readiness
+
+Before increasing autonomy, make sure the environment can push back:
+
+- local or CI gates are binary for the claims they protect
+- failure output includes file paths, line numbers, rule names, and remediation hints where possible
+- logs, metrics, traces, screenshots, or DOM snapshots are reachable by the agent for the workflows it owns
+- the app can run in an isolated branch, worktree, sandbox, or ephemeral stack when stateful validation matters
+- recurring drift has a scheduled check or background maintenance task instead of relying on memory
+
+If one of these is missing, improve the harness before extending the loop.
+
 ## Post-Compaction Recovery Protocol
 
 After context compaction fires, agents lose the conversational thread. The critical failure mode is not forgetting — it is **confident assumption-filling**: the agent reconstructs what "must have been" from fragments and proceeds as if it remembered, producing subtly wrong results that are hard to detect because they look plausible.

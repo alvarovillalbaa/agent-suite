@@ -27,6 +27,17 @@ Start investigations with the observability the repo already has. Adding new log
 4. If those signals are insufficient, add the minimum new instrumentation in the system the repo already uses.
 5. Remove temporary debug noise before finishing unless the repo explicitly keeps it.
 
+## Agent-Readable Observability
+
+For agent-heavy repos, observability is part of the execution harness. Prefer signals an agent can query directly:
+
+- runbooks with exact commands for logs, metrics, traces, Sentry, deployment events, and browser debug modes
+- structured output that includes timestamps, subsystem tags, request/run/thread/trace ids, and status
+- query tools such as `query_system_logs`, `query_agent_metrics`, or `get_trace_summary` when the repo has durable telemetry stores
+- worktree-local observability stacks or clearly isolated namespaces when multiple agent runs execute in parallel
+
+Do not require a human to manually correlate dashboards if the agent is expected to diagnose the class of issue.
+
 ## Correlation Checklist
 
 Useful fields vary by stack, but the goal is consistent:

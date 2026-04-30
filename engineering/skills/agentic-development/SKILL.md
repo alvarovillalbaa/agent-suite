@@ -3,8 +3,9 @@ name: agentic-development
 description: >-
   Use for end-to-end software execution in an unfamiliar or complex repo:
   orienting the codebase, choosing an execution model, planning and verifying
-  changes, reviewing architecture or PRs, and coordinating work across the
-  specialized `frontend` and `backend` engineering skills.
+  changes, reviewing architecture or PRs, improving agent-first harnesses, and
+  coordinating work across the specialized `frontend` and `backend`
+  engineering skills.
 ---
 
 # Agentic Development
@@ -18,10 +19,11 @@ This skill is the orchestration layer for software engineering work. It owns rep
 3. Identify the task type: implementation, review, debugging, architecture analysis, refactor, release, or planning.
 4. Decide the execution mode before coding: direct execution, subagents, team-of-agents, or supervised loop.
 5. Decide the proof path before editing: tests, traces, screenshots, logs, reviewer output, or deploy evidence.
-6. Route implementation detail to the right specialist:
+6. If the task is about agent autonomy, repo readiness, CI feedback, instruction files, evals, or continuous quality, read [harness-engineering.md](./references/harness-engineering.md).
+7. Route implementation detail to the right specialist:
    - UI, browser behavior, accessibility, design systems, components, React, Next.js, motion, and visual polish go to [`../frontend/SKILL.md`](../frontend/SKILL.md).
    - APIs, services, schemas, persistence, queues, auth, caching, and server behavior go to [`../backend/SKILL.md`](../backend/SKILL.md).
-7. For coordinated features, keep this skill as controller and use the frontend/backend skills for the domain slices.
+8. For coordinated features, keep this skill as controller and use the frontend/backend skills for the domain slices.
 
 ## Core Rules
 
@@ -31,6 +33,9 @@ This skill is the orchestration layer for software engineering work. It owns rep
 - Keep research context separate from implementation context.
 - One task per loop. If work stretches across iterations, persist state on disk and restart with fresh context.
 - Verification gates claims. Do not say fixed, complete, or ready without fresh proof.
+- Treat agent failures as harness defects first: ask what capability, context, enforcement, or feedback loop is missing.
+- Prefer machine-enforced constraints over prose-only rules when a pattern must hold across the repo.
+- Keep always-loaded instruction files as maps and move detailed guidance into repo-local references.
 - Report status explicitly: `DONE`, `DONE_WITH_CONCERNS`, `BLOCKED`, or `NEEDS_CONTEXT`.
 - Use this skill to coordinate frontend/backend work, not to duplicate their detailed guidance.
 - When a task becomes domain-heavy, stop bloating this transcript and load [`../frontend/SKILL.md`](../frontend/SKILL.md) or [`../backend/SKILL.md`](../backend/SKILL.md).
@@ -43,6 +48,7 @@ This skill is the orchestration layer for software engineering work. It owns rep
 | Medium, separable concerns | Subagents-driven development |
 | Large, cross-domain feature | Team of agents |
 | Epic, multi-iteration work | Supervised harness loop |
+| Agent-first repo audit or harness improvement | Harness engineering pass |
 
 Read [subagents-and-parallelism.md](./references/subagents-and-parallelism.md) for controller/worker patterns, safe parallelization, and team composition.
 
@@ -53,6 +59,8 @@ Read [subagents-and-parallelism.md](./references/subagents-and-parallelism.md) f
 Read [repo-orientation.md](./references/repo-orientation.md) for startup discovery, repo-shape detection, and initial command selection.
 
 Read [instruction-file-design.md](./references/instruction-file-design.md) when structuring or auditing `AGENTS.md`, `CLAUDE.md`, or other instruction surfaces.
+
+Read [harness-engineering.md](./references/harness-engineering.md) when improving agent-first repo readiness: context architecture, subsystem guidance, mechanical enforcement, CI feedback, evals, observability, persistent knowledge, or background quality agents.
 
 Read [harness-loops.md](./references/harness-loops.md) for repeated agent iterations, disk-backed specs/plans, and builder/reviewer loops.
 
@@ -139,6 +147,7 @@ This skill should reference the specialized engineering skills repeatedly and in
 ## Bundled Scripts
 
 - `scripts/repo_scan.py` for repo scanning and startup context.
+- `scripts/harness_audit.py` for agent-first readiness audits across instructions, CI, evals, observability, enforcement, and persistent knowledge.
 - `scripts/project_architect.py` for architecture detection and layer violations.
 - `scripts/architecture_diagram_generator.py` for Mermaid, PlantUML, or ASCII diagrams.
 - `scripts/stack_detector.py` and `scripts/pipeline_generator.py` for baseline CI generation.

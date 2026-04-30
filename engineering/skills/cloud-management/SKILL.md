@@ -28,6 +28,8 @@ In command examples below, `<skill-dir>` means the installed `cloud-management` 
 1. Run `python <skill-dir>/scripts/detect_repo_stack.py <repo-root>`.
 2. Read [cli-operating-model.md](./references/cli-operating-model.md) for the shared operating discipline.
 3. Load only the references needed for the task:
+   - greenfield architecture design or migration target design: [cloud-architecture-patterns.md](./references/cloud-architecture-patterns.md)
+   - provider service selection by compute, data, identity, network, observability, or cost concern: [service-selection-matrix.md](./references/service-selection-matrix.md)
    - mixed-cloud selection and workload mapping: [provider-selection.md](./references/provider-selection.md)
    - approval gates and cost risk: [approval-policy.md](./references/approval-policy.md)
    - CI/CD and automatic deployments: [cicd-and-auto-deploy.md](./references/cicd-and-auto-deploy.md)
@@ -93,6 +95,30 @@ Use this loop for every cloud task:
    - DNS and CDN
    - CI identity
 4. Preserve existing systems of record unless the user explicitly wants migration or consolidation.
+
+### Design a Cloud Architecture
+
+Use this path when the user asks what to build on AWS, Azure, or GCP, asks for a migration target, or needs service choices before provisioning.
+
+1. Gather requirements: application type, expected users or RPS, budget, team cloud maturity, compliance, availability, region or residency, and existing estate constraints.
+2. Run `scripts/architecture_designer.py` for a first-pass recommendation:
+
+```bash
+python <skill-dir>/scripts/architecture_designer.py \
+  --provider gcp \
+  --app-type saas \
+  --users 50000 \
+  --rps 150 \
+  --budget 1200 \
+  --team-size 4 \
+  --compliance SOC2 GDPR \
+  --format markdown
+```
+
+3. Load [cloud-architecture-patterns.md](./references/cloud-architecture-patterns.md) and [service-selection-matrix.md](./references/service-selection-matrix.md).
+4. Validate the recommended pattern against budget, team maturity, compliance, data gravity, rollback expectations, and current IaC ownership.
+5. Convert the approved pattern into the repo's existing IaC path. Use `terraform_scaffolder.py` only when no suitable module structure exists yet.
+6. Run `cloud_change_guard.py` before any write that provisions cost, identity, public ingress, DNS, or stateful resources.
 
 ### Deploy New Resources or Services
 
@@ -235,6 +261,8 @@ Use `cloud_change_guard.py` to classify risk and generate the checklist or appro
 
 ## Bundled Scripts
 
+- `scripts/architecture_designer.py`
+  - Recommend an AWS, Azure, or GCP architecture pattern from workload requirements. Produces markdown or JSON with provider service stacks, cost estimate, tradeoffs, compliance notes, and next steps. Usage: `python <skill-dir>/scripts/architecture_designer.py --provider azure --app-type web_app --users 10000 --budget 500 --format json`
 - `scripts/detect_repo_stack.py`
   - Inspect a repo and emit deploy-relevant signals: languages, frameworks, CI, IaC, cloud hints, identity hints, and recommended runtime bias.
 - `scripts/cloud_change_guard.py`

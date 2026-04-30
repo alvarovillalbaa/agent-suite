@@ -37,6 +37,24 @@ If using async/await: read async-patterns.md
 
 This creates a conditional reference tree. The agent loads exactly the branch it needs, nothing more.
 
+## Harness-Ready AGENTS.md
+
+In agent-first repos, `AGENTS.md` is part of the harness, not a contributor handbook. Keep it close to 100 lines and use it as a map to repo-local, versioned artifacts.
+
+It should contain:
+
+- one paragraph objective
+- instruction hierarchy and required skills
+- the few commands agents must know immediately
+- pointers to architecture, testing, CI, product context, and runbooks
+- short Always / Ask / Never boundaries
+
+It should not contain full architecture manuals, complete command encyclopedias, code style tutorials, or long framework examples. Move those into `docs/references/`, `docs/cookbook/`, or subsystem-local docs and link to them.
+
+For large repos, add subsystem `AGENTS.md` files beside high-risk code. Each local file should state the interface/protocol, critical invariants, anti-patterns, debug paths, and when to load specialized skills. A good subsystem guide prevents agents from inferring invisible rules from nearby code alone.
+
+Make the map enforceable: add CI that checks referenced files exist, stale links are reported, and required subsystem guides are present for known high-risk directories.
+
 ---
 
 ## Rules vs Skills
