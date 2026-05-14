@@ -1,10 +1,35 @@
 # Memory Management
 
-Memory-management skill slot for the `learning-system` plugin.
+Design, audit, and improve agent memory systems across Claude Code's three memory layers.
 
-## Current status
+## What this skill covers
 
-The current [`SKILL.md`](./SKILL.md) is only a short note, not a developed workflow. It hints at automatic memory systems, documentation-backed memory, extensions, and platform-specific workarounds, but it is not yet a finished skill.
+- The full Claude Code memory stack: CLAUDE.md, auto-memory (MEMORY.md), session memory, and `.claude/rules/`
+- The curation lifecycle: capture → review → promote → enforce
+- Rules directory patterns for scoped, file-type-specific instructions
+- Memory health monitoring and capacity planning
+- Error-capture hook for surfacing debugging solutions automatically
+
+## Commands
+
+| Command | What it does |
+|---------|-------------|
+| `/si:review` | Analyze auto-memory for promotion candidates and stale entries |
+| `/si:promote` | Graduate a proven pattern to CLAUDE.md or `.claude/rules/` |
+| `/si:extract` | Turn a pattern into a standalone portable skill |
+| `/si:status` | Memory health dashboard — line counts, capacity warnings |
+| `/si:remember` | Explicitly save a pattern to auto-memory right now |
+
+## Agents
+
+- `agents/memory-analyst.md` — read-only memory analyzer, spawned by `/si:review`
+- `agents/skill-extractor.md` — skill generator, spawned by `/si:extract`
+
+## References
+
+- `references/memory-architecture.md` — technical reference for all three memory systems
+- `references/promotion-rules.md` — scoring guide and distillation rules for promotion
+- `references/rules-directory-patterns.md` — path scoping patterns for `.claude/rules/`
 
 ## Install
 

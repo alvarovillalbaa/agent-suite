@@ -729,6 +729,98 @@ The improved target file is always saved back to its original location during th
 
 ---
 
+## sub-flow: autoresearch experiment (measurable file metric)
+
+Use this sub-flow when the improvement target is **not a skill, agent, or documentation file** but a code file, asset, or content file where quality is measured by a concrete external metric (execution time, bundle size, test pass rate, CTR score).
+
+This is distinct from the eval loop because:
+- The evaluator is **immutable** — you never modify it
+- Keep/discard uses **git commit/reset** — not a score comparison
+- The target is optimized against a **fixed measurement** — not judged by the LLM
+- Strategy **escalates** explicitly by run count
+
+### When to use
+
+- "Make this API endpoint faster" → target: the endpoint file; eval: `pytest bench.py`
+- "Reduce bundle size" → target: `vite.config.ts`; eval: `npm run build && du -sb dist/`
+- "Improve these headlines" → target: `content/titles.md`; eval: LLM judge script
+
+### Setup
+
+If `.autoresearch/{domain}/{name}/config.cfg` does not exist, run `/ar:setup` first.
+
+Requirements:
+- A target file (the one being optimized)
+- An evaluation command that prints `metric_name: value` to stdout
+- A git repo (for the keep/discard mechanism)
+- A direction: is lower or higher better?
+
+### Experiment structure
+
+```
+.autoresearch/{domain}/{name}/
+├── config.cfg         # target, eval cmd, metric, direction, time_budget_minutes
+├── program.md         # objectives, constraints, strategy notes
+└── results.tsv        # commit | metric | status | description
+```
+
+### Each iteration
+
+1. Read `results.tsv` for history — what worked, what failed, what has not been tried
+2. Decide **one** change to the target file. One variable per experiment.
+3. Commit: `git add {target} && git commit -m "experiment: {description}"`
+4. Run: `python scripts/run_experiment.py --experiment {domain}/{name} --single`
+5. Script outputs KEEP, DISCARD, or CRASH with the metric value
+6. On DISCARD/CRASH: the script reverts automatically with `git reset --hard HEAD~1`
+7. Go to step 1
+
+### Strategy escalation
+
+| Runs | Approach | Risk |
+|------|----------|------|
+| 1–5 | Low-hanging fruit (obvious improvements, simple cache/index/IO changes) | Low |
+| 6–15 | Systematic exploration (vary one parameter at a time) | Medium |
+| 16–30 | Structural changes (algorithm swaps, architecture shifts) | High |
+| 30+ | Radical experiments (completely different approaches) | Very High |
+
+If no improvement after 20 consecutive runs → update the Strategy section of `program.md`.
+
+### Self-improvement every 10 runs
+
+After every 10 experiments, review `results.tsv` for patterns and update `program.md`:
+- Which change types consistently keep?
+- Which change types consistently discard?
+- What new hypotheses does the data suggest?
+
+### Hard rules for this sub-flow
+
+- **Never modify the evaluator** — it is the ground truth. Changing it invalidates all comparisons.
+- **One change per experiment** — you won't know what helped otherwise
+- **Simplicity criterion** — same metric with simpler code is a win; removing code is the best outcome
+- **5 consecutive crashes → stop** — alert the user, do not burn cycles
+- **No new dependencies** — only use what is already in the project
+
+### Stopping conditions
+
+- Pass rate ≥ goal stated in `program.md`
+- No improvement after 20+ runs (suggest strategy change)
+- Budget cap in `config.cfg` reached
+- User interrupts (results.tsv and git log persist for `/ar:resume`)
+
+### Output when done
+
+```
+Autoresearch complete — {domain}/{name}
+Target: {file}
+Metric: {name} ({direction})
+Baseline: {start value}
+Best: {best value} ({delta}% improvement, run N)
+Experiments: {total} ({kept} kept, {discarded} discarded, {crashed} crashed)
+Branch: autoresearch/{domain}/{name}
+```
+
+---
+
 ## the test
 
 A good auto-improve run:

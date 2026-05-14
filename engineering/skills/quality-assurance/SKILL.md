@@ -368,6 +368,34 @@ Read [references/browser-playwright.md](./references/browser-playwright.md) for 
 
 For **TypeScript Playwright E2E test suites** (page objects, auth reuse, CI) see the section below.
 
+### Browser trace — full observability for agent-driven QA
+
+Read [references/browser-trace.md](./references/browser-trace.md) when you need to capture everything a browser does into a searchable filesystem — not just drive it. Use this for:
+- **Flaky test diagnosis** — run the failing path twice, diff `network/requests.jsonl` and `console/messages.jsonl` to find race conditions or missing responses
+- **Reverse engineering** — grep `network/requests.jsonl` for API endpoints and payloads without reading source code
+- **Autoresearch loops** — trace a page, extract links from the DOM snapshot, trace each link to map the full API surface
+- **Pre-QA recon** — run before the live web app QA workflow to understand the app's API surface before structured exploration
+- **Regression monitoring** — diff traces across deploys to detect new or removed API calls
+
+**One-command capture:**
+```bash
+python <skill-dir>/scripts/browser_trace.py \
+  --url http://localhost:3000/dashboard \
+  --output /tmp/trace-dashboard \
+  --wait "[data-testid='chart-container']"
+```
+
+Output structure: `summary.json` + `network/requests.jsonl` + `network/responses.jsonl` + `dom/*.html` + `screenshots/*.png` + `console/messages.jsonl` + `console/errors.log`
+
+Key search patterns:
+```bash
+grep '"/api/' /tmp/trace-dashboard/network/requests.jsonl          # all API calls
+grep -E '"status": [45]' /tmp/trace-dashboard/network/responses.jsonl  # error responses
+cat /tmp/trace-dashboard/console/errors.log                         # JS errors
+```
+
+For inline use inside automation scripts, see the `BrowserTrace.attach(page)` API in the reference.
+
 ### Live web app QA (browser-based testing)
 
 Use this workflow when the user says "QA this app", "test this site", "find bugs and fix", "test and fix", or "does this work?" It is distinct from writing automated tests — it drives a real browser, finds actual bugs in a running app, scores overall health, fixes issues, and produces a structured report.

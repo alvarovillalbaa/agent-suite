@@ -36,7 +36,19 @@ Never use a "Before:" / "After:" list format. Always use the table.
 
 ## Animation Decision Framework
 
-Before writing any animation code, answer these questions in order.
+**Quick Decision** — answer the first matching question and stop:
+
+| Question | Rule |
+|---|---|
+| Is this element **entering or exiting**? | Use `ease-out` |
+| Is an **on-screen element moving** (repositioning)? | Use `ease-in-out` |
+| Is this a **hover or color transition**? | Use `ease` |
+| Will users **see this 100+ times daily**? | Don't animate it |
+| Is this a **drag or interruptible gesture**? | Use a spring |
+| Is the element **large** (drawer, full panel)? | Bigger size = longer duration |
+| Is this an **exit animation**? | Make it faster than the entrance |
+
+Before writing any animation code, work through these questions in order.
 
 ### 1. Should this animate at all?
 
@@ -101,7 +113,10 @@ Resources: [easing.dev](https://easing.dev/) and [easings.co](https://easings.co
 | Tooltips, small popovers | 125–200ms |
 | Dropdowns, selects | 150–250ms |
 | Modals, drawers | 200–500ms |
+| Full panels, large surfaces | 300–500ms |
 | Marketing/explanatory | Can be longer |
+
+**Element size scales duration.** A small dropdown at 200ms feels right. The same ease on a full-width panel feels rushed — bigger elements need proportionally longer durations because there's more visual distance to cover.
 
 **UI animations must stay under 300ms.** A 180ms dropdown feels more responsive than a 400ms one. A faster-spinning spinner makes the app feel like it loads faster, even when load time is identical.
 

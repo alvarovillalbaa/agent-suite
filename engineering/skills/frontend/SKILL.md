@@ -66,11 +66,15 @@ Read [signup-onboarding-flows.md](./references/signup-onboarding-flows.md) when 
 
 ### UI constraints, design quality, and polish
 
-Read [ui-constraints.md](./references/ui-constraints.md) for hard MUST/NEVER/SHOULD rules around stack defaults, accessible primitives, motion budget, layout discipline, and design guardrails.
+Read [ui-constraints.md](./references/ui-constraints.md) for hard MUST/NEVER/SHOULD rules around stack defaults, accessible primitives, motion budget, layout discipline, glassmorphism technique, and design guardrails.
 
-Read [design-engineering.md](./references/design-engineering.md) for animation decisions, interaction polish, gestures, and perceived performance.
+Read [design-engineering.md](./references/design-engineering.md) for animation decisions, interaction polish, gestures, and perceived performance. The Quick Decision table at the top is the fastest path to the right easing and duration.
 
-Read [ui-ux-guidelines.md](./references/ui-ux-guidelines.md) for broader UX rules across accessibility, forms, navigation, charts, and interaction design.
+Read [transitions.md](./references/transitions.md) for the CSS micro-transition pattern library: nine drop-in transitions (card resize, number pop-in, notification badge, text swap, dropdown, modal, panel reveal, page slide, icon swap) with semantic CSS custom properties and a decision tree for picking the right one.
+
+Read [anti-slop.md](./references/anti-slop.md) for forbidden AI design patterns, the brand-mode vs product-mode register system, and the pre-ship anti-slop checklist. Apply before shipping any UI to avoid recognizable AI clichés.
+
+Read [ui-ux-guidelines.md](./references/ui-ux-guidelines.md) for broader UX rules across accessibility, forms, navigation, charts, interaction design, audio feedback, predictive prefetching, and the named Laws of UX (Fitts', Hick's, Miller's, Jakob's, von Restorff, Zeigarnik, and 13 others).
 
 Read [web-design-guidelines.md](./references/web-design-guidelines.md) when auditing UI code or validating a page against best practices.
 

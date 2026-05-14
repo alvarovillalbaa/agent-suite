@@ -29,7 +29,13 @@ https://github.com/alvarovillalbaa/plugins/tree/main/engineering/skills/cloud-ma
 - `references/`
 - `scripts/`
 
-Notable Azure-specific references now bundled:
+AWS deep-dive references:
+
+- `references/aws-amplify-guide.md` — Amplify full-stack (auth, data, storage, functions, hosting, Gen 2)
+- `references/aws-serverless-guide.md` — Lambda, API Gateway, Step Functions, EventBridge, SAM, CDK
+- `references/aws-databases-guide.md` — RDS, Aurora, Aurora DSQL, DynamoDB, ElastiCache, connection management
+
+Notable Azure-specific references:
 
 - `references/azure-diagnostics-guide.md`
 - `references/azure-resource-visualization.md`

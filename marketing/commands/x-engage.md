@@ -5,10 +5,11 @@ argument-hint: "[post, thread, topic, or goal]"
 allowed-tools: [Read, Write, AskUserQuestion, Skill]
 ---
 
-Use skill: **x-engagement** — `skills/x-engagement/SKILL.md`.
+Use skill: **social-media-management** — `skills/social-media-management/SKILL.md`.
+Reference: `skills/social-media-management/references/x-writing-guidelines.md`
 
-1. **Gather context** – Ask for the target post, conversation, and desired outcome if the prompt is thin.
-2. **Choose the interaction type** – Reply, quote post, DM, or short engagement run.
-3. **Draft the output** – Produce a concise, platform-native draft with a strong angle.
-4. **Add variants if useful** – Include alternative tones such as sharper, warmer, or more neutral.
-5. **Deliver** – Output the drafts and the core angle behind them.
+1. **Gather context** – Ask for the target post URL or text, conversation summary, and desired outcome if the prompt is thin.
+2. **Choose the interaction type** – Reply, quote post, DM, or short engagement sequence.
+3. **Draft the output** – Produce a concise, platform-native draft with a strong angle. Apply the hook and specificity rules from `x-writing-guidelines.md` even in replies.
+4. **Add variants if useful** – Include alternative tones: sharper, warmer, or more neutral. At least one variant should take a contrarian angle if the topic allows.
+5. **Deliver** – Output the drafts and a one-line rationale for why the angle fits the target conversation.

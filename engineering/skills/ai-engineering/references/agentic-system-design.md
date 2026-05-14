@@ -10,6 +10,9 @@ Agent architectures, tool use patterns, and multi-agent orchestration with pseud
 4. [Multi-Agent Collaboration](#4-multi-agent-collaboration)
 5. [Memory and State Management](#5-memory-and-state-management)
 6. [Agent Design Patterns](#6-agent-design-patterns)
+7. [Multi-Agent Coordination Protocols](#7-multi-agent-coordination-protocols)
+8. [Orchestration Patterns](#8-orchestration-patterns)
+9. [Agent Lifecycle & Guardrails](#9-agent-lifecycle--guardrails)
 
 ---
 
@@ -644,3 +647,340 @@ class ExpertRouter:
 | Complex reasoning | Self-Ask |
 | Domain expertise | Expert Routing |
 | Conversation continuity | Memory System |
+| Cross-vendor agent collaboration | A2A Protocol |
+| Central orchestration | Manager Pattern |
+| Distributed peer tasks | Handoff Pattern |
+
+---
+
+## 7. Multi-Agent Coordination Protocols
+
+### MCP vs A2A vs ACP
+
+| Protocol | Layer | Purpose |
+|----------|-------|---------|
+| **MCP** | Tool/resource | Agents reach external systems (tools, data, resources) |
+| **A2A** | Agent-to-agent | Agents collaborate across vendors/frameworks |
+| **ACP** | Agent control plane | Internal orchestration, lifecycle control, streaming |
+
+**Decision rule:**
+- All collaboration is internal → use orchestration (ACP/SDK)
+- Need cross-vendor or external agent collaboration → add A2A
+- Need tool/data access → use MCP
+
+### A2A Protocol (Agent-to-Agent)
+
+A2A enables agent interoperability across frameworks and vendors. An agent exposing A2A publishes an **agent card** that describes its capabilities.
+
+**Agent card structure:**
+```json
+{
+  "name": "hr-screener",
+  "description": "Screens candidates against job requirements",
+  "endpoint": "https://api.example.com/agents/hr-screener",
+  "capabilities": ["candidate_evaluation", "job_matching"],
+  "auth": {"type": "bearer"},
+  "streaming": true
+}
+```
+
+**A2A task lifecycle:**
+```
+CREATED → ACCEPTED → IN_PROGRESS → [STREAMING] → COMPLETED
+                                               → FAILED
+                                               → CANCELLED
+```
+
+**A2A complements MCP**: MCP connects agents to tools; A2A connects agents to agents. Implement A2A when external partners or third-party agents need to invoke your agents by capability rather than by URL.
+
+### Coordination Services (Lease / Anchor / Conflict)
+
+For multi-agent systems operating on shared state:
+
+| Service | Purpose |
+|---------|---------|
+| `lease_service` | Distributed lock for exclusive operations (prevents concurrent writes) |
+| `anchor_service` | Ensures consistent reference across parallel agent branches |
+| `conflict_service` | Detects and resolves write conflicts when agents operate in parallel |
+
+---
+
+## 8. Orchestration Patterns
+
+### Pattern A: Manager-as-Tools (Central Orchestrator)
+
+A single orchestrator agent holds all routing logic. Peer agents are exposed as tools.
+
+```
+User → Orchestrator
+         ├── call agent_as_a_tool("research_agent", task)
+         ├── call agent_as_a_tool("writing_agent", task)
+         └── synthesize results → User
+```
+
+**When to use:**
+- All agents are internal (same framework)
+- Orchestrator needs to maintain full context across agent calls
+- Simple linear or branching workflows
+
+**Tradeoff:** Single point of failure; orchestrator context grows with each agent call.
+
+### Pattern B: Handoff (Peer-to-Peer Transfer)
+
+An agent transfers full control to a peer. The original agent exits the loop.
+
+```
+User → Agent A
+         └── handoff(target="agent_b", context=forwarded_context)
+              → Agent B continues
+                   └── final response → User
+```
+
+**When to use:**
+- Clear domain boundary (agent A handles intent detection, agent B handles execution)
+- Context forwarding is complete and unambiguous
+- You want lower orchestrator context pressure
+
+**Instruction Forwarding**: extract only the domain rules and constraints relevant to the sub-task before handing off. Never forward the full system prompt.
+
+### Pattern C: Parallel Fan-Out + Merge
+
+Run N agents simultaneously; merge results before final generation.
+
+```python
+results = await asyncio.gather(
+    agent_a.run(task_slice_a),
+    agent_b.run(task_slice_b),
+    agent_c.run(task_slice_c),
+)
+merged = merge_strategy(results)   # majority vote, union, or LLM-merge
+```
+
+**When to use:**
+- Tasks can be partitioned without dependencies
+- Time budget is tight (parallelism reduces wall-clock time)
+- You want diversity of perspectives before synthesis
+
+### Pattern D: Hierarchical (Manager → Sub-managers → Workers)
+
+```
+Orchestrator
+  ├── Research Manager
+  │     ├── Source Agent A
+  │     └── Source Agent B
+  └── Writing Manager
+        ├── Draft Agent
+        └── Review Agent
+```
+
+**Context Forward-Propagation rule**: at each level, compress and extract conclusions before forwarding to the next level. Never pass raw intermediate traces across levels.
+
+---
+
+## 9. Agent Lifecycle & Guardrails
+
+### Complete Request Lifecycle
+
+```
+POST /api/agent/ → AgentView
+    → WebSocket status: starting
+    → Celery: run_agent_task (async)
+    → 202 {task_id, ws_group}
+
+Celery:
+    → Orchestrator: execute_workflow
+        → Load credentials
+        → Load previous context (thread history)
+        → Determine primary agent (routing)
+        → Route to agent
+
+    → AgentService: process_agent_streamed
+        → Load session (thread_id → SQLiteSession)
+        → SDK Runner.run_streamed
+            → streaming: token deltas, reasoning, tool events → WebSocket
+        → Final result → ResultBus
+
+    → ResultBus:
+        → extract_context_from_result
+        → persist_to_conversation (DB)
+        → WebSocket status: success
+```
+
+### Guardrail Types
+
+| Type | Trigger | Behavior |
+|------|---------|----------|
+| `InputGuardrail` | Before agent processes input | Reject, sanitize, or flag |
+| `OutputGuardrail` | After agent generates output | Block, redact, or escalate |
+| Session guardrail | Per-session state | Rate limiting, turn limits |
+| Confirmation gate | Tool call | Pause execution for user approval |
+
+### Max Turns & Safety Limits
+
+Every agent run must have an explicit `max_turns` limit. When `MaxTurnsExceeded` is raised:
+1. Return the best partial result accumulated so far
+2. Surface the turn count in the response metadata
+3. Log the trace for debugging
+4. Never silently truncate
+
+### Streaming Control
+
+| Event type | Streamed to client |
+|------------|-------------------|
+| Token deltas | Yes (real-time) |
+| Reasoning chunks | Yes (if reasoning model) |
+| Tool call args | Conditional (see tool stream_policy) |
+| Tool call results | Conditional (see tool stream_policy) |
+| Status events | Yes (starting, success, error) |
+
+### Autonomy Levels
+
+| Level | Description | Confirmation required |
+|-------|-------------|----------------------|
+| Supervised | Every action confirmed | Yes (all writes) |
+| Semi-autonomous | Only high-risk confirmed | Yes (medium/high risk) |
+| Autonomous | Operator pre-approved scope | No (within approved tools) |
+| Full autonomous | Complete delegation | No |
+
+**Default**: start at semi-autonomous for new agents. Move toward autonomous only after eval coverage is established.
+
+---
+
+## 10. Run Steering
+
+`RunSteeringService` injects concise guidance into active agent runs without interrupting them — mid-run correction without requiring a new user message.
+
+### When steering fires
+
+Two trigger conditions:
+1. **Pending steers**: the user queued a steer while the agent was mid-run (via `push_pending_steers(thread_id, steer)`). Fires on the next tool output.
+2. **Actionable output**: the tool output contains error/warning markers and `AGENT_STEERING_SCORE_TOOL_OUTPUTS = true`. Throttled to one check per `AGENT_STEERING_MIN_INTERVAL_SECONDS` (default: 30s).
+
+```python
+# Actionable output markers (triggers proactive scoring)
+"error", "failed", "warning", "needs_confirmation", "not_found", "validation"
+```
+
+### Steering pipeline
+
+```
+Tool call completes
+    ↓
+evaluate_tool_output(thread_id, run_id, tool_name, tool_args, tool_output)
+    ↓
+Check pending_steers + _looks_actionable(output_text)
+    ↓
+_build_evaluation → LLM generates SteeringEvaluation(score, steers)
+    ↓
+steers[:3] → route_memory_write(subtype="runtime_steer")
+    ↓
+clear_pending_steers(thread_id)
+```
+
+### SteeringEvaluation schema
+
+```python
+class SteeringEvaluation(BaseModel):
+    score: float   # 0.0–1.0: how much correction is needed
+    steers: list[str]  # 0–3 actionable steering sentences
+```
+
+### Steer write contract
+
+Steers are written via `route_memory_write` with:
+```python
+{
+    "memory_type": "steers",
+    "subtype": "runtime_steer",
+    "scope": "company" if company_id else "user",
+    "metadata": {
+        "tool_name": tool_name,
+        "run_id": run_id,
+        "score": evaluation.score,
+        "pending_steers": pending_steers,
+        "source_type": "run_steering",
+    }
+}
+```
+
+### Design rules
+
+- Max 3 steers injected per tool output. Truncate, never expand.
+- Steers must be directly actionable ("Search for candidates with Python, not JavaScript") not diagnostic ("the previous search was wrong").
+- `reasoning_effort = "low"` — steering is a real-time path; latency matters more than depth.
+- If `_build_evaluation` fails, fall back to the raw pending steer text rather than dropping it.
+
+---
+
+## 11. Agent Skill Package Schema
+
+Agent skills are packaged and deployed using `AgentSkillPackageSpec`. This enables distributable, versioned skill bundles that can be hosted, inlined, or loaded from local paths.
+
+### AgentSkillFileSpec
+
+```python
+class AgentSkillFileSpec(BaseModel):
+    path: str           # relative path (e.g. "SKILL.md", "scripts/process.py")
+    content: str        # file contents
+    encoding: Literal["utf-8", "base64"] = "utf-8"  # base64 for binary
+    mime_type: str | None = None     # optional: "text/markdown", "text/x-python"
+    description: str | None = None  # what this file does in the skill
+```
+
+### AgentSkillPackageSpec
+
+```python
+class AgentSkillPackageSpec(BaseModel):
+    name: str           # 1-64 chars, lowercase alphanumeric + hyphens
+    title: str          # human-friendly display title
+    description: str    # trigger keywords + what this does (1-1024 chars)
+    files: list[AgentSkillFileSpec]  # all files including SKILL.md
+    entrypoint: str | None = None    # e.g. "scripts/main.py"
+    directories: list[str] = []      # e.g. ["scripts", "references", "assets"]
+```
+
+### Runtime deployment variants
+
+| Variant | Schema | Use case |
+|---------|--------|----------|
+| `hosted_reference` | `HostedSkillReferenceSpec(skill_id, version)` | Published skill registry |
+| `hosted_inline` | `HostedInlineSkillSpec(zip_base64)` | Inline zip bundle |
+| `local_path` | `LocalSkillPathSpec(path)` | Development and CI |
+
+All three extend `AgentSkillRuntimeSpecBase`:
+```python
+class AgentSkillRuntimeSpecBase(BaseModel):
+    category_id: str
+    name: str
+    title: str
+    description: str
+    scope: Literal["platform", "company", "user"] = "company"
+    source_type: str = ""
+    source_kind: str = ""
+    prompt_path: str | None = None
+```
+
+### Scope semantics
+
+| Scope | Availability |
+|-------|-------------|
+| `platform` | All companies and users |
+| `company` | This company only (default) |
+| `user` | This user only |
+
+### Minimum required files
+
+Every skill package must include `SKILL.md` (the routing entry point) at the root. All other files (scripts, references, templates) are optional but must be referenced from `SKILL.md` to be loaded.
+
+```python
+AgentSkillPackageSpec(
+    name="hr-research",
+    title="HR Research Skill",
+    description="Find and summarize candidate and job data. Use when searching HR records.",
+    files=[
+        AgentSkillFileSpec(path="SKILL.md", content="..."),
+        AgentSkillFileSpec(path="references/search-guide.md", content="..."),
+        AgentSkillFileSpec(path="scripts/search.py", content="..."),
+    ],
+    directories=["references", "scripts"],
+)

@@ -23,6 +23,7 @@ Opinionated hard rules for building interfaces. Apply these on top of the genera
 - MUST use an `AlertDialog` for destructive or irreversible actions.
 - SHOULD use structural skeletons for loading states.
 - NEVER use `h-screen`; use `h-dvh`.
+- MUST use `min-h-[100dvh]` (not `h-dvh`) for hero sections — `min-h` prevents catastrophic layout jump when the iOS Safari toolbar appears or disappears.
 - MUST respect `safe-area-inset` for fixed elements.
 - MUST show errors next to where the action happens.
 - NEVER block paste in `input` or `textarea` elements.
@@ -39,6 +40,7 @@ Opinionated hard rules for building interfaces. Apply these on top of the genera
 - SHOULD respect `prefers-reduced-motion`.
 - NEVER introduce custom easing curves unless explicitly requested.
 - SHOULD avoid animating large images or full-screen surfaces.
+- NEVER animate the entrance of context menus — appear instantly; exit animation only.
 
 ## Typography
 
@@ -55,11 +57,17 @@ Opinionated hard rules for building interfaces. Apply these on top of the genera
 - SHOULD set `font-synthesis: none` on display or icon fonts to prevent browser-generated faux bold/italic.
 - SHOULD use `font-display: swap` in `@font-face` declarations.
 - SHOULD add `letter-spacing: 0.05em` to uppercase or small-caps text.
+- SHOULD use `font-feature-settings: "calt" 1` to enable contextual alternates; never explicitly disable it.
+- SHOULD use any integer weight 100–900 with variable fonts; avoid stopping at standard steps (400/500/600/700 only).
+- SHOULD use `font-variant-numeric: diagonal-fractions` for recipe, math, or measurement contexts.
+- SHOULD pair `text-align: justify` with `hyphens: auto` to prevent rivers of whitespace.
 
 ## Layout
 
 - MUST use a fixed `z-index` scale (no arbitrary `z-*`).
 - SHOULD use `size-*` for square elements instead of `w-*` + `h-*`.
+- MUST use CSS Grid (`grid-cols-N gap-N`) for multi-column layouts; NEVER use flex percentage math (`w-[calc(33%-1rem)]`) — it breaks at fractional widths and is impossible to maintain.
+- MUST fall back to single-column (`w-full px-4`) on viewports below `md:` for any asymmetric or high-variance layout.
 
 ## CSS Pseudo-Elements
 
@@ -91,6 +99,30 @@ Opinionated hard rules for building interfaces. Apply these on top of the genera
 - Covers multilingual text (Korean, RTL Arabic) and platform-specific emoji out of the box — prefer it over custom measurement utilities for any i18n-sensitive layout.
 - Demo catalogue: [chenglou.me/pretext](https://chenglou.me/pretext/) and [somnai-dreams.github.io/pretext-demos](https://somnai-dreams.github.io/pretext-demos/).
 
+**What `@chenglou/pretext` unlocks (demos):**
+- [Masonry](https://chenglou.me/pretext/masonry/) — virtualize hundreds of thousands of text boxes each with differing height, without DOM measurement, reducing visibility-check to a single linear cache-less traversal; scrolls and resizes at 120fps.
+- [Chat bubbles](https://chenglou.me/pretext/bubbles/) — shrinkwrapped chat bubbles whose width tracks actual text width without DOM reads.
+- [Dynamic magazine layout](https://chenglou.me/pretext/dynamic-layout) — responsive multi-column layout that reflows in real time as the container resizes.
+- [Variable-font ASCII art](https://chenglou.me/pretext/variable-typographic-ascii) — pixel-accurate ASCII art rendered at any font weight because character widths are measured in userland, not the DOM.
+
+## Glassmorphism
+
+When implementing frosted glass, go beyond `backdrop-blur`. Add a 1px inner border and inset highlight to simulate physical edge refraction:
+
+```css
+.glass-panel {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    0 4px 24px rgba(0, 0, 0, 0.12);
+}
+```
+
+- NEVER animate `backdrop-filter` — it triggers full repaint on every frame.
+- NEVER apply `backdrop-filter` to scrolling containers.
+
 ## Design
 
 - NEVER use gradients unless explicitly requested.
@@ -106,3 +138,23 @@ Opinionated hard rules for building interfaces. Apply these on top of the genera
 - SHOULD use semi-transparent or neutral dark colors for shadows (`rgba(17,24,39,0.08)`), not pure `rgba(0,0,0,X)`.
 - SHOULD use semi-transparent border colors (e.g. `var(--gray-a4)`) that adapt to any background instead of hardcoded hex.
 - NEVER animate `box-shadow` directly — it triggers expensive repaints. Animate a pseudo-element's `opacity` instead.
+- SHOULD match `box-shadow` scale to elevation: small blur/offset for cards, medium for dropdowns, large for modals.
+- SHOULD use six-layer shadow anatomy for polished buttons: outer cut (`0 0 0 0.5px`), inner ambient inset, inner top-highlight inset, 3+ external depth shadows, `text-shadow` on the label, and an imperceptible subtle gradient background.
+
+```css
+.button-polished {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--gray-12) 100%, white 4%),
+    var(--gray-12)
+  );
+  box-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 1px 2px rgba(0, 0, 0, 0.10),
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 4px 8px rgba(0, 0, 0, 0.03);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+}
+```

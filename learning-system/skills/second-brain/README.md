@@ -26,6 +26,9 @@ https://github.com/alvarovillalbaa/plugins/tree/main/learning-system/skills/seco
 
 ## What is bundled
 
-- `references/`
+- `references/` — operational modes, page model, wiki compiler, Obsidian adapter, and **ingest sources** (Twitter/xurl, YouTube, LinkedIn, web URLs, PDFs, images)
+- `agents/openai.yaml` — Second Brain agent definition
+- `commands/ingest.md` — `/ingest` command for any source type
+- `commands/compile-raw.md` — `/compile-raw` command for batch processing the `raw/` folder
 
 This skill is one of the strongest starting points in the learning-system plugin. Read [`SKILL.md`](./SKILL.md) before adapting it to any tool-specific setup.

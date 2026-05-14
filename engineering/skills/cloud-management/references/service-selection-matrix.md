@@ -7,7 +7,10 @@ Use this reference when deciding between provider-native services. The goal is n
 | Need | AWS | Azure | GCP | Notes |
 | --- | --- | --- | --- | --- |
 | Static site | S3 + CloudFront | Static Web Apps or Storage + Front Door | Cloud Storage + Cloud CDN | Keep DNS and TLS ownership explicit. |
-| Function runtime | Lambda | Functions | Cloud Functions | Good for short tasks and event handlers. Check timeout and cold-start constraints. |
+| Full-stack managed (frontend-first) | Amplify (Auth + Data + Storage + Hosting) | Static Web Apps + Functions | Firebase + Cloud Run | Use Amplify when the team wants a managed path and workload fits Auth/AppSync/DynamoDB/S3. |
+| Function runtime | Lambda (SAM or CDK) | Functions (Durable for stateful) | Cloud Functions | Good for event handlers, short tasks, async jobs. Check timeout (29s API GW / 15m Lambda) and cold-start constraints. |
+| Serverless API | API Gateway (HTTP API) + Lambda | Functions + API Management | Cloud Endpoints + Cloud Run | HTTP API is cheaper and faster; REST API adds usage plans and mapping templates. |
+| Workflow orchestration | Step Functions | Durable Functions or Logic Apps | Cloud Workflows | Use for multi-step, retry-heavy, or human-approval workflows. |
 | Managed containers | ECS Fargate | Container Apps | Cloud Run | Default for most containerized APIs and workers. |
 | Kubernetes | EKS | AKS | GKE | Use for platform teams, service mesh, custom networking, or k8s-native repos. |
 | VMs | EC2 | Virtual Machines or VMSS | Compute Engine or MIGs | Use only for legacy, host-level, or licensing constraints. |
@@ -16,10 +19,12 @@ Use this reference when deciding between provider-native services. The goal is n
 
 | Need | AWS | Azure | GCP | Notes |
 | --- | --- | --- | --- | --- |
-| PostgreSQL or MySQL | RDS or Aurora | Azure Database for PostgreSQL/MySQL | Cloud SQL | Default relational path. Confirm backups, HA, private access, and version. |
-| Serverless relational | Aurora Serverless | Azure SQL serverless | Cloud SQL edition choices | Verify cold-start, connection, and pause behavior before production. |
-| Document or key-value | DynamoDB | Cosmos DB | Firestore | Good for predictable access patterns; model queries before schema. |
-| Cache | ElastiCache Redis/Valkey | Azure Cache for Redis | Memorystore | Keep private, size from metrics, and avoid always-on non-prod overkill. |
+| PostgreSQL or MySQL | RDS or Aurora Cluster | Azure Database for PostgreSQL/MySQL | Cloud SQL | Default relational path. Confirm backups, HA, private access, and version. |
+| Serverless relational (scale to low) | Aurora Serverless v2 | Azure SQL serverless | Cloud SQL edition choices | Serverless v2 does not pause to zero; verify min ACU and cold-start before using as a cost-saving measure. |
+| Distributed serverless SQL (multi-region) | Aurora DSQL | Cosmos DB (PostgreSQL API) | AlloyDB Omni or Spanner | DSQL: PostgreSQL-compatible, active-active multi-region, IAM auth, no cluster sizing. Model for tenant isolation; no FK constraints across tenants. |
+| Document or key-value | DynamoDB | Cosmos DB | Firestore | Model queries before schema. Good for predictable access patterns with high throughput. |
+| Lambda-to-RDS connection pooling | RDS Proxy | — | Cloud SQL Auth Proxy | Required for Lambda + RDS/Aurora at scale; handles IAM auth token exchange and connection multiplexing. |
+| Cache | ElastiCache (Valkey preferred) | Azure Cache for Redis | Memorystore | Keep private, size from metrics. Valkey is the open-source Redis successor. |
 | Warehouse | Redshift or Athena | Synapse | BigQuery | Pricing model matters more than headline feature set. |
 | Data lake | S3 | Data Lake Storage Gen2 | Cloud Storage | Add lifecycle, retention, encryption, and access boundaries early. |
 

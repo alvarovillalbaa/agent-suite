@@ -9,9 +9,10 @@ description: >-
   recommendation with dated evidence, explicit confidence, visible decision
   logic, and clear next actions. Also use for public-web company or people
   discovery, account or lead list building, expert-finding, financial filing
-  retrieval, research-paper discovery, and practitioner-blog or portfolio
-  research when the answer must stay evidence-backed. Run short iterative
-  research loops, not a one-shot source dump.
+  retrieval, research-paper discovery, practitioner-blog or portfolio research,
+  and community or market sentiment research when the answer must stay
+  evidence-backed. Run short iterative research loops, not a one-shot source
+  dump.
 ---
 
 # Research
@@ -22,17 +23,60 @@ not produce a search dump.
 Default to one primary lane. Add overlays only when they materially improve the
 answer.
 
+## Output Contract (Read Before Synthesizing)
+
+Every citation in the final artifact must be an inline markdown link `[name](url)`.
+Never emit a trailing `Sources:` or `References:` block. Never emit raw URLs.
+If a source genuinely has no URL, fall back to plain text for that one item only.
+
+- **Good:** `per [r/devops](https://reddit.com/r/devops)`,
+  `per [TechCrunch](https://techcrunch.com/…)`
+- **Bad (raw URL):** `per https://techcrunch.com/…`
+- **Bad (plain name when URL exists):** `per TechCrunch`
+- **Bad (trailing block):** `Sources:\n- TechCrunch\n- Reddit`
+
+Do a post-synthesis self-check before finalizing any artifact. Scan for:
+
+1. trailing `Sources:` / `References:` / `Citations:` blocks — delete them
+2. claims that lack a date where freshness matters — add `(as of YYYY-MM)` or
+   downgrade confidence
+3. inference presented as directly observed fact — label it explicitly
+4. a ranking or score without visible logic — add the logic or remove the rank
+5. an artifact that ends without a recommendation, constraint, or next action —
+   add one
+
+## Query Quality Pre-Flight
+
+Before building the source plan, check for these traps:
+
+- **Keyword trap.** A query like "sales tools" or "AI" is too broad to route to
+  a useful lane. Reframe by asking: what decision does this support? For which
+  buyer, segment, or account?
+- **False freshness request.** The user says "recent" but the actual decision
+  does not require fresh evidence (e.g., "recent history of CRM pricing models"
+  only needs the last major shift). Calibrate the freshness window to the
+  decision, not the word "recent."
+- **Scope mismatch.** The brief says "research this company" but the actual need
+  is "prepare for a meeting with their head of engineering." Narrow the scope
+  before sourcing.
+
+If the brief has a keyword trap or scope mismatch, ask one clarifying question
+before starting. Do not research a badly framed question and then apologize
+afterward.
+
 ## Operating Pattern
 
 Use this default loop:
 
-1. parse the brief
-2. choose the lane and artifact
-3. build the minimum credible source plan
-4. run a direct-evidence pass
-5. run one targeted gap-closing pass
-6. synthesize the answer or recommendation
-7. run a reviewer pass and repair only the weakest dimension once
+1. run the query quality pre-flight
+2. parse the brief
+3. choose the lane and artifact
+4. build the minimum credible source plan
+5. run a direct-evidence pass
+6. run one targeted gap-closing pass
+7. synthesize the answer or recommendation
+8. run a reviewer pass and repair only the weakest dimension once
+9. run the post-synthesis self-check from the Output Contract
 
 Keep a compact working ledger while researching. At minimum, track:
 
@@ -93,6 +137,15 @@ Load these overlays in addition to the primary lane when needed:
     financial filings, research papers, independent practitioner writing, or
     structured lead generation at scale
 
+- `references/social-signal-pass.md`
+  - when current community reaction, operator sentiment, or market discourse
+    is a material input — covering Reddit, X, Hacker News, YouTube, and
+    GitHub as primary signal sources
+  - load when the brief mentions "what people are saying", "community
+    reaction", "practitioner sentiment", "adoption friction", or "buzz"
+  - also add as a layer to competitor intelligence when promotional evidence
+    needs third-party discourse corroboration
+
 Do not blur lanes unless the actual decision spans them.
 
 ## Intake Contract
@@ -152,7 +205,7 @@ Classify the job before sourcing. Use the smallest artifact that fits.
   - themes, contradictions, segments, and opportunity areas from mixed
     evidence
 
-## Output Contract
+## Artifact Requirements
 
 Every final artifact must contain:
 
@@ -167,7 +220,7 @@ specific claim. Use it to make the logic visible, not to flood the output.
 
 ## Execution Protocol
 
-### 1. Parse The Brief
+### 1. Pre-Flight And Parse The Brief
 
 Capture:
 
@@ -242,16 +295,11 @@ lightest collection mode that can answer the question:
 6. interact only when clicks, forms, pagination, or rendering block static
    capture
 
-If current operator or market reaction matters and a discourse tool exists, run
-an extra signal pass after the direct-source pass:
-
-1. decompose the question into 3-5 targeted queries
-2. search for direct mentions, pain points, praise, objections, and linked
-   resources
-3. refine noisy queries instead of accepting junk results
-4. follow high-signal threads
-5. deep-dive linked primary sources
-6. synthesize by theme, not by query or post
+If current operator or market reaction matters, load
+`references/social-signal-pass.md` and run a targeted discourse pass after
+the direct-source pass. The reference file defines platform routing (Reddit,
+X, HN, YouTube, GitHub), query decomposition into 3-5 targeted sub-queries,
+synthesis-by-theme rules, and the specific failure modes to avoid.
 
 Treat discourse as signal, not ground truth.
 
@@ -476,6 +524,39 @@ work, proceed and label it.
 - repairing every weakness at once instead of the one blocking the artifact
 - keeping template sections that the evidence does not support
 - ending with "it depends" when a directional recommendation is possible
+
+### Named Antipatterns
+
+These specific failure modes have recurred. Know them by name.
+
+**Source dump without synthesis.** Running 10 searches, pasting snippets, and
+calling it a brief. The output contract requires a decision artifact with visible
+logic, not a reading list.
+
+**Confidence collapse.** Every claim marked "medium" or "low" confidence because
+the researcher is hedging instead of distinguishing what is well-supported from
+what is thin. Strong claims with good primary evidence deserve `High` confidence.
+
+**Stale-fresh blend.** Mixing a 2022 pricing page with a 2025 press release in
+the same evidence row without labeling the date gap. Always date-stamp
+time-sensitive claims.
+
+**Inference laundering.** Summarizing a marketing page and presenting it as an
+independent finding. Primary sources describe themselves; they are not neutral
+evidence about themselves. Label the source type.
+
+**Discourse-as-ground-truth.** Treating one upvoted Reddit thread as
+representative consensus. Social signal is corroboration, not primary evidence.
+Always cross-platform corroborate before elevating a community signal.
+
+**Missing-the-actual-question.** Producing a thorough piece about the company
+when the user asked about a specific product feature, a specific competitor, or
+a specific decision. Parse the `decision_or_question` from the intake contract
+before sourcing.
+
+**Endless gap-closing.** Running five research passes because "more information
+exists." The loop is capped: one gap-closing pass, then downgrade confidence
+and proceed. Research debt is acceptable; infinite loops are not.
 
 ## Quality Bar
 

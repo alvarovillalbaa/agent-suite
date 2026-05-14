@@ -69,6 +69,16 @@ audience:
 - Validation plan:
 - Approval required before code: `yes`
 
+## Storyboard
+
+Write this table before Remotion code. One row per beat.
+
+| Beat | Time range | Visuals | Text overlay |
+|------|------------|---------|--------------|
+|      |            |         |              |
+
+Before/after note (if applicable):
+
 ## Scene Breakdown
 
 1. Scene:
@@ -98,6 +108,14 @@ audience:
 - Hero frames / boundaries to inspect:
 - Final render path:
 - Self-eval frames / moments:
+
+## Platform Targets
+
+- [ ] `1920x1080` — X, LinkedIn, YouTube
+- [ ] `1080x1920` — Instagram Reels, TikTok
+- [ ] `1080x1080` — Instagram feed
+- [ ] GIF export — embed / Slack
+- Primary render codec and quality:
 
 ## Persistence
 

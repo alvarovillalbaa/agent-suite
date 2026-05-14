@@ -243,6 +243,78 @@ Good defaults:
 
 Goal: make structure visible without turning the visual layer into the source of truth.
 
+## Confidence mode
+
+Use before committing to a plan, proposal, or decision when the user wants to assess readiness.
+
+This mode answers: what do we actually know here, what are we assuming, and what gaps should be closed before proceeding?
+
+Default flow:
+
+1. State the plan or decision being evaluated in one sentence.
+2. List what the knowledge base confirms with high confidence — cited pages or sources.
+3. List what is assumed but unverified — plausible but not grounded in evidence.
+4. List what is unknown and consequential — gaps that could invalidate the plan.
+5. Assign an overall confidence level: high (proceed), medium (close named gaps first), or low (do not proceed without more input).
+6. For each gap, name the specific action that would close it: a source to check, a page to write, a question to ask.
+
+Output: a structured readiness summary with a recommendation and specific next steps, not just a list of doubts.
+
+Do not conflate this with Challenge mode. Challenge mode is adversarial — it looks for prior failures. Confidence mode is prospective — it maps what is known versus unknown before acting.
+
+## Work mode
+
+Use when the user wants to execute a plan from the knowledge base.
+
+Default flow:
+
+1. Find the plan page or have the user confirm the plan to execute.
+2. Break the plan into tasks with explicit dependencies. Mark which can run in parallel.
+3. Execute tasks in dependency order, running parallel work streams concurrently where possible.
+4. After each significant task, log progress back to the plan file so the plan stays current.
+5. When a task produces a decision, insight, or new fact, route it into the knowledge base immediately — do not defer to a cleanup pass.
+6. At the end of execution, trigger Compound mode to extract learnings from the session.
+
+Rules:
+- Keep the plan file as the source of truth for what was done, what was skipped, and what changed.
+- Never complete Work mode without a Compound mode closing step.
+- If a task reveals that the plan is wrong, update the plan before continuing — do not silently improvise.
+
+Goal: execution leaves a paper trail that feeds the next planning cycle.
+
+## Compound mode
+
+Use at the end of every meaningful work session, plan execution, or ingest pass.
+
+This is the closing ritual that makes the knowledge base compound. Without it, sessions add volume but not acceleration.
+
+Default flow:
+
+1. Scan the session for 1–3 durable learnings — things that are true beyond this session and would change how future work approaches similar problems.
+2. For each learning, check the knowledge base for an existing page that should absorb it.
+3. If an existing page matches: update it, rewrite the compiled-truth section if needed, and append a timeline entry.
+4. If no page matches: create a new knowledge file with the standard YAML frontmatter and page structure.
+5. Explicitly check for contradictions: does this learning conflict with anything already in the knowledge base? If so, surface the contradiction instead of silently overwriting.
+6. Update `LOG.md` and any relevant index files.
+7. Report: what was saved, what was updated, and any contradictions found.
+
+Frontmatter schema for new knowledge files:
+
+```yaml
+---
+type: insight  # insight | decision | procedure | fact | question
+tags: [domain, subtopic]
+confidence: high  # high | medium | low
+created: YYYY-MM-DD
+source: session | ingest | research | meeting
+---
+```
+
+Rules:
+- Extract learnings, not events. "We decided X" is an event. "Fast iteration beats perfect planning when scope is unclear" is a learning.
+- 1–3 per session maximum. If everything feels important, nothing is. Compress.
+- Never skip this step after Work mode. Skipping it is the main way compound systems stop compounding.
+
 ## Automation mode
 
 Use when the user wants background maintenance or scheduled runs.

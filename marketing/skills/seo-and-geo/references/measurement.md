@@ -22,10 +22,23 @@ Traditional SEO has mature tooling. GEO measurement is still emerging.
 - Content included in AI training datasets
 
 **Proxy metrics for GEO:**
-- "Direct" traffic increases (users who saw your brand in AI)
+- "Direct" traffic increases (users who saw your brand in AI — see Attribution Gap below)
 - Unlinked brand mention growth (social listening)
 - Brand search volume growth (Search Console branded queries)
-- AI referral traffic (Search Console → Referring Sites → AI domains)
+- AI referral traffic (GA4 → custom "AI Search" channel group)
+
+**GEO measurement tools:**
+
+| Tool | Coverage | Pricing |
+|------|----------|---------|
+| **HubSpot AEO Grader** | ChatGPT, Google AI | Free — good starting baseline |
+| **LLMrefs** | ChatGPT, Gemini, Perplexity, Claude, Grok | Paid — leading platform |
+| **Nightwatch** | ChatGPT, Gemini, Perplexity, Claude | Paid — citation-level sentiment |
+| **AIclicks** | Multiple platforms | Paid — prompt-level visibility |
+| **Otterly AI** | ChatGPT, Perplexity, Google AI Overviews | Paid — share of AI voice |
+| **Peec AI** | ChatGPT, Gemini, Perplexity, Claude, Copilot | Paid — multi-platform scale |
+| **Evertune** | Multiple | Enterprise — AI Brand Index |
+| **Semrush One** | ChatGPT, Perplexity, Gemini | Paid add-on to existing SEO suite |
 
 ---
 
@@ -172,7 +185,9 @@ Perplexity cites sources visibly. Monitor:
 - Whether your domain appears in Perplexity citations
 - Which of your pages gets cited most
 
-**Tool:** BrightEdge, Semrush AI, and Zoominfo have AI visibility features. Manual is free.
+**Tools:** BrightEdge, Semrush AI, LLMrefs, and Nightwatch have AI visibility features. Manual is free.
+
+**Polling methodology (for scale):** Define 250–500 high-intent queries your audience would ask AI. Run across ChatGPT, Perplexity, Google AI Overviews, Claude weekly. Track: mention rate, citation rate, citation position, and sentiment. Start with 50 core queries and expand. Trend Share of Voice over time to identify which content changes drive improvements.
 
 ### Method 3: GA4 AI Referral Traffic
 
@@ -181,12 +196,38 @@ AI assistants with browsing capabilities send referral traffic:
 - Filter by Source/Medium for AI domains
 
 **AI referral sources to monitor:**
-- `chat.openai.com` (ChatGPT browsing)
-- `perplexity.ai`
-- `bard.google.com` / `gemini.google.com`
-- `bing.com` (Copilot referrals)
-- `you.com`
-- `phind.com`
+
+| Domain | Source |
+|--------|--------|
+| `chat.openai.com` | ChatGPT |
+| `chatgpt.com` | ChatGPT (new domain — track separately) |
+| `perplexity.ai` | Perplexity |
+| `claude.ai` | Claude |
+| `copilot.microsoft.com` | Microsoft Copilot |
+| `gemini.google.com` | Google Gemini |
+| `grok.x.ai` | Grok |
+| `you.com` | You.com |
+
+**GA4 custom channel group setup:** Create a dedicated "AI Search" channel group in GA4 (Admin → Data Settings → Channel Groups) matching all the domains above. This separates AI traffic from organic/direct in all your reports.
+
+**Key benchmark:** ChatGPT drives **87.4%** of all AI referral traffic. AI platform traffic grew **155.6% YoY**. AI search traffic converts at **14.2%** vs Google organic at **2.8%** — a 5× difference.
+
+### The Attribution Gap
+
+AI creates a new customer journey that is **invisible in traditional analytics:**
+
+```
+User asks AI → AI mentions your brand → User searches brand or navigates directly → Shows as "direct" traffic
+```
+
+This "AI mention → direct visit" path never appears as AI referral traffic. The user shows up as direct even though AI drove discovery.
+
+**Mitigations:**
+- Track GA4 AI referrer traffic directly (catches users who click AI-provided links)
+- Monitor branded search volume trends in Search Console (increases correlate with AI mentions)
+- Use dedicated LLM visibility tools (LLMrefs, Nightwatch) to track the mention side
+- Survey new users: "How did you hear about us?" — add AI options explicitly
+- Monitor branded queries in Google Search Console as a proxy metric
 
 ### Method 4: Brand Search Volume as GEO Proxy
 
@@ -365,6 +406,18 @@ Track these by first-touch source to see organic search contribution:
 
 GEO-driven conversions are difficult to attribute directly. Use:
 - Brand search volume increase as a leading indicator
-- Qualitative surveys: "How did you hear about us?" → "Saw it recommended by AI"
+- Qualitative surveys: "How did you hear about us?" → include AI options explicitly
 - Direct traffic increase (AI users often navigate directly after getting a recommendation)
 - UTM parameters on any links AI assistants generate when linking to your site
+- GA4 "AI Search" custom channel group for click-through attribution
+
+**Conversion benchmark:** AI search traffic converts at **14.2%** vs Google organic at **2.8%** (5× higher). ChatGPT retail: 11.4%, Perplexity: 10.5%. Even low AI referral volumes are high-value.
+
+### Monitoring Cadence
+
+| Frequency | Action |
+|-----------|--------|
+| **Weekly** | Check GA4 AI referrer traffic, note trends |
+| **Monthly** | Run polling queries across ChatGPT/Perplexity/Claude/Google, update Share of Voice, review citation sentiment |
+| **Quarterly** | Full strategy review: which content earned citations, which didn't. Update llms.txt Instructions for LLMs section, refresh stale pages, review AI crawler list for new user agents |
+| **On deploy** | Re-verify LLM discovery file endpoints (llms.txt, agent-card.json, security.txt) — check for unexpected 404s |

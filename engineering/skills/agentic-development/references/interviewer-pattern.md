@@ -10,15 +10,22 @@ The fix: before building anything, a planner step expands the request into a ful
 
 ## When to Apply
 
-Apply the interviewer pattern when:
-- The request asks Claude to create or build something (document, feature, system, design, content, sequence, workflow)
-- The request leaves strategic decisions unresolved: who is this for, what is the main objection, what is the tone, what is the scope, what does success look like
+**Default: apply for all non-trivial creation work.** Any request to build, design, write, or implement something should go through this pattern. The question is not "do I need this?" but "how much of this do I need?".
+
+Apply the full three-step workflow when:
+- The request asks you to create or build something (feature, system, document, design, content, workflow)
+- Strategic decisions are still open: audience, scope, success criteria, architectural approach, tone
 - The user would likely need to iterate on the output more than once before it is right
 
+Apply a lightweight version (spec expansion only, skip the interview) when:
+- The spec is mostly defined but a few gaps remain — expand, call out the gaps, and ask only about the ones that materially affect quality
+
 Skip the pattern when:
-- The task is a clearly scoped fix or refactor with no strategic ambiguity
-- The spec is already fully defined (requirements doc, ticket with ACs, detailed prompt)
+- The task is a clearly scoped fix or refactor with a known causal chain (no strategic ambiguity)
+- The spec is already fully defined (requirements doc, ticket with ACs, detailed prompt that answers scope/audience/success)
 - The change surface is trivial (rename, typo, formatting)
+
+**The cost of skipping is always higher than the cost of a 2-minute spec review.** Editing Claude's output is expensive. Answering 3–5 questions before generating is cheap. Apply the pattern aggressively; tighten scope only when the spec is genuinely complete.
 
 ## The 3-Step Workflow
 

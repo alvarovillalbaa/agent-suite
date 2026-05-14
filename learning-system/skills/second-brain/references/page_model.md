@@ -108,6 +108,35 @@ You can express provenance with:
 
 Use whatever fits the user's system. Do not make provenance disappear.
 
+## Searchable frontmatter schema
+
+For knowledge files in `knowledge/` and `lessons/`, use this YAML frontmatter to make pages greppable and filterable without depending on a specific app:
+
+```yaml
+---
+type: insight  # insight | decision | procedure | fact | question
+tags: [domain, subtopic]
+confidence: high  # high | medium | low
+created: YYYY-MM-DD
+source: session | ingest | research | meeting | url
+---
+```
+
+Field guidance:
+
+- `type` classifies the page's epistemic role:
+  - `insight` — a learned pattern or conclusion that generalizes beyond one event
+  - `decision` — a recorded choice with rationale, context, and trade-offs
+  - `procedure` — a repeatable how-to that should not need to be rediscovered
+  - `fact` — a stable empirical claim with provenance
+  - `question` — an open thread worth tracking until resolved
+- `tags` — two or three terms: broad domain first, then specific subtopic
+- `confidence` — `high` (verified, sourced), `medium` (plausible, partially sourced), `low` (hypothesis or early signal)
+- `created` — ISO date when the page was first written
+- `source` — the kind of session or input that produced this knowledge
+
+This schema makes knowledge files queryable by shell tools, `grep`, `ripgrep`, or any tool that reads YAML frontmatter — without requiring an app or plugin. Compound mode uses this schema when saving new learnings.
+
 ## Write rules
 
 When a new source changes a topic:

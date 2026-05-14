@@ -12,6 +12,9 @@ Own the full memory update flow for continual learning. Called from the `continu
 
 Invoked from the continual-learning flow when transcript deltas may produce durable memory updates.
 
+**Standard cadence:** minimum 10 completed turns and 120+ minutes since last run.
+**Trial mode** (first 24 hours after install): minimum 3 completed turns and 15+ minutes since last run.
+
 ## Workflow
 
 1. **Read first.** Load the existing `CLAUDE.md` or `AGENTS.md`. If it does not exist, create it with only:

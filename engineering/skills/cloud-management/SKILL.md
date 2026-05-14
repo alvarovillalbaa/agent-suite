@@ -1,6 +1,6 @@
 ---
 name: cloud-management
-description: Cross-cloud CLI-first cloud operations for AWS, Azure, and GCP. Use when the assistant needs to identify which cloud provider or multi-cloud estate a repo uses, deploy new resources or services, wire automatic deployments, inventory and optimize infrastructure, or diagnose and repair cloud failures entirely from the terminal, with explicit approval gates for high-cost, destructive, identity-sensitive, or hard-to-reverse changes.
+description: Cross-cloud CLI-first cloud operations for AWS, Azure, and GCP. Use when the assistant needs to identify which cloud provider or multi-cloud estate a repo uses, deploy new resources or services, wire automatic deployments, inventory and optimize infrastructure, or diagnose and repair cloud failures entirely from the terminal, with explicit approval gates for high-cost, destructive, identity-sensitive, or hard-to-reverse changes. Covers AWS Amplify full-stack projects, serverless workloads (Lambda, API Gateway, Step Functions, SAM, CDK), and the full AWS database portfolio (RDS, Aurora, Aurora DSQL, DynamoDB, ElastiCache), as well as deep Azure references for diagnostics, storage, compute, compliance, identity, Foundry, and cross-cloud migrations.
 ---
 
 # Cloud Management
@@ -38,6 +38,10 @@ In command examples below, `<skill-dir>` means the installed `cloud-management` 
      - [aws-cli-playbook.md](./references/aws-cli-playbook.md)
      - [azure-cli-playbook.md](./references/azure-cli-playbook.md)
      - [gcp-cli-playbook.md](./references/gcp-cli-playbook.md)
+   - AWS deep-dive references when the task is AWS-specific:
+     - Amplify full-stack projects (auth, data, storage, functions, hosting): [aws-amplify-guide.md](./references/aws-amplify-guide.md)
+     - serverless workloads (Lambda, API Gateway, Step Functions, EventBridge, SAM, CDK): [aws-serverless-guide.md](./references/aws-serverless-guide.md)
+     - database selection, schema design, migrations, and connection management: [aws-databases-guide.md](./references/aws-databases-guide.md)
    - Azure deep-dive references when the task is Azure-specific:
      - diagnostics and incident loops: [azure-diagnostics-guide.md](./references/azure-diagnostics-guide.md)
      - architecture diagrams and relationship mapping: [azure-resource-visualization.md](./references/azure-resource-visualization.md)
@@ -228,16 +232,50 @@ When the task is Azure AI Foundry or Microsoft Foundry provisioning, agent deplo
 3. Verify quota, model availability, RBAC, registry, and deployment target before building or shipping agents.
 4. Request approval before new model deployments, quota-consuming capacity changes, external data-source hookups, or public agent ingress.
 
+### AWS Amplify Full-Stack Projects
+
+When the task is an Amplify project — authentication, data models, storage, Lambda functions, Amplify Hosting, or sandbox environments:
+
+1. Load [aws-amplify-guide.md](./references/aws-amplify-guide.md).
+2. Confirm the Amplify environment (`amplify env list`) and AWS profile before any write.
+3. Prefer `amplify push` for Amplify-managed resources; do not introduce parallel Terraform or CloudFormation stacks for the same resources.
+4. Evaluate whether the workload fits Amplify's service boundary. If it needs relational joins, private networking, ECS, or SQS, recommend graduating to direct AWS services.
+5. Request approval before changing auth configuration or `@auth` rules on a User Pool with production data.
+
+### AWS Serverless (Lambda, API Gateway, Step Functions)
+
+When the task is Lambda functions, API Gateway REST/HTTP/WebSocket APIs, Step Functions workflows, EventBridge rules, or SAM/CDK serverless deployments:
+
+1. Load [aws-serverless-guide.md](./references/aws-serverless-guide.md).
+2. Confirm whether the project uses SAM, CDK, or Terraform. Extend the existing IaC path.
+3. For Lambda-to-RDS connectivity, always check whether an RDS Proxy is in place before prescribing a connection pool pattern.
+4. For API Gateway, establish HTTP API vs REST API tradeoff before prescribing authorizer, CORS, or throttle configuration.
+5. Request approval before changing concurrency limits, reserved concurrency, or Lambda execution roles in production.
+
+### AWS Databases (RDS, Aurora, DynamoDB, Aurora DSQL, ElastiCache)
+
+When the task is database service selection, schema design, migrations, connection management, or operational incidents on any AWS database service:
+
+1. Load [aws-databases-guide.md](./references/aws-databases-guide.md).
+2. Identify the service type before issuing any command — RDS, Aurora cluster, Aurora DSQL, DynamoDB, or ElastiCache each have different CLI namespaces and operational models.
+3. For DynamoDB, confirm access patterns exist before discussing schema.
+4. For Aurora DSQL, use IAM token auth and confirm the application handles token refresh (900-second expiry).
+5. Request approval before any destructive DDL, snapshot deletion, table deletion, DB class modification, or topology change.
+
 ## Architecture Bias
 
 Favor the simplest managed platform that fits the repo:
 
 - Static site or SPA: storage plus CDN, or the provider's lightweight static hosting path.
+- Full-stack mobile or web app with a frontend-first team: AWS Amplify (auth, data, storage, functions, hosting) before wiring bare ECS or Lambda directly — only if the workload fits Amplify's service boundary.
 - Containerized API: ECS Fargate, Azure Container Apps, or Cloud Run before Kubernetes.
+- Serverless API or event handler: Lambda plus API Gateway or EventBridge before ECS, when cold-start tolerance, sub-15-minute duration, and provider lock-in are acceptable.
+- Workflow orchestration: Step Functions (AWS) or Durable Functions (Azure) before hand-rolled retries or cron-inside-app patterns.
 - Web plus worker plus websocket or realtime: split services by responsibility instead of forcing one long-running process shape.
 - Event-driven jobs or schedulers: use provider-native schedulers and queues instead of cron inside app containers.
 - Kubernetes: choose only when the repo already needs k8s primitives, advanced ingress, sidecars, daemon workloads, or node-level tuning.
 - Azure-hosted AI agents: keep Foundry project, model deployment, retrieval layer, tracing, and runtime identity aligned unless the user explicitly wants a split control plane.
+- AWS relational database: RDS or Aurora Cluster by default; Aurora Serverless v2 for scale-to-low traffic; Aurora DSQL only for distributed multi-region active-active SQL needs.
 
 For multi-runtime backends, use this as the baseline example, not a hard requirement:
 

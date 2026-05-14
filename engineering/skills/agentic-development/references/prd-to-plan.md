@@ -59,6 +59,8 @@ Create `./plans/` if it does not exist. Write the plan as a Markdown file named 
 ```markdown
 # Plan: <Feature Name>
 
+> **For agentic workers:** To implement this plan, use the `subagents-and-parallelism` reference for task dispatch. Steps use checkbox (`- [ ]`) syntax for tracking. Execute all tasks without pausing for mid-plan check-ins — stop only on `BLOCKED` or genuine ambiguity.
+
 > Source PRD: <brief identifier or link>
 
 ## Architectural decisions
@@ -111,6 +113,25 @@ A concise description of this vertical slice. Describe the end-to-end behavior, 
 | **Vertical / tracer bullet** (preferred) | One narrow end-to-end path through every layer | Early validation, demoable sooner, integration bugs surface early |
 
 A completed vertical slice answers: "Can a user do X?" — not "Is layer Y done?"
+
+## Implementation Task Granularity
+
+When a phase is handed to a subagent or executed inline, the tasks inside it must meet these standards. Vague tasks cause subagent drift and untestable increments.
+
+**Per-task requirements:**
+- **Scope**: 2–5 minutes of focused work. If a task would take longer, split it.
+- **File paths**: name every file to create or modify — no "add a file for this" vagueness.
+- **Code**: include the complete code block or diff. No `TBD`, `TODO`, `implement error handling`, or `similar to the above` placeholders. If you don't know the exact code yet, do not write the task yet.
+- **Verification**: one concrete command (e.g. `npm test -- --testPathPattern=auth`) or manual step that proves this task is done.
+- **TDD order**: if the phase uses TDD, the failing test must be its own task before the implementation task.
+
+**Forbidden patterns:**
+- "Implement the user service" (too broad, no file, no code)
+- "Add error handling" (what errors? where? what behavior?)
+- "Similar to the above" (copy the code, don't reference it)
+- Bundling 3 separate logical changes into one task
+
+A well-formed task is dispatching instructions, not a writing prompt. A subagent should be able to execute it without reading back the plan header.
 
 ## Integration with other references
 

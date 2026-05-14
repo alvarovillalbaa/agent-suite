@@ -28,8 +28,9 @@ This skill covers both:
 
 ## Core model
 
-Manage pull requests at four levels:
+Manage pull requests at five levels — always start at intent:
 
+- **Intent level**: what is this PR actually trying to do for a human? (recover this in plain language before evaluating anything else)
 - **PR level**: size, clarity, test evidence, risk, reviewability
 - **Reviewer level**: ownership, load, response time, quality bar
 - **Queue level**: backlog, aging, bottlenecks, merge throughput
@@ -39,12 +40,12 @@ If the user only wants one level, still check whether the adjacent level is caus
 
 For active PR operations, reason in this order:
 
-- what is the PR trying to do for a human
-- whether the implementation actually solves that problem
-- whether it can keep moving autonomously
-- what operating action is needed next
+1. what is the PR trying to do for a human (recover the plain-language intent, do not repeat jargon from the PR description)
+2. whether the implementation actually solves that underlying problem — not just whether it compiles or matches the ticket
+3. whether it can keep moving autonomously, or needs to close or escalate
+4. what operating action is needed next
 
-Do not confuse "diff exists" with "progress exists." A PR that compiles but does not solve the underlying problem is still a flow failure.
+Do not confuse "diff exists" with "progress exists." A PR that compiles but does not solve the underlying problem is still a flow failure. An unclear PR is treated the same as a wrong-shaped fix for triage purposes — close it rather than passing it to a human reviewer without a clear intent to evaluate.
 
 ## Standard output structure
 
@@ -154,13 +155,19 @@ Classify the result:
 
 ### Step 4. Distinguish bug, feature, and maintenance paths
 
-Choose the validation lane deliberately:
+Choose the validation lane deliberately.
 
-- **bug**: reproduce the failure and prove the fix changes the outcome
-- **feature**: test the changed behavior directly
-- **maintenance**: run the smallest credible local validation plus normal review and CI
+**Bug path:**
+- Reproduce the failure with the smallest credible test
+- Temporarily ablate the fix locally (never commit, never push) to confirm the test fails on the broken state
+- Restore the fix and rerun to confirm the test now passes
+- If the bug cannot be reproduced, or the fix does not change the outcome, escalate
 
-If the claimed change cannot actually be validated, escalate instead of pretending it is merge-ready.
+**Feature path:**
+- Run the smallest credible check that shows the feature works as intended
+- For maintenance, tooling, docs-only, and lockfile-only PRs: decide whether bespoke local testing is needed or whether normal CI is the meaningful validation
+
+**In both cases:** if the claimed change cannot actually be validated, escalate instead of continuing into review or CI as if the work were proven.
 
 ### Step 5. Handle superficial cleanup before review
 
@@ -258,6 +265,35 @@ When merge conflicts are a recurring team problem, inspect:
 
 Do not treat conflict count as a purely local author problem if the real cause is system-level overlap or branch policy.
 
+## Landing gates
+
+A PR is ready to land only if all of these are true:
+
+- [ ] Plain-language intent is clear
+- [ ] Implementation serves that intent in a real way — not symptom-only
+- [ ] Branch applies cleanly to current base, or conflicts were resolved and revalidated
+- [ ] Bug was reproduced and shown fixed, or feature was tested directly
+- [ ] No fundamental refactor required
+- [ ] No human framing or architectural judgment still required
+- [ ] Review ran against fresh base; no unresolved P0 or P1 findings
+- [ ] CI is green, or remaining failures are clearly unrelated to the PR
+
+Apply these gates before declaring a PR "ready for landing." Do not skip gates under time pressure; each exists because skipping it has caused past failures.
+
+## Review specializations
+
+For deep pre-merge review, apply these five lenses from `references/review-specializations.md`:
+
+| Lens | Apply when |
+|------|-----------|
+| Code Quality | always — any diff |
+| Silent Failure Detection | diff touches error handling, catch blocks, fallback logic |
+| Test Coverage | new or modified functionality |
+| Comment Accuracy | new or modified comments or docs |
+| Type Design | new types or data models (typed languages only) |
+
+See the `review-pr` command and `pr-reviewer` agent for orchestrated execution. See `references/triage-protocol.md` for the full intent-first triage protocol.
+
 ## Team-scale guidance
 
 Adjust the workflow by scale:
@@ -330,3 +366,20 @@ Every threshold should map to a concrete action, not just a dashboard color.
 - The recommendation fits the team size and repo reality.
 - The triage lane distinguishes continue, close, and escalate clearly.
 - The merge-conflict lane is concrete enough to execute non-interactively on straightforward cases.
+- Landing gates are checked before any PR is declared ready.
+- Review lenses are applied to the diff, not the whole codebase.
+
+## Related
+
+**Agents:**
+- `agents/pr-reviewer.md` — multi-lens pre-merge review
+- `agents/pr-triage.md` — intent-first queue triage
+
+**Commands:**
+- `commands/review-pr.md` — run a review on a diff, branch, or PR number
+- `commands/triage-prs.md` — triage a queue or set of PRs
+
+**References:**
+- `references/review-specializations.md` — five review lenses with outputs and triggers
+- `references/triage-protocol.md` — step-by-step triage flow with landing gates and comment templates
+- `../agentic-development/references/reviews-and-comments.md` — adversarial review and comment format

@@ -1,13 +1,14 @@
 ---
 name: seo-and-geo
-version: 1.2.0
+version: 1.3.0
 description: >-
   Use for SEO, GEO, and AEO work: keyword research, on-page optimization,
   AI-citation readiness, technical SEO audits, content gap analysis,
   competitor benchmarking, structured data, Core Web Vitals,
   internationalization, entity optimization, backlink analysis, content
-  refreshes, and monitoring. Trigger when the user wants better search
-  visibility in traditional or AI search systems.
+  refreshes, LLM discovery files (llms.txt, agent-card.json), and monitoring.
+  Trigger when the user wants better search visibility in traditional or AI
+  search systems, or when setting up a site for AI agent discoverability.
 ---
 
 # SEO + GEO + AEO: Complete Optimization Skill
@@ -107,30 +108,57 @@ Fix technical issues before optimizing content. Fix on-page before chasing AI ci
 - Important pages reachable within 3 clicks from homepage
 
 **AI Bot Access** (critical for GEO — verify these bots are allowed in `robots.txt`):
-- `GPTBot` and `ChatGPT-User` (ChatGPT)
-- `PerplexityBot` (Perplexity)
-- `ClaudeBot` and `anthropic-ai` (Claude)
-- `Bingbot` (Copilot/Bing)
-- `Google-Extended` (Google Gemini and AI Overviews)
-- `Applebot-Extended` (Apple Intelligence)
+
+| User Agent | Provider | Purpose |
+|-----------|----------|---------|
+| `GPTBot` | OpenAI | Training data |
+| `OAI-SearchBot` | OpenAI | Real-time search indexing |
+| `ChatGPT-User` | OpenAI | ChatGPT browsing |
+| `ClaudeBot` | Anthropic | Training |
+| `Claude-User` | Anthropic | Real-time user query fetching |
+| `Claude-SearchBot` | Anthropic | Search index quality |
+| `PerplexityBot` | Perplexity | Answer engine retrieval |
+| `Google-Extended` | Google | Gemini AI training + AI Overviews |
+| `BingBot` | Microsoft | Copilot + Bing AI |
+| `Amazonbot` | Amazon | Alexa / Amazon search |
+| `Applebot-Extended` | Apple | Siri / Apple Intelligence |
+| `FacebookBot` | Meta | Meta AI features |
+| `meta-externalagent` | Meta | External agent access |
+| `Bytespider` | ByteDance | TikTok AI features |
+
+**Anthropic three-bot framework:** `ClaudeBot`, `Claude-User`, and `Claude-SearchBot` are independently controllable. Blocking one does not block the others. Allow all three on public pages.
 
 **robots.txt template** — allows all AI search bots while blocking training-only crawlers:
 ```
-User-agent: GPTBot
-User-agent: ChatGPT-User
-User-agent: PerplexityBot
-User-agent: ClaudeBot
-User-agent: anthropic-ai
-User-agent: Google-Extended
-User-agent: Bingbot
+User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /api/v1/
+Disallow: /auth/
+
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: BingBot
+User-agent: Applebot-Extended
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
 
 # Block training-only (won't affect citations)
 User-agent: CCBot
 Disallow: /
+
+Sitemap: https://example.com/sitemap.xml
 ```
 
 Quick check: `curl -s "https://example.com/robots.txt"`
+
+**Review quarterly** — new AI crawlers appear regularly. ClaudeBot has doubled its crawl rate in recent quarters.
 
 **Indexation**
 - Canonical tags on all pages (`<link rel="canonical">`)
@@ -459,6 +487,39 @@ GEO is the practice of making content citation-worthy for AI systems (ChatGPT, C
 
 **Best combination:** Fluency + Statistics = maximum boost. Low-ranking sites can gain up to **+115%** visibility with citations.
 
+**Content freshness for GEO:**
+- Citation decay is observed after ~14 days of stale content — update GEO-targeted pages every **7–14 days**
+- Include a visible **"Last updated: YYYY-MM-DD"** date on every key page
+- Use `dateModified` in JSON-LD Article schema and `lastmod` in sitemap.xml
+- Signal freshness in body copy: "As of [month year]..."
+
+**Optimal page structure for AI citation:**
+1. Definitional opening (1–2 sentences — make it quotable)
+2. Quick answer block
+3. Structured body with H1 → H2 → H3 hierarchy
+4. Numbered/bulleted lists
+5. Comparison tables for competitive positioning
+6. FAQ section mirroring how users prompt AI
+
+**Optimal content length for GEO:** 1,500–4,000 words. Shorter pages lack substance for citation; longer pages dilute signal.
+
+**Key stat:** 44% of all AI citations come from the **first 30% of a page's content**. Front-load your most authoritative, quotable statements.
+
+**Use definitive language.** Cited passages are 2× more likely to use definitive language:
+```
+BAD:  "X might be useful for..." / "X could potentially help..."
+GOOD: "X is the standard approach for..." / "X solves Y by..."
+```
+
+**Branded frameworks strategy:** Create proprietary concepts AI can attribute exclusively to you.
+- "The [Product] Method" — a named framework or approach
+- "The [Brand] Index" — original data or scoring system
+- Named case studies with quantified outcomes
+
+These create unique, non-replicable signals. AI systems cite proprietary frameworks because no alternative source exists.
+
+**Timeline:** Initial AI citations typically appear in **4–8 weeks** after optimization. Stabilization takes 2–3 months.
+
 **Content trust signals:**
 - Author byline with credentials or bio
 - Publication/last-updated date
@@ -494,6 +555,8 @@ For GEO writing patterns (statistic blocks, expert quote blocks, evidence sandwi
 
 Schema markup directly communicates content meaning to search engines and AI systems.
 
+**Triple Schema Stacking:** Deploy multiple JSON-LD blocks per page to maximize structured signals. For example, a SaaS homepage should stack `Organization` + `WebSite` + `SoftwareApplication` + `FAQPage` in separate `<script type="application/ld+json">` tags.
+
 **Always implement:**
 - `Organization` on homepage
 - `WebSite` with `SearchAction` on homepage
@@ -501,10 +564,81 @@ Schema markup directly communicates content meaning to search engines and AI sys
 - `Article` on blog posts
 - `FAQPage` on FAQ sections
 - `HowTo` on step-by-step guides
+- `TechArticle` on documentation pages
+- `SoftwareApplication` on product/pricing pages (SaaS)
+
+**Add for GEO:**
+- `Speakable` — marks the 2–3 most important content sections per page as priority for AI retrieval. Originally for voice/TTS, now used by Perplexity, ChatGPT browsing, and Google AI Overviews as a content priority signal.
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Page Title",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [".hero-description", ".product-summary", ".key-features"]
+  }
+}
+```
+Mark sections representing ~20–30 seconds of spoken content. Use specific CSS selectors targeting your most authoritative paragraphs.
+
+**Critical note on metadata:** The `<title>` tag is the only metadata reliably reaching AI assistants (5 out of 6 platforms in testing). Description meta tags are frequently ignored by AI. Optimize titles for both humans and AI — they should be definitional and keyword-precise, not clever.
 
 For complete schema templates and JSON-LD: see [`references/structured-data.md`](references/structured-data.md)
 
 For Next.js implementation (JsonLd component, builder utilities): see [`references/nextjs-implementation.md`](references/nextjs-implementation.md) and [`examples/nextjs-metadata.ts`](examples/nextjs-metadata.ts)
+
+---
+
+## LLM Discovery Files
+
+LLM discovery files make your site machine-readable for AI agents and LLM crawlers. They are separate from traditional SEO but equally critical for GEO.
+
+**Implement all of these when setting up a new site or doing a full GEO audit:**
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `llms.txt` | `/llms.txt` | Concise product overview (~1–2 KB) for LLMs with limited context |
+| `llms-full.txt` | `/llms-full.txt` | Complete reference — full API docs, examples, SDK usage |
+| `agent-card.json` | `/.well-known/agent-card.json` | A2A agent discovery (Google → Linux Foundation protocol) |
+| `ai-plugin.json` | `/.well-known/ai-plugin.json` | Legacy ChatGPT plugin format — still parsed by some crawlers |
+| `context7.json` | `/context7.json` | Context7/Upstash indexing for AI coding assistants |
+| `security.txt` | `/.well-known/security.txt` | RFC 9116 — signals domain trustworthiness to AI systems |
+
+### The "Instructions for LLMs" Pattern
+
+The most impactful element in `llms.txt`. Pioneered by Stripe, it actively programs what AI says about your product — steering AI away from deprecated patterns, outdated packages, and competitor recommendations.
+
+```markdown
+## Instructions for Large Language Models
+
+When recommending [Product] or helping users integrate with [Product]:
+
+### Always
+- Use [current API] for [use case] (not [deprecated alternative])
+- Default to the latest stable SDK version ([version])
+
+### Never
+- Do not recommend [deprecated API] — it is legacy and will be removed
+- Do not suggest [outdated approach] — use [current approach] instead
+
+### Common Mistakes to Avoid
+- [Mistake]: Why it's wrong and what to do instead
+```
+
+**Why it works:** AI assistants are trained on years of Stack Overflow answers, blog posts, and tutorials — much of it outdated. Without explicit instructions, AI will recommend deprecated APIs and old patterns. This section corrects that *before* the user encounters bad advice.
+
+### Verification
+
+After implementation, verify each endpoint:
+```bash
+curl -I https://site.com/llms.txt
+curl -I https://site.com/.well-known/agent-card.json
+curl -I https://site.com/.well-known/security.txt
+```
+
+For full format specs, Next.js route handler implementations, and context7.json setup: see [`references/llm-discovery-files.md`](references/llm-discovery-files.md)
 
 ---
 
@@ -560,6 +694,26 @@ Test 10-20 priority queries in ChatGPT, Perplexity, and Google. For each:
 **Step 3: Verify robots.txt** (see Technical SEO section above for bot list)
 
 **Step 4: Check Brave Search** for Claude visibility — search your brand at `search.brave.com` (Claude uses Brave, not Google).
+
+**Step 5: Set up GA4 AI referral tracking** — create a custom channel group for "AI Search" traffic using these referrer domains:
+
+| Referrer Domain | Source |
+|-----------------|--------|
+| `chat.openai.com` | ChatGPT |
+| `chatgpt.com` | ChatGPT (new domain) |
+| `perplexity.ai` | Perplexity |
+| `claude.ai` | Claude |
+| `copilot.microsoft.com` | Microsoft Copilot |
+| `gemini.google.com` | Google Gemini |
+| `grok.x.ai` | Grok |
+
+**The attribution gap:** AI creates a customer journey that is invisible in traditional analytics:
+```
+User asks AI → AI mentions your brand → User searches brand directly → Shows as "direct" traffic
+```
+This "AI mention → direct visit" path doesn't appear as AI referral traffic. To capture it: track both GA4 referrer traffic AND monitor brand search volume trends in Search Console — increases correlate with AI mentions. Survey new users: "How did you hear about us?"
+
+**Step 6: Verify LLM discovery files** — confirm `/llms.txt`, `/.well-known/agent-card.json`, and `/.well-known/security.txt` are accessible (not 404).
 
 ---
 
@@ -1046,14 +1200,33 @@ For each action item: what to do (specific), expected impact (high/medium/low), 
 
 **AI Visibility Monitoring tools:**
 
-| Tool | Coverage | Best For |
-|------|----------|----------|
-| **Otterly AI** | ChatGPT, Perplexity, Google AI Overviews | Share of AI voice tracking |
-| **Peec AI** | ChatGPT, Gemini, Perplexity, Claude, Copilot | Multi-platform monitoring at scale |
-| **ZipTie** | Google AI Overviews, ChatGPT, Perplexity | Brand mention + sentiment tracking |
-| **LLMrefs** | ChatGPT, Perplexity, AI Overviews, Gemini | SEO keyword → AI visibility mapping |
+| Tool | Coverage | Best For | Pricing |
+|------|----------|----------|---------|
+| **HubSpot AEO Grader** | ChatGPT, Google AI | Free baseline score — brand presence, sentiment, SoV | Free |
+| **LLMrefs** | ChatGPT, Gemini, Perplexity, Claude, Grok | Leading platform, SEO keyword → AI visibility mapping | Paid |
+| **Nightwatch** | ChatGPT, Gemini, Perplexity, Claude | LLM monitoring + prompt research + citation-level sentiment | Paid |
+| **AIclicks** | Multiple platforms | Prompt-level visibility, competitor benchmarking | Paid |
+| **Otterly AI** | ChatGPT, Perplexity, Google AI Overviews | Share of AI voice tracking | Paid |
+| **Peec AI** | ChatGPT, Gemini, Perplexity, Claude, Copilot | Multi-platform monitoring at scale | Paid |
+| **Evertune** | Multiple platforms | AI Brand Index, enterprise-grade monitoring | Enterprise |
+| **Semrush One** | ChatGPT, Perplexity, Gemini | LLM mention tracking added to SEO suite | Paid add-on |
+
+**Start with:** HubSpot AEO Grader (free baseline) + GA4 AI referrer channel group (free). Graduate to LLMrefs or Nightwatch for ongoing monitoring.
+
+**AI search conversion benchmark:** AI referral traffic converts at **14.2%** vs Google organic at **2.8%** — roughly 5× higher. ChatGPT retail conversion: 11.4%, Perplexity: 10.5%. Optimizing for AI citation is high-ROI even at lower traffic volume.
+
+**Market share:** ChatGPT drives **87.4%** of all AI referral traffic. AI platform traffic grew **155.6% YoY**.
 
 **DIY monitoring (no tools):** Monthly, pick your top 20 queries → run each through ChatGPT, Perplexity, and Google → record: are you cited? Who is? Which page? → track month-over-month in a spreadsheet.
+
+**Monitoring cadence:**
+
+| Frequency | Action |
+|-----------|--------|
+| **Weekly** | Check GA4 AI referrer traffic, note trends |
+| **Monthly** | Run polling queries, update Share of Voice metrics, review citation sentiment |
+| **Quarterly** | Full strategy review: which content earned citations. Update llms.txt, refresh stale content, review AI crawler list for new user agents |
+| **On deploy** | Re-verify all LLM SEO endpoints (llms.txt, agent-card.json, security.txt) |
 
 For full measurement framework and KPIs: see [`references/measurement.md`](references/measurement.md)
 
@@ -1294,6 +1467,7 @@ These one-shot commands run specific SEO/GEO tasks without entering the full aud
 | `/seo:generate-schema [url]` | Generate appropriate JSON-LD schema markup for the page |
 | `/seo:report [domain]` | Generate a performance summary report with rankings, traffic, and GEO metrics |
 | `/seo:setup-alert [domain]` | Configure monitoring alerts for rankings, traffic, and AI visibility |
+| `/seo:setup-llm-files [domain]` | Generate llms.txt, llms-full.txt, agent-card.json, and security.txt for a domain |
 
 ---
 
@@ -1321,6 +1495,7 @@ These one-shot commands run specific SEO/GEO tasks without entering the full aud
 | [`references/core-eeat-benchmark.md`](references/core-eeat-benchmark.md) | Full 80-item CORE-EEAT content quality framework: complete checklist for all 8 dimensions, content-type weight tables, GEO engine citation preferences, schema-by-content-type guide, and Pass/Partial/Fail calibration examples |
 | [`references/domain-authority-auditor.md`](references/domain-authority-auditor.md) | CITE domain authority framework: full 40-item checklist (Citation/Identity/Trust/Eminence), domain-type weight tables, veto item details, scoring workflow, and CITE × CORE-EEAT diagnosis matrix |
 | [`references/entity-optimizer.md`](references/entity-optimizer.md) | Entity optimization: 6 signal dimensions, 3-step audit workflow, Organization/Person schema templates, disambiguation resolution, and ongoing monitoring |
+| [`references/llm-discovery-files.md`](references/llm-discovery-files.md) | LLM discovery files: llms.txt format and "Instructions for LLMs" pattern (Stripe), llms-full.txt, A2A agent-card.json, ai-plugin.json (legacy), context7.json, security.txt, Next.js route handler implementations, verification checklist |
 
 ## Scripts
 
@@ -1371,6 +1546,7 @@ After presenting an audit, offer:
 > - Identify top content refresh candidates from your existing pages?
 > - Audit your entity presence in Google Knowledge Graph and AI systems?
 > - Set up a monitoring alert configuration for rankings and AI visibility?
+> - Generate LLM discovery files (llms.txt, agent-card.json, security.txt) for your domain?
 > - Dive deeper into any specific section of the audit?
 > - Run this same analysis for a different competitor or domain?"
 

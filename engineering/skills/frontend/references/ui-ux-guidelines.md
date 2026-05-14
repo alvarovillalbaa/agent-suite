@@ -16,6 +16,7 @@ Apply this alongside `ui-constraints.md` (Tailwind/React hard rules) and `design
 - Improving perceived quality, clarity, or usability of interfaces
 - Adding sound or audio feedback to UI interactions
 - Implementing prefetching strategies to reduce perceived navigation latency
+- Ordering navigation items, grouping content, handling complexity budgets, or designing completion and success states (Laws of UX)
 
 **Recommended when:**
 - UI looks unprofessional but the reason is unclear
@@ -44,6 +45,7 @@ Use this table to prioritize which category to address first. Columns: key check
 | 10 | Charts & Data | LOW | Legends, tooltips, accessible colors | Relying on color alone, no keyboard access, blank error states |
 | 11 | Audio Feedback | MEDIUM | Visual equivalent, user toggle, prefers-reduced-motion, subtle volume | Sound on typing/hover, no disable option, harsh error tones |
 | 12 | Predictive Prefetching | MEDIUM | Trajectory > hover, intent-based, hitSlop, touch fallback | Prefetching all visible links, mouse-only strategy |
+| 13 | Laws of UX | HIGH | Named psychological principles for ordering, grouping, complexity, and completion | Violating familiar patterns, exposing system complexity, no success states |
 
 ---
 
@@ -406,3 +408,29 @@ const { elementRef } = useForesight({
 
 <Link ref={elementRef} href="/dashboard">Dashboard</Link>
 ```
+
+---
+
+## 13. Laws of UX (HIGH)
+
+Named psychological principles for interface design. Use when ordering elements, grouping content, handling complexity, or designing completion states. Source: [lawsofux.com](https://lawsofux.com).
+
+- **fitts-target-size** — Interactive targets should be at minimum 32px; larger is better. Hit area can exceed visual size via invisible padding or pseudo-elements.
+- **hicks-minimize-choices** — Minimize the number of choices to reduce decision time. Every extra option slows the user down logarithmically (Hick's Law).
+- **millers-chunking** — Working memory holds ~7 items. Chunk large datasets into groups of 5–9 for scannability (e.g., `4532 0151 1283 0366` not `4532015112830366`).
+- **doherty-under-400ms** — System must respond within 400ms to maintain user flow. Over 400ms feels like the system is thinking; over 1s requires a progress indicator.
+- **doherty-perceived-speed** — Fake speed with skeletons, optimistic UI, and progress indicators when actual speed cannot be improved.
+- **postels-accept-messy-input** — Accept messy human input (any date format, extra spaces, mixed case) and normalize it internally. Validate generously, output strictly.
+- **progressive-disclosure** — Show what matters now; reveal complexity later. Do not front-load every option, setting, or edge case.
+- **jakobs-familiar-patterns** — Users spend most time on other sites. Match familiar patterns (top nav, breadcrumbs, search in the header) so no learning cost is introduced.
+- **aesthetic-usability** — Visual polish increases perceived usability and trust. Small details — consistent spacing, considered shadows, smooth type — compound into confidence.
+- **von-restorff-emphasis** — When multiple similar elements exist, the one that differs is remembered. Use it intentionally: make destructive actions visually distinct from neutral ones.
+- **serial-position** — Users best remember the first and last items in a sequence. Place the most important navigation items and actions at the edges, not buried in the middle.
+- **peak-end-finish-strong** — People judge an experience by its peak moment and its end. Invest in success and completion states — they shape how the whole flow is remembered.
+- **teslers-complexity** — Every system has irreducible complexity. Move it to the system, not the user: a date picker absorbs ISO format complexity so the user types naturally.
+- **goal-gradient-progress** — People accelerate as they near a goal. Show progress visually (progress bar, step counter, completion %) to drive engagement toward completion.
+- **zeigarnik-incomplete** — People remember incomplete tasks better than completed ones. Show incomplete profile progress, setup checklists, or onboarding steps to drive follow-through.
+- **pragnanz-simplify** — Users interpret visuals as the simplest form possible. Reduce noise: remove redundant borders, mixed shadows, and competing colors so hierarchy reads clearly.
+- **pareto-prioritize** — 80% of users use 20% of features. Design and polish the critical 20% first; do not spread quality evenly across rarely-used features.
+- **cognitive-load-reduce** — Remove anything that does not help the user complete their task. Decoration, redundant labels, unnecessary confirmations, and extra options all add load.
+- **uniform-connectedness** — Elements that are visually connected (line, shared color, enclosing frame) are perceived as related. Use connectors for step sequences, timelines, and grouped actions.

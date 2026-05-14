@@ -31,12 +31,22 @@ Visual is the default, not the exception. Even text-heavy explainers should beco
 
 Before writing HTML, commit to a direction instead of drifting into a generic "dark page with blue cards" default.
 
-Decide these four things up front:
+Make **two independent decisions** up front — layout and style are separate axes:
+
+**Axis 1 — Layout** (the information structure):
+Choose from the layout library below. This determines how information flows and relates. Pick the one that matches the content shape, not the one you used last time.
+
+**Axis 2 — Style** (the visual aesthetic):
+Choose from `references/visual-directions.md`. This is independent of layout. The same bento grid can be Blueprint or Craft Handmade.
+
+Then answer:
 
 1. Who is reading: engineer, PM, exec, founder, client, or mixed audience.
-2. What kind of structure dominates: architecture, flow, comparison, audit, timeline, dashboard, or prose-first explainer.
-3. Which rendering approach best fits the content.
-4. Which visual direction will make the page feel intentional instead of auto-generated.
+2. Which layout fits the content's natural shape — flow, comparison, hierarchy, cycle, or mosaic?
+3. Which style will make the page feel intentional instead of auto-generated?
+4. Does the source material need to be reproduced verbatim, or is synthesis appropriate?
+
+**Before generating**, state your chosen Layout × Style combination in one line and confirm it fits. Do not draft HTML before this decision is locked.
 
 Read `references/rendering-strategy.md` and `references/visual-directions.md` before building complex artifacts. Re-read them when the output mode changes instead of relying on memory.
 
@@ -67,6 +77,37 @@ Gather only the inputs that materially change the artifact:
   - Browser page, report, shareable handoff, or slide-mode.
 
 If key context is missing, ask 2 to 4 targeted questions. Do not run a long survey.
+
+## Layout Library
+
+These are the available structural patterns. Match the layout to the shape of the content, not to a generic default.
+
+### Core Layouts (output-mode level)
+
+| Layout | Best for |
+|---|---|
+| `explainer` | concept walkthrough, architecture overview, mental model |
+| `review` | diff, plan review, fact check, requirement coverage |
+| `comparison` | tool evals, before/after, option tradeoffs |
+| `dashboard` | KPI snapshot, funnel, health check |
+| `timeline` | incident recap, release narrative, milestone plan |
+| `slide-mode` | team readout, investor walk-through |
+
+### Extended Layouts (use these to avoid the same flat card default)
+
+| Layout | Shape | Best for |
+|---|---|---|
+| `bento-grid` | Asymmetric mosaic of varied-size tiles | Multi-topic overviews, feature summaries — **default for overviews** |
+| `hub-spoke` | Central concept with radiating details | Single core idea with supporting context, product architecture |
+| `iceberg` | Top surface vs. hidden depth | What users see vs. what's underneath, risk surface |
+| `bridge` | Problem on left, solution on right | Pitch decks, proposal pages, before/after |
+| `jigsaw` | Interconnected pieces that form a whole | Systems where every part depends on the others |
+| `periodic-table` | Grid of named, categorized cells | Feature catalogs, API surface, team directory, taxonomy |
+| `circular-flow` | Continuous cycle with labeled stages | Feedback loops, recurring processes, product lifecycle |
+| `winding-roadmap` | Journey with milestone waypoints | Product roadmaps, growth stages, learning paths |
+| `dense-modules` | High-density tightly packed information blocks | Reference guides, cheatsheets, full capability maps |
+
+When in doubt, start with `bento-grid` for overviews and `bridge` for proposals. Use `dense-modules` only when the content is truly reference-grade.
 
 ## Output Modes
 
@@ -216,6 +257,8 @@ Every output should:
 - Use typography, palette, and spacing that feel chosen, not defaulted.
 - Vary visual weight across sections so the key takeaway dominates the first viewport.
 
+**Data fidelity:** Reproduce source material faithfully. Do not summarize, rephrase, or omit data unless the user explicitly asks for synthesis. Design aesthetics are secondary to accuracy. When in doubt, preserve the original wording and numbers.
+
 ## Image Asset Strategy
 
 When the visual artifact needs imagery, use a deliberate source plan instead of dropping in arbitrary placeholders.
@@ -252,15 +295,15 @@ For comparisons and audits:
 
 ## Workflow
 
-1. Decide the output mode.
-2. Choose the audience and information density.
-3. Choose the rendering strategy.
-4. Choose the visual direction.
+1. Analyze the source material — identify its natural shape (flow, comparison, hierarchy, cycle, mosaic).
+2. Choose audience and information density.
+3. **Propose Layout × Style** — state the chosen layout from the Layout Library and the chosen visual direction from `references/visual-directions.md` in one line before generating. Confirm this fits before proceeding.
+4. Choose the rendering strategy from `references/rendering-strategy.md`.
 5. Decide the image source plan when the artifact needs imagery.
 6. Draft the information architecture before styling.
 7. Start from the closest template and then customize aggressively.
 8. Generate the self-contained HTML artifact.
-9. Verify that the page is readable, scannable, and accurate.
+9. Verify that the page is readable, scannable, and accurate — run the Slop Test.
 10. Write the file to a predictable location and report the path.
 
 ## Reusable Resources

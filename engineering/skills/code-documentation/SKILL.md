@@ -6,7 +6,7 @@ version: 2.0.0
 
 # Code Documentation
 
-Last updated: 2026-04-25
+Last updated: 2026-05-13
 
 Write documentation that stays close to the code, stays coherent over time, and gives humans and agents one clear place to look.
 
@@ -17,10 +17,11 @@ This skill owns the documentation contract, not only doc generation. Use it to:
 - use docs as reference and historical record
 - detect conflicting live-vs-historical documentation
 - move, merge, or remove misplaced docs so the repo has one clear source of truth
+- autonomously research a project and generate a complete documentation website
 
 ## Core model
 
-Documentation in this repo falls into six surfaces:
+Documentation in this repo falls into seven surfaces:
 
 1. **Inline docs** — docstrings, JSDoc/TSDoc, comments, types
 2. **In-folder docs** — `README.md`, `ARCHITECTURE.md`, `TESTS.md`, and related files that explain one folder
@@ -28,8 +29,9 @@ Documentation in this repo falls into six surfaces:
 4. **Timestamped history** — logs, lessons, items, fixes, audits, raw material, implementation plans
 5. **Living source-of-truth docs** — specs, references, cookbook, knowledge, runbooks, research, official docs, context, source registries, generated libraries
 6. **Domain-specific AFS paths** — `<domain>/<folder>/` only when the repo genuinely needs domain-specific surfaces such as `health/` or `investing/`
+7. **Documentation websites** — Nextra or equivalent sites for projects with external users; generated via the `/docs-site` command after a full project research phase
 
-Default rule: put the doc in the narrowest place that future readers will naturally check first.
+Default rule: put the doc in the narrowest place that future readers will naturally check first. Use surface 7 only when the project has external users or when in-repo Markdown is insufficient.
 
 ## Quick routing
 
@@ -257,6 +259,63 @@ Good documentation lets the next engineer or agent answer all of these quickly:
 
 Prefer short, high-signal docs over exhaustive prose. If a doc becomes dense, split the durable parts into the right living doc and keep only the historical context in timestamped artifacts.
 
+## Documentation website workflow
+
+Use the `/docs-site` command to trigger this workflow. Work through all five phases in sequence.
+
+### Phase 1 — Project research
+
+Before writing anything, build a complete mental model of the project.
+
+Use `references/project-research.md` for the full protocol. Summary:
+
+1. Read all existing docs and the package manifest.
+2. Map the full directory tree.
+3. Read entry points to understand the public surface.
+4. Read at least 10 representative source files.
+5. Read tests and examples — they reveal intent better than source.
+6. Build a **feature inventory**: every user-facing capability, one line each.
+7. Identify the project philosophy and non-obvious design decisions.
+
+Do not write documentation until the feature inventory is complete.
+
+### Phase 2 — Structure design
+
+Group by user intent, not by code structure:
+
+- **Getting Started** — install, quick start, first result
+- **Concepts** — mental models and philosophy (at least two concept articles)
+- **Guides** — task-oriented how-tos
+- **Reference** — exhaustive API/CLI/config reference
+- **Examples** (optional)
+- **Changelog** (optional)
+
+Every item in the feature inventory must appear in at least one page.
+
+### Phase 3 — Content writing
+
+Quality bar:
+- Every code example must be runnable.
+- Concept articles explain *why*, not *how*.
+- Getting started must produce a working result in under 5 minutes.
+- Reference pages must be exhaustive.
+
+### Phase 4 — Nextra scaffolding
+
+Use `references/docs-site.md` for the full setup. Key files:
+
+- `docs/package.json`
+- `docs/next.config.js`
+- `docs/theme.config.tsx`
+- `docs/pages/_meta.json` per directory
+- `docs/pages/index.mdx` (landing page)
+
+Verify `npm run build` passes before deploying.
+
+### Phase 5 — Vercel deployment
+
+Use `vercel --prod` from within `docs/`. Configure root directory in Vercel dashboard if needed.
+
 ## Next.js / MDX
 
 For Next.js or MDX-heavy repos, keep using the existing references and templates in this skill:
@@ -279,6 +338,8 @@ Load only what the task needs:
 - `references/writing-standards.md` — tone, structure, anti-patterns
 - `references/nextjs-doc-conventions.md` — MDX conventions
 - `references/nextjs-code-to-docs-mapping.md` — Next.js source-to-doc mapping
+- `references/project-research.md` — systematic codebase research before writing project-level docs
+- `references/docs-site.md` — Nextra scaffolding, page templates, Vercel deployment
 
 ## Templates
 

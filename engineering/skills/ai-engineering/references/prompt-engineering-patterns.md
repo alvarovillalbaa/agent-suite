@@ -1,8 +1,77 @@
 # Prompt Engineering Patterns
 
-Specific prompt techniques with example inputs and expected outputs.
+Specific prompt techniques with examples. Organized by technique family. Prompting families form a toolbox — choose by task type, not by popularity.
 
-## Patterns Index
+## Full Taxonomy by Family
+
+### Zero-Shot Family
+| Technique | When to use |
+|-----------|-------------|
+| **Zero-shot** | Simple, well-defined tasks |
+| **Role / Persona** | Need expertise or specific perspective |
+| **Emotion Prompting** | Increase effort on high-stakes outputs ("This is critical…") |
+| **Style Injection** | Constrain tone/register ("Respond in bullet points, ≤100 words") |
+| **S2A (System-to-Agent)** | Reframe system prompt as agent instructions |
+| **SimToM** | Perspective-taking: "What does X know/believe at this moment?" |
+| **RaR (Rephrase and Respond)** | "Rephrase the question in your own words before answering" |
+| **RE2 (Re-reading)** | "Read the problem twice before answering" — reduces careless errors |
+| **Self-Ask** | "What sub-questions do you need to answer this?" |
+
+### Few-Shot Family
+| Technique | When to use |
+|-----------|-------------|
+| **Few-shot** | Consistent format needed; domain-specific patterns |
+| **Example Generation** | Ask model to generate diverse examples before the task |
+| **Ordering** | Recency matters: most relevant example should be last |
+| **KNN Exemplar Selection** | Retrieve nearest-neighbor examples from a pool |
+| **Vote-K** | Select maximally diverse examples via coverage voting |
+| **Prompt Mining** | Extract implicit templates from task demonstrations |
+
+### Thought Generation Family
+| Technique | When to use |
+|-----------|-------------|
+| **Chain-of-Thought** | "Think step by step" — reasoning, math, multi-step |
+| **Zero-Shot CoT** | Same effect without examples: "Let's think step by step" |
+| **Analogical Prompting** | "Recall a similar problem and apply the same approach" |
+| **Step-Back** | Abstract the question first, then answer the specific |
+| **Thread-of-Thought** | Structured thought thread with numbered steps |
+| **Table CoT** | Intermediate reasoning as a structured table |
+| **Active Prompt** | Select highest-uncertainty examples for CoT annotation |
+| **Auto-CoT** | Auto-generate CoT demonstrations from a question set |
+| **Memory-of-Thought** | Retrieve relevant past reasoning before generating |
+| **Uncertainty-Routed CoT** | Use greedy decode normally; route to CoT only when uncertain |
+
+### Ensembling Family
+| Technique | When to use |
+|-----------|-------------|
+| **Self-Consistency** | High-stakes decisions — run N times, majority-vote |
+| **Universal Self-Consistency** | Select most consistent answer across formats |
+| **Meta-CoT** | Ensemble multiple chains before final answer |
+| **Prompt Paraphrasing** | Same question phrased N ways, aggregate |
+| **MMI Variants** | Minimum Bayes risk decoding; diverse sampling |
+
+### Self-Criticism Family
+| Technique | When to use |
+|-----------|-------------|
+| **Self-Verification** | Model verifies its own answer for logical consistency |
+| **Calibration** | Ask model to express confidence before committing |
+| **Self-Refinement** | "Now improve your answer based on this criterion…" |
+| **Reverse CoT** | Generate question from answer; verify it matches original |
+| **Cumulative Reasoning** | Accumulate and verify partial conclusions before final answer |
+
+### Decomposition Family
+| Technique | When to use |
+|-----------|-------------|
+| **Least-to-Most** | Break into simplest sub-problem first; solve in order |
+| **Plan-and-Solve** | Plan the solution before executing any step |
+| **Program-of-Thought** | Generate code to compute the answer; execute and use result |
+| **Tree of Thoughts** | Explore branching solution paths; prune bad branches |
+| **Skeleton-of-Thought** | Generate outline; fill in sections in parallel |
+| **Recursive Thought** | Recursively decompose each sub-problem until trivial |
+
+---
+
+## Classic Patterns Index (with full examples)
 
 1. [Zero-Shot Prompting](#1-zero-shot-prompting)
 2. [Few-Shot Prompting](#2-few-shot-prompting)
@@ -13,6 +82,10 @@ Specific prompt techniques with example inputs and expected outputs.
 7. [ReAct (Reasoning + Acting)](#7-react-reasoning--acting)
 8. [Tree of Thoughts](#8-tree-of-thoughts)
 9. [Retrieval-Augmented Generation](#9-retrieval-augmented-generation)
+10. [Meta-Prompting](#10-meta-prompting)
+11. [Advanced Compact Reference](#11-advanced-compact-reference)
+
+---
 10. [Meta-Prompting](#10-meta-prompting)
 
 ---
@@ -564,11 +637,130 @@ Return ONLY the JSON array, no additional text.
 |-----------|---------------------|
 | Simple classification | Zero-shot |
 | Consistent formatting needed | Few-shot |
-| Math/logic problems | Chain-of-Thought |
+| Math/logic problems | Chain-of-Thought or Program-of-Thought |
 | Need expertise/perspective | Role Prompting |
 | API integration | Structured Output |
 | High-stakes decisions | Self-Consistency |
 | Tool use required | ReAct |
-| Complex problem solving | Tree of Thoughts |
+| Complex problem solving | Tree of Thoughts or Skeleton-of-Thought |
 | Factual Q&A | RAG |
 | Prompt generation | Meta-Prompting |
+| Reducing careless errors | RE2 / RaR |
+| Perspective-dependent reasoning | SimToM |
+| Model hallucinating on complex tasks | Step-Back + Self-Verification |
+| Long multi-step workflows | Plan-and-Solve + Least-to-Most |
+| Diverse ensemble needed | Prompt Paraphrasing + Universal Self-Consistency |
+| Format/output regression detected | Calibration + Self-Refinement |
+
+---
+
+## 11. Advanced Compact Reference
+
+### Step-Back Prompting
+
+```
+First, answer this more general question:
+{abstract_question}
+
+Now use that to answer the specific question:
+{specific_question}
+```
+
+**When to use:** The model fails on specific questions because it skips relevant principles. Force it to retrieve the principle first.
+
+---
+
+### SimToM (Simulation Theory of Mind)
+
+```
+Consider the following scenario:
+{scenario}
+
+From {character}'s perspective, what do they know at this moment?
+What information do they NOT have access to?
+
+Now answer: {question}
+```
+
+**When to use:** Questions requiring perspective-taking (negotiation, user modeling, theory-of-mind tasks).
+
+---
+
+### RaR / RE2 (Rephrase and Re-read)
+
+```
+[RaR] Rephrase the following question in your own words before answering:
+{question}
+
+[RE2] Read this question twice before answering:
+{question}
+{question}
+```
+
+**When to use:** Careless errors on well-defined problems. Cheap, zero-shot, high reliability gain.
+
+---
+
+### Least-to-Most Decomposition
+
+```
+To solve: {complex_problem}
+
+First, what is the simplest sub-problem I need to solve?
+[solve it]
+
+What is the next sub-problem, given what I now know?
+[solve it]
+
+[repeat until done]
+```
+
+**When to use:** Problems with ordered dependencies. More reliable than asking for the full answer at once.
+
+---
+
+### Self-Verification
+
+```
+Here is my answer to {question}:
+{answer}
+
+Now verify: is each step logically sound? Are any assumptions unjustified?
+List any errors found.
+
+If errors found: provide a corrected answer.
+If no errors: confirm the answer is correct.
+```
+
+**When to use:** After Chain-of-Thought on high-stakes problems.
+
+---
+
+### Memory-of-Thought
+
+```
+Before answering {question}, recall relevant past reasoning or facts you know about this topic.
+
+[recalled knowledge]
+
+Now answer {question} using this context.
+```
+
+**When to use:** Domain-specific questions where recalling prior reasoning improves reliability.
+
+---
+
+### Uncertainty-Routed CoT
+
+```python
+# Pseudo-implementation
+answer_greedy = llm.generate(question, temperature=0)
+if confidence(answer_greedy) > THRESHOLD:
+    return answer_greedy
+else:
+    # Route to CoT
+    answer_cot = llm.generate(COT_PROMPT + question, temperature=0)
+    return answer_cot
+```
+
+**When to use:** Cost-sensitive applications where CoT is only needed for uncertain cases.

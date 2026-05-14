@@ -351,10 +351,10 @@ def score_tests_evals(root: Path, text_files: list[Path]) -> Dimension:
     else:
         dim.gap("No integration/e2e/smoke testing signal detected.", "Add at least one end-to-end proof path for critical agent-facing workflows.")
 
-    if re.search(r"worktree|ephemeral|isolated|docker compose|redis namespace|test database", "\n".join(read_text(path) for path in text_files), re.IGNORECASE):
+    if re.search(r"worktree|ephemeral|isolated|docker compose|redis namespace|test database|agent-worktree-up", "\n".join(read_text(path) for path in text_files), re.IGNORECASE):
         dim.add(2, "Worktree or isolated-environment signal detected.")
     else:
-        dim.gap("No isolated worktree/test environment signal detected.", "Document or script per-worktree app/DB/cache isolation for agent runs.")
+        dim.gap("No isolated worktree/test environment signal detected.", "Script per-worktree app/DB/cache isolation for agent runs (e.g. scripts/agent-worktree-up.sh).")
 
     if re.search(r"test first|red.*green|TDD|fails before implementation", "\n".join(read_text(path) for path in text_files), re.IGNORECASE):
         dim.add(2, "TDD or test-first protocol detected.")
@@ -377,10 +377,13 @@ def score_observability(root: Path, text_files: list[Path]) -> Dimension:
         dim.gap("No common observability signals detected.", "Add or document logging, metrics, traces, and runtime error tracking.")
 
     all_text = "\n".join(read_text(path) for path in text_files)
-    if re.search(r"query_.*logs|query_.*metrics|get_trace|LogQL|PromQL|TraceQL|Sentry", all_text, re.IGNORECASE):
+    if re.search(r"query_system_logs|query_agent_metrics|query_.*logs|query_.*metrics|get_trace|get_trace_summary|LogQL|PromQL|TraceQL|Sentry", all_text, re.IGNORECASE):
         dim.add(3, "Agent-readable log/metric/trace query path detected.")
     else:
-        dim.gap("No agent-readable telemetry query path detected.", "Add tools or runbooks for querying logs, metrics, traces, and Sentry errors.")
+        dim.gap(
+            "No agent-readable telemetry query path detected.",
+            "Add agent-callable tools: query_system_logs(thread_id, error_type), query_agent_metrics(agent_type, signal_type), get_trace_summary(trace_id).",
+        )
 
     if re.search(r"request[_-]?id|trace[_-]?id|span[_-]?id|run[_-]?id|thread[_-]?id", all_text, re.IGNORECASE):
         dim.add(2, "Correlation id conventions detected.")
@@ -439,10 +442,13 @@ def score_memory_quality(root: Path, text_files: list[Path]) -> Dimension:
         dim.gap("No auto-improvement or learning infrastructure detected.")
 
     all_repo_text = all_text.lower()
-    if re.search(r"doc[- ]gardening|garbage collection|architecture drift|stale doc|quality score", all_repo_text):
+    if re.search(r"doc[- ]gardening|garbage collection|garbage.collection.agent|doc.gardening.agent|architecture drift|stale doc|quality score", all_repo_text):
         dim.add(3, "Continuous quality maintenance language detected.")
     else:
-        dim.gap("No doc-gardening or architecture-drift process detected.", "Add scheduled scans that report stale docs, oversized files, and boundary drift.")
+        dim.gap(
+            "No doc-gardening or architecture-drift process detected.",
+            "Add GarbageCollectionAgent (weekly: scans for oversized files, missing tests, stale docs) and DocGardeningAgent (post-merge: checks service docs and daily logs).",
+        )
 
     workflows = list((root / ".github" / "workflows").glob("*.yml")) + list((root / ".github" / "workflows").glob("*.yaml"))
     workflow_text = "\n".join(read_text(path) for path in workflows)
@@ -468,7 +474,7 @@ def score_execution_legibility(root: Path, text_files: list[Path]) -> tuple[Dime
     execution = Dimension("Execution harness", 10)
     all_text = "\n".join(read_text(path) for path in text_files)
     if re.search(r"harness|timeout|stall|token budget|HITL|human[- ]in[- ]the[- ]loop|guardrail|confirmation", all_text, re.IGNORECASE):
-        execution.add(4, "Execution harness, guardrail, or HITL signals detected.")
+        execution.add(3, "Execution harness, guardrail, or HITL signals detected.")
     else:
         execution.gap("No execution harness or guardrail signal detected.", "Document timeouts, escalation points, and confirmation gates for autonomous loops.")
     if re.search(r"hook|pre-tool|post-tool|completion gate|stop hook|pre-commit|pre-push", all_text, re.IGNORECASE):
@@ -476,13 +482,20 @@ def score_execution_legibility(root: Path, text_files: list[Path]) -> tuple[Dime
     else:
         execution.gap("No local hook feedback signal detected.", "Add hooks or pre-commit checks for fast local failures.")
     if re.search(r"reviewer|self-review|agent review|Ralph|builder.*reviewer", all_text, re.IGNORECASE):
-        execution.add(2, "Agent review loop signal detected.")
+        execution.add(1, "Agent review loop signal detected.")
     else:
         execution.gap("No builder/reviewer loop signal detected.", "Separate builder and reviewer contexts for larger changes.")
-    if re.search(r"timeout|budget|max_run|six.hour|long run", all_text, re.IGNORECASE):
+    if re.search(r"timeout|budget|max_run|six.hour|long run|max_run_seconds", all_text, re.IGNORECASE):
         execution.add(2, "Timeout or budget policy signal detected.")
     else:
-        execution.gap("No timeout/budget policy detected.", "Define run budgets and escalation behavior for long-running tasks.")
+        execution.gap("No timeout/budget policy detected.", "Define run budgets and per-agent-type escalation behavior for long-running tasks.")
+    if re.search(r"gen_trace_id|trace_<|trace_[0-9a-f]{32}|TraceIntegrityHook|signal_telemetry|HarnessSignal", all_text, re.IGNORECASE):
+        execution.add(2, "Trace integrity or signal telemetry signal detected.")
+    else:
+        execution.gap(
+            "No trace integrity or harness signal telemetry detected.",
+            "Use SDK utilities (gen_trace_id) for trace IDs, never raw UUIDs. Emit structured metrics when harness signals fire.",
+        )
 
     legibility = Dimension("Agent legibility", 10)
     if re.search(r"schema|pydantic|zod|types?|interface|serializer|DTO", all_text, re.IGNORECASE):

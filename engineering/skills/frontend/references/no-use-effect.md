@@ -15,6 +15,8 @@ export function useMountEffect(effect: () => void | (() => void)) {
 }
 ```
 
+**Placement:** Define `useMountEffect` once in a shared global hooks module (e.g., `src/hooks/useMountEffect.ts`), not inline in each component. All components import from the shared module. This makes it a single seam for the lint exception and prevents duplicate definitions from drifting out of sync.
+
 Use `useMountEffect` only when you are genuinely synchronizing with an external system (DOM, third-party widget, browser API subscription). It makes the intent explicit and prevents ad-hoc `useEffect` usage. Any other use of `useEffect` is a signal to apply one of the five patterns below.
 
 ---
@@ -200,6 +202,28 @@ function VideoPlayerWrapper({ videoId }) {
 
 ---
 
+## Forcing Function for Component Tree Design
+
+Banning direct `useEffect` works as a forcing function for cleaner tree structure:
+
+- **Parents own orchestration and lifecycle boundaries.** They decide when a child should mount, unmount, or receive fresh props.
+- **Children can assume their preconditions are already met.** They don't need internal guards for "is this ready yet?" — the parent handles that via conditional rendering or key-based remounting.
+- **Each component does one job; coordination happens at clear boundaries.** This is Unix philosophy applied to components: composable units with explicit contracts, not hidden synchronization logic.
+
+When you reach for `useEffect` to coordinate between parent and child, that is a signal to lift the lifecycle boundary up to the parent.
+
+## Choose Your Bug
+
+No codebase ships zero bugs. The question is which failure mode you can tolerate.
+
+| `useMountEffect` failures | Direct `useEffect` failures |
+|--------------------------|---------------------------|
+| Binary and loud — it ran once, or it didn't | Gradual and silent — flaky behavior, performance issues, loops before a hard failure |
+| Easy to reproduce — fixed inputs, fixed timing | Hard to reproduce — timing-dependent, dependency-array-dependent |
+| Immediately visible in dev | Often only visible under production load or after a refactor |
+
+Prefer the failure mode that is loud over the one that degrades silently. A component that crashes on mount is easier to fix than one that loops subtly for three days before causing a production incident.
+
 ## Why this matters for agentic code
 
 - **Dependency arrays hide coupling.** A seemingly unrelated refactor can quietly change effect behavior.
@@ -210,7 +234,48 @@ function VideoPlayerWrapper({ videoId }) {
 
 ## Enforcement
 
-Add `no-restricted-syntax` (ESLint) to block direct `useEffect` calls in components. Allow it only inside `useMountEffect`. Reference this rule in `AGENTS.md` / `CLAUDE.md` so agents respect it from context.
+### Lint gate (prevents new violations)
+
+Add `no-restricted-syntax` (ESLint) to block direct `useEffect` calls in components. Allow it only inside `useMountEffect`:
+
+```json
+{
+  "rules": {
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "CallExpression[callee.name='useEffect']",
+        "message": "Direct useEffect is banned. Use useMountEffect for external sync, or one of the five replacement patterns. See no-use-effect.md."
+      }
+    ]
+  }
+}
+```
+
+Wire this rule to CI so violations cannot merge. The lint gate prevents new debt from forming after the codebase is clean.
+
+### Agent guidance surface (prevents agent-introduced violations)
+
+Reference this rule in `AGENTS.md` / `CLAUDE.md` so agents do not add `useEffect` during autonomous code generation:
+
+```markdown
+## React Rules
+- Never call `useEffect` directly. Use `useMountEffect` for external sync.
+- For data fetching, use the project's query library (React Query / SWR).
+- For event-driven side effects, use event handlers directly.
+- See `engineering/skills/frontend/references/no-use-effect.md` for the five replacement patterns.
+```
+
+### Mass-fix existing violations (eliminates accumulated debt)
+
+Once the lint gate is wired and the playbook is defined, use a cloud-agent cadence to clear existing violations:
+
+1. Run the linter to generate the full violation list: `eslint --rule '{"no-restricted-syntax": "error"}' src/ --format json > violations.json`
+2. Dispatch one parallel agent session per file, each applying the correct replacement pattern from the five rules above.
+3. Review PRs for pattern correctness — agents occasionally misclassify a case (e.g., treating a data-fetch effect as an external-sync case). Require a human pass for any component that touches auth, payments, or data integrity.
+4. Once all PRs land, the lint gate blocks regressions automatically.
+
+The full fix often lands in one weekend of parallel agent sessions. After it ships, the lint gate plus the `AGENTS.md` guidance hold the line going forward. See [tech-debt-cloud-agents.md](../agentic-development/references/tech-debt-cloud-agents.md) for the general pattern.
 
 ## Reference
 

@@ -41,6 +41,8 @@ These rules are about production correctness and reviewability, not taste:
 6. Brand choices must come from the project, the user, or an explicit fallback assumption. Never silently invent a generic visual system.
 7. Verify the output before presenting it. Use Studio, still renders, or short renders to catch layout, timing, caption, and asset issues yourself first.
 8. Persist the approved plan in a durable artifact near the implementation: a markdown brief, scene manifest, or JSON timeline spec. Do not force future revisions to reconstruct the intent from code alone.
+9. Never invent product UI labels, feature names, or agent names. Screenshot the real product and mirror copy exactly. Invented UI is immediately visible to anyone who knows the product.
+10. Default to burned-in captions for all social exports. 85% or more of social views are muted — captions are part of the composition model, not a post-production option.
 
 ## Anti-Slop Guardrails
 
@@ -52,6 +54,7 @@ Do not silently ship any of these defaults:
 4. Generic dark-glass cards floating over a blurred background.
 5. Continuous glowing or pulsing effects that do not communicate state.
 6. Three or more consecutive scenes with the same centered composition pattern.
+7. Invented timing numbers for text animations — use the named patterns in `references/rules/text-animations.md` with their exact pacing specs instead.
 
 If the visual system would still look interchangeable after swapping the logo, it is under-designed.
 
@@ -60,16 +63,19 @@ If the visual system would still look interchangeable after swapping the logo, i
 Use this workflow unless the task is a trivial patch:
 
 1. Frame the task with [references/overview.md](references/overview.md).
-2. Gather required inputs with [references/data-sources.md](references/data-sources.md).
+2. Gather required inputs with [references/data-sources.md](references/data-sources.md). Collect the brief, brand tokens, screen recordings, and optional voice calibration materials before writing any code.
 3. Ask the minimum targeted questions needed to resolve format, duration, audience, CTA, assets, and visual direction.
 4. Choose the implementation path with [references/composition-patterns.md](references/composition-patterns.md).
 5. Choose the image source plan with [references/image-sourcing.md](references/image-sourcing.md).
 6. Use [templates/video-plan.md](templates/video-plan.md) to lock the strategy, scenes, assets, timing, validation gates, and persistence artifact before code.
-7. Wait for plan approval before starting major implementation.
-8. Read only the relevant rule files from `references/rules/` and use [templates/video-code.md](templates/video-code.md) as the implementation scaffold.
-9. Run preview, still, or render checks from [references/rendering.md](references/rendering.md).
-10. Self-evaluate the output before presenting it.
-11. Cross-check the output against [references/checklist.md](references/checklist.md) before finishing.
+7. Write a storyboard table — beat, time range, visuals, and text overlay — for every scene before writing Remotion code. Include it in the plan artifact.
+8. Wait for plan approval before starting major implementation.
+9. Read only the relevant rule files from `references/rules/` and use [templates/video-code.md](templates/video-code.md) as the implementation scaffold.
+10. Run preview, still, or render checks from [references/rendering.md](references/rendering.md). Test individual frames before full renders.
+11. Self-evaluate the output before presenting it. Inspect the first 3 seconds, last 3 seconds, and every scene boundary.
+12. For launch videos, run multi-agent review with [references/multi-agent-review.md](references/multi-agent-review.md) before handoff.
+13. Cross-check the output against [references/checklist.md](references/checklist.md) before finishing.
+14. Render platform variants when the output is intended for social distribution. See [references/platform-specs.md](references/platform-specs.md).
 
 ## Choose The Right Operating Mode
 
@@ -186,11 +192,15 @@ Use this loop for substantial video work:
    Ask only the questions the material does not answer: runtime, platform, aspect ratio, CTA, brand direction, narration, captions, missing assets, or revision target.
 3. Propose strategy:
    Describe the scene structure, timing model, transition style, caption approach, and validation plan in plain English. Wait for confirmation.
-4. Implement:
+4. Storyboard:
+   Write a shot-list table with beat, time range, visuals, and text overlay before touching Remotion code.
+5. Implement:
    Build the plan using the smallest architecture that fits: scene-first, manifest-driven, or JSON timeline.
-5. Self-evaluate:
-   Preview or render the output yourself and inspect the risky frames: opening, closing, scene boundaries, dense caption moments, and any layout-heavy animation.
-6. Persist:
+6. Self-evaluate:
+   Preview or render the output yourself and inspect the risky frames: opening, closing, scene boundaries, dense caption moments, and any layout-heavy animation. Verify the first 3 seconds specifically — hook must land before the viewer can swipe.
+7. Multi-agent review:
+   For launch videos, deploy four parallel critics — design/layout, text/readability, narrative/pacing, and brand alignment — before final handoff. See [references/multi-agent-review.md](references/multi-agent-review.md).
+8. Persist:
    Keep the approved plan in a durable artifact so the next revision starts from intent instead of reverse-engineering the code.
 
 ## Output Contract
@@ -198,6 +208,7 @@ Use this loop for substantial video work:
 When using this skill, the output should usually include:
 
 - a brief scene plan before large implementations
+- a storyboard table (beat, time, visuals, text overlay) before Remotion code
 - a plain-English strategy summary before code when the change is non-trivial
 - explicit composition metadata and frame counts
 - the chosen operating mode
@@ -208,6 +219,7 @@ When using this skill, the output should usually include:
 - the artifact where the approved plan now lives
 - clear assumptions for any missing assets, brand direction, or timing inputs
 - whether scene composition variety was intentionally maintained or intentionally standardized
+- platform render variants and social copy when the video targets social distribution
 
 ## Rule Index
 
@@ -240,7 +252,7 @@ Read individual rule files for detailed explanations and code examples:
 - [references/rules/silence-detection.md](references/rules/silence-detection.md) - Adaptive silence detection for audio and video
 - [references/rules/subtitles.md](references/rules/subtitles.md) - Router for caption and subtitle workflows
 - [references/rules/tailwind.md](references/rules/tailwind.md) - Tailwind usage in Remotion
-- [references/rules/text-animations.md](references/rules/text-animations.md) - Text animation patterns
+- [references/rules/text-animations.md](references/rules/text-animations.md) - 20-pattern named text animation catalog with exact pacing, easing curves, stagger specs, and Remotion translation rules. Always read this before writing any text reveal, headline animation, or word-level transition.
 - [references/rules/timing.md](references/rules/timing.md) - Interpolation, easing, and spring timing
 - [references/rules/transcribe-captions.md](references/rules/transcribe-captions.md) - Caption transcription
 - [references/rules/transparent-videos.md](references/rules/transparent-videos.md) - Transparent video export settings
@@ -249,6 +261,8 @@ Read individual rule files for detailed explanations and code examples:
 - [references/rules/videos.md](references/rules/videos.md) - Video embedding, looping, trimming, and playback controls
 - [references/rules/voiceover.md](references/rules/voiceover.md) - Scene voiceover generation and duration-driven timing
 - [references/rules/ffmpeg.md](references/rules/ffmpeg.md) - FFmpeg and FFprobe usage from Remotion projects
+- [references/multi-agent-review.md](references/multi-agent-review.md) - 4-critic parallel review pattern for launch videos
+- [references/platform-specs.md](references/platform-specs.md) - Platform aspect ratios, duration limits, render defaults, and GIF export
 
 ## Local Extras
 
@@ -256,5 +270,7 @@ Read individual rule files for detailed explanations and code examples:
 - Use [references/composition-patterns.md](references/composition-patterns.md) to choose between scene-first, manifest-driven, and JSON-render architectures.
 - Use [references/image-sourcing.md](references/image-sourcing.md) for when to reuse, host, generate, or code imagery.
 - Use [references/rendering.md](references/rendering.md) for project setup, Studio preview, single-frame checks, and final render commands.
+- Use [references/multi-agent-review.md](references/multi-agent-review.md) for the 4-critic parallel review pattern on launch videos.
+- Use [references/platform-specs.md](references/platform-specs.md) for platform-specific aspect ratios, resolutions, and duration limits.
 - Use `examples/` for marketing-oriented prompts and deliverables.
 - Keep the rule files authoritative when there is a conflict between a template and a rule.

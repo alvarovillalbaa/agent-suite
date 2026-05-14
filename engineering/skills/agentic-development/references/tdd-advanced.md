@@ -2,6 +2,45 @@
 
 Extends the TDD foundations in `specs-plans-tests.md` with spec-first workflows, property-based and mutation testing, language-specific patterns, test quality principles, and rules for autonomous test generation.
 
+## The Iron Law
+
+```
+NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
+```
+
+Write code before the test? Delete it and start over. Do not keep it as "reference," do not "adapt" it while writing tests. Delete means delete. Implement fresh from tests.
+
+### Red-Green-Refactor (non-negotiable)
+
+1. **RED** — write one minimal failing test that describes the behavior. Run it. Confirm it fails for the expected reason (missing feature, not typo). If it passes immediately, you are testing existing behavior — fix the test.
+2. **GREEN** — write the simplest code that makes the test pass. No extra features. No "nice to haves." Minimal.
+3. **REFACTOR** — clean up only after green. Remove duplication, improve names. Keep tests green throughout.
+
+**Verify both RED and GREEN by running the test suite.** Never skip the RED check — if you did not watch the test fail, you do not know whether it actually tests the right behavior.
+
+### Common Rationalizations — All Invalid
+
+| Excuse | Reality |
+|--------|---------|
+| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
+| "I'll test after" | Tests passing immediately prove nothing |
+| "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
+| "Already manually tested" | Ad-hoc ≠ systematic. No record, can't re-run. |
+| "Deleting X hours is wasteful" | Sunk cost. Keeping unverified code is technical debt. |
+| "Keep as reference, write tests first" | You'll adapt it. That is testing after. Delete means delete. |
+| "Need to explore first" | Fine. Throw away the exploration, then start TDD. |
+| "TDD will slow me down" | TDD is faster than debugging production. |
+
+### Red Flags — Stop and Start Over
+
+- Code was written before the test
+- Test passed immediately on first run (never saw it fail)
+- You cannot explain what the failure message would have said
+- Tests were added "later" or "after verifying it works"
+- Any form of "I'll write tests after this one" rationalization
+
+All of these mean: delete the code, start over with TDD.
+
 ---
 
 ## Spec-First Workflow

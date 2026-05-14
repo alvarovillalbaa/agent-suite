@@ -30,6 +30,21 @@ The goal is not just to store notes. The goal is to make the knowledge base comp
 
 Treat this as an incrementally maintained LLM wiki, not an upload-and-forget document workflow. Do not default to rereading the same raw sources from scratch for every question when a maintained canonical wiki can carry the synthesis forward. Query-time retrieval can still help, but the main asset is the wiki that compounds across ingests.
 
+## The compound loop
+
+For work sessions that involve planning, execution, or research, use this six-phase cycle. Each cycle makes the next one faster by returning structured knowledge to the base:
+
+1. **Brainstorm** — accept raw input (notes, transcripts, problem statements); auto-search the knowledge base for relevant prior context before elaborating
+2. **Plan** — structure the brainstorm into an actionable plan using conclusion-first (Pyramid Principle) format; launch parallel research agents to surface past work, knowledge base insights, and stale knowledge that may affect the plan
+3. **Confidence** — assess what the system knows versus assumes versus does not know; produce a readiness level (high / medium / low) and specific gap-closing actions before proceeding
+4. **Review** — run two parallel critics: one for strategic alignment (goal clarity, falsifiable hypotheses) and one for data accuracy (sourcing, baselines, freshness)
+5. **Work** — execute the plan in dependency order; log progress back to the plan file; route decisions and insights into the knowledge base immediately
+6. **Compound** — extract 1–3 durable learnings from the session, check for contradictions, save with YAML frontmatter, update indexes
+
+See [references/compound_loop.md](./references/compound_loop.md) for the full workflow including research agents, review agents, and the YAML schema.
+
+This loop is not required for every session. Use it when a session involves real decision-making, planning, or research that should inform future cycles. Skip it for simple lookups or minor ingest passes.
+
 Another useful mental model from larger personal-brain systems is:
 
 - the interface can change, but the knowledge contract should stay stable
@@ -75,6 +90,9 @@ Rules:
 - Saving a conversation, work session, or meeting back into the knowledge base as linked updates instead of a single dump note.
 - Restoring continuity at the start of a session by loading identity, current state, recent logs, and only the minimum deep context needed.
 - Producing answers, reports, briefings, or research outputs grounded in the knowledge base.
+- Running a full compound loop — brainstorm → plan → confidence → review → work → compound — to make each cycle accelerate the next.
+- Assessing readiness before committing to a plan: knowing vs. assuming vs. missing.
+- Extracting 1–3 durable learnings from a session and saving them in searchable YAML-fronted knowledge files.
 - Producing markdown deliverables, slide decks, plots, or other rendered artifacts from the knowledge base instead of only returning terminal text.
 - Exporting a portable snapshot or graph view of the knowledge base for other tools, agents, or review workflows.
 - Turning idea fragments into scoped projects, plans, or operating procedures when the user wants execution structure, not just storage.
@@ -482,8 +500,37 @@ Use that reference to interpret requests such as:
 - export a portable snapshot or generate a graph, canvas, or atlas view
 - challenge this idea, connect two domains, or graduate an idea into a project
 - run a health audit, lint pass, or scheduled maintenance workflow
+- assess confidence before committing to a plan (know vs. assume vs. missing)
+- execute a plan with dependency tracking and execution logging
+- extract learnings and compound them back into the knowledge base
 
 Treat these as storage-agnostic modes, not slash-command requirements. If the user already has commands, scripts, or buttons for them, map the mode onto those entry points.
+
+For work sessions that span all phases — brainstorm through execution and compound — load [references/compound_loop.md](./references/compound_loop.md).
+
+Available commands in this plugin:
+
+- `/ingest` — fetch any source (Twitter/xurl, YouTube, LinkedIn, web URL, PDF, or local file), save to `raw/`, and optionally compile into canonical knowledge immediately.
+- `/compile-raw` — process all unprocessed files in `raw/` in one pass, handling mixed source types automatically.
+- `/learning-sync` — capture durable engineering lessons and update repo-local learning artifacts.
+
+## Multi-source ingestion
+
+For source-specific fetch, parse, and normalize instructions, read [references/ingest_sources.md](./references/ingest_sources.md).
+
+That reference covers all supported source types with concrete CLI commands:
+
+- **Twitter / X** — fetch tweets, threads, and profile timelines via the `xurl` CLI. Use the 6-step research loop (Decompose → Search → Follow Threads → Deep-Dive → Synthesize → Save) for multi-angle topic research.
+- **LinkedIn** — personal data export or page capture via `defuddle` or `agent-browser`.
+- **Web URLs** — clean article extraction via `defuddle`, `curl`+`pandoc`, or `agent-browser` for dynamic pages. Supports batch ingestion from a URL list file.
+- **YouTube** — transcript extraction via `yt-dlp --skip-download --write-auto-sub`. No download required. Supports single videos and full playlists.
+- **Research papers and PDFs** — text extraction via `pdftotext` (poppler), `mutool`, or Python `pdfplumber`. Metadata via `pdfinfo`.
+- **Images and screenshots** — OCR via `tesseract` when text content matters; otherwise inspect visually during compilation.
+- **Plain markdown and text files** — direct absorb with frontmatter normalization.
+
+All collected material is saved to `raw/YYYY-MM-DD_<source-type>_<slug>.md` with a standard frontmatter block before any compilation step.
+
+For the raw/ compilation agent loop and type-detection heuristics when processing a mixed queue of file types, see `references/ingest_sources.md#raw-folder-compilation-agent-loop`.
 
 ## Optional automated source collection
 

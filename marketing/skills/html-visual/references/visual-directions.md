@@ -42,6 +42,63 @@ Prefer the constrained directions first. They create stronger defaults and reduc
 - Good type pairings: `IBM Plex Mono + IBM Plex Sans`, `JetBrains Mono + Azeret Mono`
 - Good accents: phosphor green, amber, muted cyan
 
+## Craft Handmade
+
+- Off-white or warm cream canvas with subtle paper texture via CSS noise or SVG filter
+- Slightly imperfect borders (`border-radius` varies, transforms slightly rotated)
+- Warm ink tones: umber, terracotta, deep olive, soft charcoal
+- Handwriting or semi-serif type accents alongside body sans
+- Best for educational explainers, cultural content, storytelling pages
+- Good type pairings: `Caveat + Lato`, `Patrick Hand + Source Sans`
+- Good accents: terracotta, warm umber, sage, worn gold
+
+## Retro Swiss Grid
+
+- Strong grid backbone with visible column lines or thick rule dividers
+- Limited palette: 2–3 colors maximum, often one saturated + neutral + black
+- Condensed or extended grotesque headline type
+- Heavy use of large numerals, bold labels, rule-based section breaks
+- Best for comparative analyses, rankings, capability maps, editorial reports
+- Good type pairings: `Bebas Neue + IBM Plex Sans`, `Barlow Condensed + DM Sans`
+- Good accents: signal red + black + off-white; yellow + black + grey
+
+## IKEA Manual
+
+- White or near-white background, minimal decoration
+- Black line illustrations preferred; simple shape-based icons
+- Numbered steps, consistent icon grid
+- No color except for one directional accent (often a warm yellow or sky blue)
+- Best for how-to guides, onboarding flows, process explainers
+- Good type pairings: `Noto Sans + Fira Sans`, `Inter + Geist Mono`
+- Good accents: muted yellow, sky blue
+
+## Knolling / Flat-Lay
+
+- White background with carefully spaced objects arranged on a strict grid
+- Each element separated by equal spacing — almost clinical organization
+- Minimal shadow (subtle drop shadow only), no decoration
+- Best for feature catalogs, component inventories, periodic-table style layouts
+- Good type pairings: `Outfit + IBM Plex Mono`, `Syne + DM Sans`
+- Good accents: cool neutral greys + one signal accent (electric blue or lime)
+
+## Morandi Journal
+
+- Warm muted palette — dusty rose, greyish sage, faded lilac, warm beige
+- Soft doodle or sketch accents as section dividers
+- Generous whitespace, light rounded corners, low contrast hierarchy
+- Best for qualitative recaps, retrospectives, culture pages, mood boards
+- Good type pairings: `Cormorant Garamond + Nunito`, `Libre Baskerville + Quicksand`
+- Good accents: dusty rose, sage, faded mauve — never saturated
+
+## Chalkboard
+
+- Deep charcoal or blackboard-green background
+- White or chalk-yellow text with soft blur effect on borders
+- Hand-drawn style icons and labels
+- Best for educational content, math/logic explainers, brainstorm artifacts
+- Good type pairings: `Chalk Duster + Source Code Pro`, `Kalam + Fira Code` (via Google Fonts CDN)
+- Good accents: chalk white, warm yellow, soft cyan
+
 ## Flexible Directions
 
 ## Product Brief

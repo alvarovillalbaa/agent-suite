@@ -28,6 +28,19 @@ This skill owns server-side implementation depth. Use it together with [`../agen
 - When debugging, start from existing signals and evidence before adding new logging.
 - Keep server responsibilities on the server; do not push backend behavior into the frontend because it is expedient.
 
+### Layer Ownership
+
+Business logic lives in **services**, not in controllers, views, or models. Follow this routing:
+
+| Layer | Owns |
+|-------|------|
+| **Controllers / Views** | Request parsing, auth check, delegating to a service, serializing the response. No business logic. |
+| **Serializers / Validators** | Input shape validation and output shape mapping. Route the result to a service for processing — serializers do not compute. |
+| **Services** | The business logic: computations, orchestration, side effects, third-party calls, conditional branching. Keep services small and single-purpose. |
+| **Models** | Persistence shape, relationships, and simple data invariants. Keep models clean — no business logic, no external service calls. |
+
+A smell that logic is in the wrong layer: a controller or serializer that branches on business state, or a model that calls an external API.
+
 ## Workflow Router
 
 ### Delivery workflow

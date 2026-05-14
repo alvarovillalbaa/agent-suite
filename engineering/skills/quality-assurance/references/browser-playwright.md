@@ -101,3 +101,17 @@ See `examples/` for runnable reference scripts:
 - `element_discovery.py` — discover buttons, links, and inputs on a page
 - `static_html_automation.py` — interact with local HTML via `file://` URLs
 - `console_logging.py` — capture browser console output during automation
+
+## Full Observability Mode
+
+When you need to capture **everything** the browser does — not just drive it — use the browser trace helper instead:
+
+```bash
+python <skill-dir>/scripts/browser_trace.py --url <URL> --output /tmp/my-trace
+```
+
+This dumps network requests, DOM snapshots, screenshots, and console logs into a searchable filesystem (`network/requests.jsonl`, `dom/*.html`, `console/errors.log`, etc.) so you can `grep` through the full session afterward.
+
+Use cases: flaky test diagnosis (diff two runs), reverse engineering undocumented APIs, autoresearch loops, pre-QA reconnaissance.
+
+See [references/browser-trace.md](./browser-trace.md) for the full reference and the `BrowserTrace.attach(page)` inline API.

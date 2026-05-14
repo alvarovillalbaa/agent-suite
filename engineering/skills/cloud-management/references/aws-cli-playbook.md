@@ -6,6 +6,8 @@
 - Command habits
 - Discovery and inventory
 - Deploy and provision
+- Serverless operations
+- Amplify operations
 - Automatic deployments
 - Troubleshooting
 - Optimization
@@ -130,6 +132,80 @@ aws cloudformation describe-stack-events --stack-name my-stack --profile my-dev
 - Secrets Manager or Parameter Store before task definition updates
 - Route53 and ACM only behind approval when public ingress changes
 
+## Serverless Operations
+
+For full serverless workflows, load [aws-serverless-guide.md](./aws-serverless-guide.md). Quick-reference CLI commands:
+
+```bash
+# Lambda: list and inspect
+aws lambda list-functions --profile my-dev
+aws lambda get-function-configuration --function-name my-function --profile my-dev
+aws lambda get-function --function-name my-function --profile my-dev
+
+# Lambda: deploy a new code package
+aws lambda update-function-code \
+  --function-name my-function \
+  --image-uri <account>.dkr.ecr.<region>.amazonaws.com/my-function:sha-123 \
+  --profile my-dev
+aws lambda wait function-updated --function-name my-function --profile my-dev
+
+# Lambda: tail logs
+aws logs tail /aws/lambda/my-function --follow --profile my-dev
+
+# API Gateway v2 (HTTP / WebSocket)
+aws apigatewayv2 get-apis --profile my-dev
+aws apigatewayv2 get-routes --api-id <id> --profile my-dev
+aws apigatewayv2 get-integrations --api-id <id> --profile my-dev
+
+# Step Functions
+aws stepfunctions list-state-machines --profile my-dev
+aws stepfunctions start-execution \
+  --state-machine-arn arn:aws:states:<region>:<account>:stateMachine:<name> \
+  --input '{}' \
+  --profile my-dev
+aws stepfunctions describe-execution --execution-arn <arn> --profile my-dev
+
+# EventBridge Scheduler
+aws scheduler list-schedules --profile my-dev
+aws scheduler get-schedule --name my-job --profile my-dev
+
+# SAM
+sam build
+sam deploy --guided
+sam local invoke MyFunction --event events/event.json
+```
+
+## Amplify Operations
+
+For full Amplify workflows, load [aws-amplify-guide.md](./aws-amplify-guide.md). Quick-reference commands:
+
+```bash
+# Status and environment
+amplify status
+amplify env list
+amplify env get --name dev
+
+# Inspect underlying CloudFormation stacks
+aws cloudformation list-stacks --profile my-dev \
+  --query "StackSummaries[?starts_with(StackName, 'amplify-')].[StackName,StackStatus]" \
+  --output table
+
+# Deploy backend changes
+amplify push --yes
+
+# Deploy backend + publish frontend via Amplify Hosting
+amplify publish
+
+# Gen 2 sandbox (ephemeral personal environment)
+npx ampx sandbox
+npx ampx sandbox delete
+
+# Amplify Hosting: list apps and branches
+aws amplify list-apps --profile my-dev
+aws amplify list-branches --app-id <app-id> --profile my-dev
+aws amplify get-branch --app-id <app-id> --branch-name main --profile my-dev
+```
+
 ## Automatic Deployments
 
 Preferred pattern:
@@ -195,12 +271,34 @@ Common failure classes:
 
 ## Multi-Runtime Backend Mapping
 
+### Managed Container Path (default for most backends)
+
 - `web`: ECS Fargate service behind ALB
 - `worker`: ECS Fargate service without public ingress
 - `socket`: ECS Fargate service with websocket-friendly ingress
-- `db`: RDS PostgreSQL
+- `db`: RDS PostgreSQL or Aurora Cluster
 - `cache`: ElastiCache Redis or Valkey
 - `files`: S3
 - `secrets`: Secrets Manager
-- `scheduler`: EventBridge
+- `scheduler`: EventBridge Scheduler
 - `admin`: keep Flower, dashboards, or internal control-plane surfaces private unless the user explicitly wants public access
+
+### Serverless Path (event-driven or low-ops APIs)
+
+- `api`: API Gateway HTTP API + Lambda
+- `websocket`: API Gateway WebSocket API + Lambda + DynamoDB (connection store)
+- `worker`: SQS + Lambda (event source mapping)
+- `workflow`: Step Functions
+- `scheduler`: EventBridge Scheduler → Lambda
+- `db`: DynamoDB (key-value / document) or RDS via RDS Proxy (relational)
+- `distributed-db`: Aurora DSQL (serverless distributed SQL, multi-region)
+- `files`: S3
+- `secrets`: Secrets Manager (referenced by ARN in Lambda env, not plaintext)
+
+### Amplify Full-Stack Path (frontend-first teams)
+
+- `auth`: Amplify Auth → Cognito User Pool
+- `api`: Amplify Data → AppSync + DynamoDB
+- `files`: Amplify Storage → S3
+- `functions`: Amplify Function → Lambda
+- `hosting`: Amplify Hosting (CI/CD + CDN)

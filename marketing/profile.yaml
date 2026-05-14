@@ -19,6 +19,8 @@ commands:
   - social-pack
   - linkedin-engage
   - x-engage
+  - x-post
+  - x-launch
   - slides
   - video
 agents:
